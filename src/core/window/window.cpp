@@ -30,6 +30,8 @@ void Core::Window::SwapBuffer() {
   glfwSwapBuffers(window);
 }
 
+GLFWwindow *Core::Window::GetWindow() { return window; }
+
 void Core::Window::initGLFW() {
   if (!glfwInit()) {
     throw std::runtime_error("failed to initiate glfw");
@@ -46,6 +48,7 @@ void Core::Window::createWindow() {
   if (window == nullptr) {
     throw std::runtime_error("failed to create glfw window");
   }
+  glfwMakeContextCurrent(window);
 }
 
 void Core::Window::Cleanup() {

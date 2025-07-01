@@ -13,3 +13,5 @@ void Core::Renderer::Init() {
   glViewport(0, 0, Window::GetWidth() * 2, Window::GetHeight() * 2);
 #endif
 }
+
+void Core::Renderer::Cleanup() {}

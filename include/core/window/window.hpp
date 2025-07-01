@@ -13,6 +13,7 @@ class Window {
   static void PollEvent();
   static void SwapBuffer();
   static void Cleanup();
+  static GLFWwindow *GetWindow();
   static int GetWidth();
   static int GetHeight();
 

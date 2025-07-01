@@ -13,6 +13,10 @@ add_executable(${PROJECT_NAME}
 	# Renderer
 	core/renderer/renderer.cpp
 
+	# Input
+	core/input/mouse.cpp
+	core/input/input.cpp
+
 	# stbi image
 	# vendor/stbi_image/stbi_image.cpp
 
