@@ -1,12 +1,5 @@
-#include "GLFW/glfw3.h"
-#define GLFW_INCLUDE_NONE
-#include <iostream>
-
+#include "core/app.hpp"
 int main() {
-  std::cout << "Hello, World" << std::endl;
-  if (!glfwInit()) {
-    std::cout << "failed to initialize";
-  }
-
-  glfwTerminate();
+  Core::App app;
+  app.Run();
 }

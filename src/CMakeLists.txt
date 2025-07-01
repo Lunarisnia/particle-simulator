@@ -5,6 +5,10 @@
 # Add the source files
 add_executable(${PROJECT_NAME} 
 	main.cpp 
+	core/app.cpp
+
+	# Window
+	core/window/window.cpp
 
 	# stbi image
 	# vendor/stbi_image/stbi_image.cpp
