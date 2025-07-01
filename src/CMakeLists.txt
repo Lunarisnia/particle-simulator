@@ -17,6 +17,9 @@ add_executable(${PROJECT_NAME}
 	core/input/mouse.cpp
 	core/input/input.cpp
 
+	# Shader
+	core/shader/shader.cpp
+
 	# stbi image
 	# vendor/stbi_image/stbi_image.cpp
 

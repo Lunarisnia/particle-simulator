@@ -25,6 +25,6 @@ add_subdirectory(src)
 # Neat trick to copy all assets to build directory
 # https://stackoverflow.com/questions/42476765/copying-assets-directory-from-source-to-build-directory-in-cmake
 # file(COPY assets DESTINATION ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
-# file(COPY shaders DESTINATION ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
+file(COPY shaders DESTINATION ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
 # file(COPY assets DESTINATION ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
 
