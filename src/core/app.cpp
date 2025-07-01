@@ -14,7 +14,10 @@ void Core::App::Run() {
     Window::PollEvent();
     Input::PollMouse();
 
+    Renderer::Render();
+
     Window::SwapBuffer();
+    Renderer::Clear();
   }
 }
 
