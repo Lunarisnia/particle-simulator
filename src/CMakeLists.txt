@@ -20,6 +20,12 @@ add_executable(${PROJECT_NAME}
 	# Shader
 	core/shader/shader.cpp
 
+	# Material
+	core/material/material.cpp
+
+	# Components
+	core/components/mesh.cpp
+
 	# stbi image
 	# vendor/stbi_image/stbi_image.cpp
 
