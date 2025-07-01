@@ -10,6 +10,9 @@ add_executable(${PROJECT_NAME}
 	# Window
 	core/window/window.cpp
 
+	# Renderer
+	core/renderer/renderer.cpp
+
 	# stbi image
 	# vendor/stbi_image/stbi_image.cpp
 

@@ -2,14 +2,35 @@
 #include <stdexcept>
 #include "GLFW/glfw3.h"
 
+int Core::Window::width = 800;
+int Core::Window::height = 600;
 GLFWwindow *Core::Window::window;
 
 void Core::Window::Init() {
-  init();
+  initGLFW();
   createWindow();
 }
 
-void Core::Window::init() {
+int Core::Window::GetHeight() { return height; }
+int Core::Window::GetWidth() { return width; }
+
+bool Core::Window::ShouldClose() {
+  if (window == nullptr) {
+    throw std::runtime_error("window is invalid");
+  }
+  return glfwWindowShouldClose(window);
+}
+
+void Core::Window::PollEvent() { glfwPollEvents(); }
+
+void Core::Window::SwapBuffer() {
+  if (window == nullptr) {
+    throw std::runtime_error("window is invalid");
+  }
+  glfwSwapBuffers(window);
+}
+
+void Core::Window::initGLFW() {
   if (!glfwInit()) {
     throw std::runtime_error("failed to initiate glfw");
   }
@@ -20,10 +41,16 @@ void Core::Window::init() {
 }
 
 void Core::Window::createWindow() {
-  window = glfwCreateWindow(800, 600, "Particle Renderer", nullptr, nullptr);
+  window =
+      glfwCreateWindow(width, height, "Particle Renderer", nullptr, nullptr);
   if (window == nullptr) {
     throw std::runtime_error("failed to create glfw window");
   }
 }
 
-void Core::Window::Cleanup() { glfwTerminate(); }
+void Core::Window::Cleanup() {
+  if (window != nullptr) {
+    glfwDestroyWindow(window);
+  }
+  glfwTerminate();
+}
