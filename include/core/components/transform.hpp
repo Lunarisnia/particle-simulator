@@ -5,5 +5,8 @@ namespace Core {
 class Transform : public Component {
  public:
   glm::vec3 position;
+
+ public:
+  void Update() override;
 };
 }  // namespace Core

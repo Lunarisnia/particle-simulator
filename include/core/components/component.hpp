@@ -3,6 +3,7 @@
 namespace Core {
 class Component {
  public:
+  virtual void Update();
   template <class Type, typename... Args>
   static std::shared_ptr<Type> Create(Args... args);
 };

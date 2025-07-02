@@ -7,6 +7,8 @@ Core::Mesh::Mesh() {}
 
 Core::Mesh::Mesh(std::shared_ptr<Material> material) : material(material) {}
 
+void Core::Mesh::Update() {}
+
 void Core::Mesh::SetupMesh() {
   glGenVertexArrays(1, &VAO);
   glGenBuffers(1, &VBO);

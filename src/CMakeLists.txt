@@ -30,7 +30,10 @@ add_executable(${PROJECT_NAME}
 	core/material/material.cpp
 
 	# Components
+	core/components/component.cpp
 	core/components/mesh.cpp
+	core/components/transform.cpp
+
 
 	# stbi image
 	# vendor/stbi_image/stbi_image.cpp

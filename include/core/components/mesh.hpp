@@ -13,6 +13,7 @@ class Mesh : public Component {
   std::vector<int> indice;
 
  public:
+  void Update() override;
   void SetupMesh();
 
   void AddVertex(VertexData vertex);
