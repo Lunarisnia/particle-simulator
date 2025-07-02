@@ -3,6 +3,8 @@
 #include "glad/glad.h"
 #include <memory>
 
+Core::Mesh::Mesh() {}
+
 Core::Mesh::Mesh(std::shared_ptr<Material> material) : material(material) {}
 
 void Core::Mesh::SetupMesh() {

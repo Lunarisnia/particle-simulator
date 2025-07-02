@@ -19,6 +19,7 @@ class Mesh : public Component {
   void AddIndex(int index);
 
  public:
+  Mesh();
   Mesh(std::shared_ptr<Material> material);
 };
 };  // namespace Core

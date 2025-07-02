@@ -20,6 +20,12 @@ add_executable(${PROJECT_NAME}
 	# Shader
 	core/shader/shader.cpp
 
+	# Object
+	core/object/object.cpp
+
+	# World
+	core/world/world.cpp
+
 	# Material
 	core/material/material.cpp
 
