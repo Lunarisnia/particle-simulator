@@ -1,6 +1,7 @@
 #include "core/app.hpp"
 #include "core/input/input.hpp"
 #include "core/renderer/renderer.hpp"
+#include "core/static_camera/static_camera.hpp"
 #include "core/window/window.hpp"
 #include "core/world/world.hpp"
 
@@ -9,6 +10,7 @@ void Core::App::Init() {
   Renderer::Init();
   Input::Init();
   World::Init();
+  StaticCamera::Init();
 }
 
 void Core::App::Run() {
@@ -29,4 +31,5 @@ Core::App::~App() {
   Renderer::Cleanup();
   Input::Cleanup();
   World::Cleanup();
+  StaticCamera::Cleanup();
 }

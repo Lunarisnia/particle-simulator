@@ -29,6 +29,7 @@ template <class Type, typename... Args>
 std::shared_ptr<Type> Object::AddComponent(Args... args) {
   std::shared_ptr<Type> component = Component::Create<Type>(args...);
 
+  component->owner = this;
   components.emplace_back(component);
 
   return component;

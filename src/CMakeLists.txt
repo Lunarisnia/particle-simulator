@@ -28,6 +28,9 @@ add_executable(${PROJECT_NAME}
 
 	# Material
 	core/material/material.cpp
+	
+	# Static Camera
+	core/static_camera/static_camera.cpp
 
 	# Components
 	core/components/component.cpp

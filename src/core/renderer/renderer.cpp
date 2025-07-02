@@ -6,6 +6,7 @@
 #include "core/components/mesh.hpp"
 #include "core/object/object.hpp"
 #include "core/shader/shader.hpp"
+#include "core/static_camera/static_camera.hpp"
 #include "core/window/window.hpp"
 
 unsigned int Core::Renderer::shaderProgram = 0;
@@ -36,7 +37,11 @@ void Core::Renderer::Render() {
     Object *owner = mesh->GetOwner();
 
     mesh->material->Use();
+    mesh->material->SetMat4("model", owner->transform->GetTransformMatrix());
+    mesh->material->SetMat4("view", StaticCamera::GetViewMatrix());
+    mesh->material->SetMat4("projection", StaticCamera::GetProjectionMatrix());
     mesh->BindVertexArray();
+
     glDrawElements(GL_TRIANGLES, mesh->GetIndiceLength(), GL_UNSIGNED_INT, 0);
   }
 }
