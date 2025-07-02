@@ -23,13 +23,19 @@ void Core::Mesh::SetupMesh() {
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * indice.size(),
                indice.data(), GL_STATIC_DRAW);
 
-  glVertexAttribPointer(0, sizeof(VertexData), GL_FLOAT, GL_FALSE,
-                        sizeof(VertexData), (void *)0);
+  glVertexAttribPointer(0, sizeof(VertexData) / sizeof(float), GL_FLOAT,
+                        GL_FALSE, sizeof(VertexData), (void *)0);
   glEnableVertexAttribArray(0);
 }
+
+void Core::Mesh::BindVertexArray() { glBindVertexArray(VAO); }
 
 void Core::Mesh::AddVertex(Core::VertexData vertex) {
   vertice.emplace_back(vertex);
 }
 
 void Core::Mesh::AddIndex(int index) { indice.emplace_back(index); }
+
+int Core::Mesh::GetIndiceLength() { return indice.size(); }
+
+Core::ComponentType Core::Mesh::GetType() { return ComponentType::MESH; }

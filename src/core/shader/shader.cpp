@@ -1,7 +1,7 @@
 #include "core/shader/shader.hpp"
 #include "glad/glad.h"
+#include "glm/gtc/type_ptr.hpp"
 #include <fstream>
-#include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -37,6 +37,12 @@ Core::Shader::Shader(const std::string &vertexPath,
 }
 
 void Core::Shader::Use() { glUseProgram(id); }
+
+void Core::Shader::SetMat4(const std::string &uniform, glm::mat4 mat4) {
+  Use();
+  int uniformId = glGetUniformLocation(id, uniform.c_str());
+  glUniformMatrix4fv(uniformId, 1, GL_FALSE, glm::value_ptr(mat4));
+}
 
 unsigned int Core::Shader::createShader(const char *source, int shaderType) {
   unsigned int shader = glCreateShader(shaderType);

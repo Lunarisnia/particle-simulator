@@ -18,6 +18,9 @@ class Object {
   template <class Type, typename... Args>
   std::shared_ptr<Type> AddComponent(Args... args);
 
+  template <class Type>
+  std::shared_ptr<Type> GetComponent();
+
  public:
   Object();
 };
@@ -29,5 +32,20 @@ std::shared_ptr<Type> Object::AddComponent(Args... args) {
   components.emplace_back(component);
 
   return component;
+}
+
+template <class Type>
+std::shared_ptr<Type> Object::GetComponent() {
+  if constexpr (!std::is_base_of<Component, Type>::value) {
+    return nullptr;
+  }
+
+  std::shared_ptr<Type> temp = Component::Create<Type>();
+  for (std::shared_ptr<Component> &comp : components) {
+    if (temp->GetType() == comp->GetType()) {
+      return std::dynamic_pointer_cast<Type>(comp);
+    }
+  }
+  return nullptr;
 }
 };  // namespace Core

@@ -8,16 +8,19 @@ namespace Core {
 class Mesh : public Component {
  private:
   unsigned int VAO, VBO, EBO;
-  std::shared_ptr<Material> material;
   std::vector<VertexData> vertice;
   std::vector<int> indice;
 
  public:
+  std::shared_ptr<Material> material;
   void Update() override;
+  ComponentType GetType() override;
   void SetupMesh();
 
+  void BindVertexArray();
   void AddVertex(VertexData vertex);
   void AddIndex(int index);
+  int GetIndiceLength();
 
  public:
   Mesh();

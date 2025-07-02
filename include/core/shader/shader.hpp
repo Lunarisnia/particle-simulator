@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "glm/ext/matrix_float4x4.hpp"
 namespace Core {
 class Shader {
  private:
@@ -11,6 +12,7 @@ class Shader {
 
  public:
   void Use();
+  void SetMat4(const std::string &uniform, glm::mat4 mat4);
 
  public:
   Shader();
