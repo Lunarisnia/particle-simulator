@@ -1,11 +1,10 @@
 #include <exception>
 #include <iostream>
-#include "core/app.hpp"
+#include "particle/app.hpp"
 
 int main() {
   try {
-    Core::App app;
-    app.Init();
+    Particle::App app;
     app.Run();
   } catch (const std::exception &error) {
     std::cout << error.what() << std::endl;

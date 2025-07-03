@@ -37,6 +37,9 @@ add_executable(${PROJECT_NAME}
 	core/components/mesh.cpp
 	core/components/transform.cpp
 
+	# Particle
+	particle/app.cpp
+	particle/simulation/simulation.cpp
 
 	# stbi image
 	# vendor/stbi_image/stbi_image.cpp
