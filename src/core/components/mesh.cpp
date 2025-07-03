@@ -1,6 +1,7 @@
 #include "core/components/mesh.hpp"
 #include "core/vertex/vertex.hpp"
 #include "glad/glad.h"
+#include "glm/ext/vector_float3.hpp"
 #include <memory>
 
 Core::Mesh::Mesh() {}
@@ -23,9 +24,12 @@ void Core::Mesh::SetupMesh() {
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * indice.size(),
                indice.data(), GL_STATIC_DRAW);
 
-  glVertexAttribPointer(0, sizeof(VertexData) / sizeof(float), GL_FLOAT,
-                        GL_FALSE, sizeof(VertexData), (void *)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData),
+                        (void *)0);
   glEnableVertexAttribArray(0);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData),
+                        (void *)(sizeof(glm::vec3)));
+  glEnableVertexAttribArray(1);
 }
 
 void Core::Mesh::BindVertexArray() { glBindVertexArray(VAO); }
