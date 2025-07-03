@@ -2,12 +2,8 @@
 #include <memory>
 #include "core/object/object.hpp"
 namespace Particle {
-class Simulation {
+class Primitive {
  public:
-  static std::shared_ptr<Core::Object> cube;
-
- public:
-  static void Init();
-  static void Update();
+  static std::shared_ptr<Core::Object> CreatePlane();
 };
 }  // namespace Particle

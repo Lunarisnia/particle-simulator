@@ -2,6 +2,7 @@
 #include "core/input/input.hpp"
 #include "core/renderer/renderer.hpp"
 #include "core/static_camera/static_camera.hpp"
+#include "core/time/time.hpp"
 #include "core/window/window.hpp"
 #include "core/world/world.hpp"
 
@@ -15,6 +16,7 @@ void Core::App::Init() {
 
 void Core::App::Run() {
   while (!Window::ShouldClose()) {
+    Time::Tick();
     Window::PollEvent();
     Input::PollMouse();
     World::Tick();

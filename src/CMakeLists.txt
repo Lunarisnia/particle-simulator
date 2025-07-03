@@ -31,6 +31,9 @@ add_executable(${PROJECT_NAME}
 	
 	# Static Camera
 	core/static_camera/static_camera.cpp
+	
+	# Time
+	core/time/time.cpp
 
 	# Components
 	core/components/component.cpp
@@ -40,6 +43,7 @@ add_executable(${PROJECT_NAME}
 	# Particle
 	particle/app.cpp
 	particle/simulation/simulation.cpp
+	particle/primitive/primitive.cpp
 
 	# stbi image
 	# vendor/stbi_image/stbi_image.cpp

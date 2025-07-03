@@ -3,6 +3,7 @@
 #include "core/app.hpp"
 #include "core/input/input.hpp"
 #include "core/renderer/renderer.hpp"
+#include "core/time/time.hpp"
 #include "core/window/window.hpp"
 #include "core/world/world.hpp"
 #include "particle/simulation/simulation.hpp"
@@ -19,6 +20,7 @@ Particle::App::App() {
 void Particle::App::Run() {
   try {
     while (!Core::Window::ShouldClose()) {
+      Core::Time::Tick();
       Core::Window::PollEvent();
       Core::Input::PollMouse();
       Simulation::Update();
