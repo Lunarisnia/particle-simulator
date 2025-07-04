@@ -35,10 +35,14 @@ add_executable(${PROJECT_NAME}
 	# Time
 	core/time/time.cpp
 
+	# Physics
+	core/physics/physics_world.cpp
+
 	# Components
 	core/components/component.cpp
 	core/components/mesh.cpp
 	core/components/transform.cpp
+	core/components/rigidbody2d.cpp
 
 	# Particle
 	particle/app.cpp

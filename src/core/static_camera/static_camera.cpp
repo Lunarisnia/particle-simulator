@@ -1,4 +1,5 @@
 #include "core/static_camera/static_camera.hpp"
+#include <iostream>
 #include <memory>
 #include "core/components/transform.hpp"
 #include "core/window/window.hpp"
@@ -16,7 +17,8 @@ glm::mat4 Core::StaticCamera::GetViewMatrix() {
   glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
   glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f);
 
-  glm::mat4 view = glm::lookAt(front, transform->position, up);
+  glm::mat4 view =
+      glm::lookAt(transform->position, transform->position + front, up);
 
   return view;
 }

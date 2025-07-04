@@ -7,6 +7,7 @@ void Core::Transform::Update() {}
 glm::mat4 Core::Transform::GetTransformMatrix() {
   glm::mat4 model(1.0f);
   model = glm::translate(model, position);
+  model = glm::scale(model, scale);
 
   return model;
 }

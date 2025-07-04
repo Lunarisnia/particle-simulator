@@ -1,4 +1,5 @@
 #pragma once
+#include <exception>
 #include <memory>
 namespace Core {
 
@@ -7,6 +8,7 @@ class Object;
 enum ComponentType {
   TRANSFORM,
   MESH,
+  RIGIDBODY_2D,
 };
 
 class Component {
