@@ -27,8 +27,8 @@ glm::vec3 Core::Mouse::ToWorldPosition() {
                 (yPos / (float)Window::GetHeight()) * 2.0f - 1.0f);
   ndcMouseCoord.y = -ndcMouseCoord.y;
 
-  glm::mat4 inv = glm::inverse(Core::StaticCamera::GetProjectionMatrix() *
-                               Core::StaticCamera::GetViewMatrix());
+  glm::mat4 inv = glm::inverse(Core::StaticCamera::GetViewMatrix() *
+                               Core::StaticCamera::GetProjectionMatrix());
 
   // TODO: Maybe use glReadpixels for the depth?
   glm::vec4 wSpace = inv * glm::vec4(ndcMouseCoord, 0.0f, 1.0f);
