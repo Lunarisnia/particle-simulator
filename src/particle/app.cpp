@@ -6,12 +6,14 @@
 #include "core/time/time.hpp"
 #include "core/window/window.hpp"
 #include "core/world/world.hpp"
+#include "editor/editor.hpp"
 #include "particle/simulation/simulation.hpp"
 Particle::App::App() {
   core = Core::App();
   try {
     core.Init();
     Simulation::Init();
+    Editor::Editor::Init();
   } catch (const std::exception& error) {
     throw error;
   }
@@ -26,7 +28,11 @@ void Particle::App::Run() {
       Simulation::Update();
       Core::World::Tick();
 
+      Editor::Editor::NewFrame();
+      Editor::Editor::Update();
+
       Core::Renderer::Render();
+      Editor::Editor::Render();
 
       Core::Window::SwapBuffer();
       Core::Renderer::Clear();

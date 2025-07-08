@@ -1,5 +1,5 @@
 # collect all imgui files
-# file(GLOB SOURCES vendor/imgui/*.cpp)
+file(GLOB SOURCES vendor/imgui/*.cpp)
 # file(GLOB IMGUIZMO_SOURCES vendor/ImGuizmo/*.cpp)
 
 # Add the source files
@@ -49,14 +49,17 @@ add_executable(${PROJECT_NAME}
 	particle/simulation/simulation.cpp
 	particle/primitive/primitive.cpp
 
+	# Editor
+	editor/editor.cpp
+
 	# stbi image
 	# vendor/stbi_image/stbi_image.cpp
 
 	# Imgui
-	# ${SOURCES}
-	# vendor/imgui/backends/imgui_impl_opengl3.cpp
-	# vendor/imgui/backends/imgui_impl_glfw.cpp
-	# vendor/imgui/misc/cpp/imgui_stdlib.cpp
+	${SOURCES}
+	vendor/imgui/backends/imgui_impl_opengl3.cpp
+	vendor/imgui/backends/imgui_impl_glfw.cpp
+	vendor/imgui/misc/cpp/imgui_stdlib.cpp
 
 	# ImGuizmo
 	# ${IMGUIZMO_SOURCES}
@@ -66,7 +69,7 @@ add_executable(${PROJECT_NAME}
 # inlcude
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include)
 # imgui include
-# target_include_directories(${PROJECT_NAME} PUBLIC vendor/imgui)
+target_include_directories(${PROJECT_NAME} PUBLIC vendor/imgui)
 # target_include_directories(${PROJECT_NAME} PUBLIC vendor/ImGuizmo)
 
 
