@@ -5,6 +5,8 @@ namespace Particle {
 class Simulation {
  public:
   static std::shared_ptr<Core::Object> cube;
+  static std::shared_ptr<Core::Object> lightCube;
+  static std::shared_ptr<Core::Object> groundCube;
 
  public:
   static void Init();

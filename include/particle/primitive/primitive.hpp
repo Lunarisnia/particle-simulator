@@ -4,7 +4,9 @@
 namespace Particle {
 class Primitive {
  public:
-  static std::shared_ptr<Core::Object> CreatePlane();
-  static std::shared_ptr<Core::Object> CreateCube();
+  static std::shared_ptr<Core::Object> CreatePlane(const std::string& vertPath,
+                                                   const std::string& fragPath);
+  static std::shared_ptr<Core::Object> CreateCube(const std::string& vertPath,
+                                                  const std::string& fragPath);
 };
 }  // namespace Particle

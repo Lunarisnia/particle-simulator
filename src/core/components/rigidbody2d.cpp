@@ -27,8 +27,5 @@ void Core::Rigidbody2D::Update() {
   float timeStep = 1.0f / 60.0f;
   force = mass * Core::PhysicsWorld::gravity;
   velocity += force / mass * timeStep;
-  if (objectTransform->position.y <= -0.5f && velocity.y < 0.0f) {
-    return;
-  }
   objectTransform->position += glm::vec3(velocity * timeStep, 0.0f);
 }

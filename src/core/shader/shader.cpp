@@ -1,5 +1,6 @@
 #include "core/shader/shader.hpp"
 #include "glad/glad.h"
+#include "glm/ext/vector_float3.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include <fstream>
 #include <sstream>
@@ -42,6 +43,12 @@ void Core::Shader::SetMat4(const std::string &uniform, glm::mat4 mat4) {
   Use();
   int uniformId = glGetUniformLocation(id, uniform.c_str());
   glUniformMatrix4fv(uniformId, 1, GL_FALSE, glm::value_ptr(mat4));
+}
+
+void Core::Shader::SetVec3(const std::string &uniform, glm::vec3 vec3) {
+  Use();
+  int uniformId = glGetUniformLocation(id, uniform.c_str());
+  glUniform3fv(uniformId, 1, glm::value_ptr(vec3));
 }
 
 unsigned int Core::Shader::createShader(const char *source, int shaderType) {

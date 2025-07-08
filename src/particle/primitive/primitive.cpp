@@ -1,15 +1,17 @@
 #include "particle/primitive/primitive.hpp"
 #include <memory>
 #include "core/object/object.hpp"
+#include "core/shader/shader.hpp"
 #include "core/world/world.hpp"
 
-std::shared_ptr<Core::Object> Particle::Primitive::CreatePlane() {
+std::shared_ptr<Core::Object> Particle::Primitive::CreatePlane(
+    const std::string& vertPath, const std::string& fragPath) {
   std::shared_ptr<Core::Object> obj = std::make_shared<Core::Object>();
-  Core::Shader shader{"./shaders/diffuse/diffuse.vert",
-                      "./shaders/diffuse/diffuse.frag"};
+  Core::Shader shader{vertPath, fragPath};
   std::shared_ptr<Core::Material> material =
       std::make_shared<Core::Material>(shader);
   std::shared_ptr<Core::Mesh> mesh = obj->AddComponent<Core::Mesh>(material);
+  obj->mesh = mesh;
   mesh->AddVertex(Core::VertexData{
       0.5f,
       -0.5f,
@@ -52,13 +54,14 @@ std::shared_ptr<Core::Object> Particle::Primitive::CreatePlane() {
   return obj;
 }
 
-std::shared_ptr<Core::Object> Particle::Primitive::CreateCube() {
+std::shared_ptr<Core::Object> Particle::Primitive::CreateCube(
+    const std::string& vertPath, const std::string& fragPath) {
   std::shared_ptr<Core::Object> obj = std::make_shared<Core::Object>();
-  Core::Shader shader{"./shaders/diffuse/diffuse.vert",
-                      "./shaders/diffuse/diffuse.frag"};
+  Core::Shader shader{vertPath, fragPath};
   std::shared_ptr<Core::Material> material =
       std::make_shared<Core::Material>(shader);
   std::shared_ptr<Core::Mesh> mesh = obj->AddComponent<Core::Mesh>(material);
+  obj->mesh = mesh;
   Core::VertexData vData;
   // Front face (z = 0.5)
   {

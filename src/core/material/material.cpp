@@ -10,3 +10,7 @@ void Core::Material::Use() { shader.Use(); }
 void Core::Material::SetMat4(const std::string &uniform, glm::mat4 mat4) {
   shader.SetMat4(uniform, mat4);
 }
+
+void Core::Material::SetVec3(const std::string &uniform, glm::vec3 vec3) {
+  shader.SetVec3(uniform, vec3);
+}
