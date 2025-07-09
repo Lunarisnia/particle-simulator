@@ -1,8 +1,6 @@
 #include "particle/simulation/simulation.hpp"
-#include <format>
 #include <iostream>
 #include <memory>
-#include <print>
 #include <string>
 #include "GLFW/glfw3.h"
 #include "core/components/rigidbody2d.hpp"
@@ -10,7 +8,7 @@
 #include "core/object/object.hpp"
 #include "core/static_camera/static_camera.hpp"
 #include "glm/ext/vector_float3.hpp"
-#include "glm/geometric.hpp"
+#include "glm/ext/vector_float4.hpp"
 #include "particle/primitive/primitive.hpp"
 
 std::shared_ptr<Core::Object> Particle::Simulation::cube;
@@ -27,13 +25,14 @@ void Particle::Simulation::Init() {
   /*std::println("{}", glm::dot(a, b));*/
 
   Core::StaticCamera::transform->position.z = 1.0f;
+
+  lightCube = Primitive::CreateCube(vertexPath, lightFrag);
+  lightCube->transform->position = glm::vec3(1.5f, 1.5f, -1.5f);
+
   cube = Primitive::CreateCube(vertexPath, diffuseFrag);
   cube->transform->position.z = -1.0f;
   cube->mesh->material->SetVec3("objectColor", glm::vec3(1.0f, 0.0f, 0.0f));
   cube->mesh->material->SetVec3("lightColor", glm::vec3(1.0f));
-
-  lightCube = Primitive::CreateCube(vertexPath, lightFrag);
-  lightCube->transform->position = glm::vec3(1.5f, 1.5f, -1.5f);
 
   groundCube = Primitive::CreateCube(vertexPath, diffuseFrag);
   groundCube->transform->position = glm::vec3(0.0f, -1.5f, 0.0f);
@@ -43,6 +42,12 @@ void Particle::Simulation::Init() {
 }
 
 void Particle::Simulation::Update() {
+  glm::vec3 lightPosWorldSpace =
+      lightCube->transform->GetTransformMatrix() *
+      glm::vec4(lightCube->transform->position, 1.0f);
+  cube->mesh->material->SetVec3("lightPosition", lightPosWorldSpace);
+  groundCube->mesh->material->SetVec3("lightPosition", lightPosWorldSpace);
+
   if (Core::Input::GetKey(GLFW_KEY_F)) {
     std::shared_ptr<Core::Object> obj =
         Primitive::CreatePlane(vertexPath, diffuseFrag);
