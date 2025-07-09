@@ -11,6 +11,7 @@ class Material {
   void Use();
   void SetMat4(const std::string &uniform, glm::mat4 mat4);
   void SetVec3(const std::string &uniform, glm::vec3 vec3);
+  void SetFloat(const std::string &uniform, float f);
 
  public:
   Material(Shader shader);

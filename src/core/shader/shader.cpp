@@ -51,6 +51,12 @@ void Core::Shader::SetVec3(const std::string &uniform, glm::vec3 vec3) {
   glUniform3fv(uniformId, 1, glm::value_ptr(vec3));
 }
 
+void Core::Shader::SetFloat(const std::string &uniform, float f) {
+  Use();
+  int uniformId = glGetUniformLocation(id, uniform.c_str());
+  glUniform1f(uniformId, f);
+}
+
 unsigned int Core::Shader::createShader(const char *source, int shaderType) {
   unsigned int shader = glCreateShader(shaderType);
   glShaderSource(shader, 1, &source, NULL);
