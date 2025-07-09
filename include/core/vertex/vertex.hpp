@@ -3,27 +3,23 @@
 #include "glm/ext/vector_float3.hpp"
 namespace Core {
 class VertexData {
-  float x;
-  float y;
-  float z;
-  float u;
-  float v;
+  glm::vec3 position;
+  glm::vec2 textureCoord;
+  glm::vec3 normal;
 
  public:
-  inline void SetPosition(glm::vec3 position) {
-    x = position.x;
-    y = position.y;
-    z = position.z;
-  }
+  inline void SetPosition(glm::vec3 p) { position = p; }
   inline void SetTextureCoordinate(glm::vec2 texCoord) {
-    u = texCoord.x;
-    v = texCoord.y;
+    textureCoord = texCoord;
   }
+  inline void SetNormal(glm::vec3 n) { normal = n; }
 
  public:
-  inline VertexData(float x, float y, float z) : x(x), y(y), z(z) {};
+  inline VertexData(float x, float y, float z) : position(x, y, z) {};
   inline VertexData(float x, float y, float z, float u, float v)
-      : x(x), y(y), z(z), u(u), v(v) {};
+      : position(x, y, z), textureCoord(u, v) {};
+  inline VertexData(glm::vec3 p, glm::vec2 texCoord, glm::vec3 n)
+      : position(p), textureCoord(texCoord), normal(n) {};
   inline VertexData() {};
 };
 };  // namespace Core

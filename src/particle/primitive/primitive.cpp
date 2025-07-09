@@ -3,6 +3,8 @@
 #include "core/object/object.hpp"
 #include "core/shader/shader.hpp"
 #include "core/world/world.hpp"
+#include "glm/ext/vector_float2.hpp"
+#include "glm/ext/vector_float3.hpp"
 
 std::shared_ptr<Core::Object> Particle::Primitive::CreatePlane(
     const std::string& vertPath, const std::string& fragPath) {
@@ -13,32 +15,24 @@ std::shared_ptr<Core::Object> Particle::Primitive::CreatePlane(
   std::shared_ptr<Core::Mesh> mesh = obj->AddComponent<Core::Mesh>(material);
   obj->mesh = mesh;
   mesh->AddVertex(Core::VertexData{
-      0.5f,
-      -0.5f,
-      0.0f,
-      1.0f,
-      0.0f,
+      glm::vec3(0.5f, -0.5f, 0.0f),
+      glm::vec2(1.0f, 0.0f),
+      glm::vec3(0.0f, 0.0f, 1.0f),
   });
   mesh->AddVertex(Core::VertexData{
-      0.5f,
-      0.5f,
-      0.0f,
-      1.0f,
-      1.0f,
+      glm::vec3(0.5f, 0.5f, 0.0f),
+      glm::vec2(1.0f, 1.0f),
+      glm::vec3(0.0f, 0.0f, 1.0f),
   });
   mesh->AddVertex(Core::VertexData{
-      -0.5f,
-      -0.5f,
-      0.0f,
-      0.0f,
-      0.0f,
+      glm::vec3(-0.5f, -0.5f, 0.0f),
+      glm::vec2(0.0f, 0.0f),
+      glm::vec3(0.0f, 0.0f, 1.0f),
   });
   mesh->AddVertex(Core::VertexData{
-      -0.5f,
-      0.5f,
-      0.0f,
-      0.0f,
-      1.0f,
+      glm::vec3(-0.5f, 0.5f, 0.0f),
+      glm::vec2(0.0f, 1.0f),
+      glm::vec3(0.0f, 0.0f, 1.0f),
   });
   mesh->AddIndex(0);
   mesh->AddIndex(1);
@@ -67,6 +61,7 @@ std::shared_ptr<Core::Object> Particle::Primitive::CreateCube(
   {
     vData.SetPosition(glm::vec3(0.5f, 0.5f, 0.5f));  // Top right
     vData.SetTextureCoordinate(glm::vec2(1.0f, 1.0f));
+    vData.SetNormal(glm::vec3(0.0f, 0.0f, 1.0f));
     mesh->AddVertex(vData);
     mesh->AddIndex(0);
 
@@ -93,6 +88,7 @@ std::shared_ptr<Core::Object> Particle::Primitive::CreateCube(
   {
     vData.SetPosition(glm::vec3(0.5f, -0.5f, 0.5f));
     vData.SetTextureCoordinate(glm::vec2(0.0f, 0.0f));
+    vData.SetNormal(glm::vec3(1.0f, 0.0f, 0.0f));
     mesh->AddVertex(vData);
     mesh->AddIndex(4);
 
@@ -119,6 +115,7 @@ std::shared_ptr<Core::Object> Particle::Primitive::CreateCube(
   {
     vData.SetPosition(glm::vec3(-0.5f, -0.5f, 0.5f));
     vData.SetTextureCoordinate(glm::vec2(1.0f, 0.0f));
+    vData.SetNormal(glm::vec3(-1.0f, 0.0f, 0.0f));
     mesh->AddVertex(vData);
     mesh->AddIndex(8);
 
@@ -145,6 +142,7 @@ std::shared_ptr<Core::Object> Particle::Primitive::CreateCube(
   {
     vData.SetPosition(glm::vec3(0.5f, -0.5f, -0.5f));
     vData.SetTextureCoordinate(glm::vec2(0.0f, 0.0f));
+    vData.SetNormal(glm::vec3(0.0f, 0.0f, -1.0f));
     mesh->AddVertex(vData);
     mesh->AddIndex(12);
 
@@ -171,6 +169,7 @@ std::shared_ptr<Core::Object> Particle::Primitive::CreateCube(
   {
     vData.SetPosition(glm::vec3(0.5f, 0.5f, 0.5f));
     vData.SetTextureCoordinate(glm::vec2(1.0f, 0.0f));
+    vData.SetNormal(glm::vec3(0.0f, 1.0f, 0.0f));
     mesh->AddVertex(vData);
     mesh->AddIndex(16);
 
@@ -197,6 +196,7 @@ std::shared_ptr<Core::Object> Particle::Primitive::CreateCube(
   {
     vData.SetPosition(glm::vec3(0.5f, -0.5f, 0.5f));
     vData.SetTextureCoordinate(glm::vec2(1.0f, 0.0f));
+    vData.SetNormal(glm::vec3(0.0f, -1.0f, 0.0f));
     mesh->AddVertex(vData);
     mesh->AddIndex(20);
 

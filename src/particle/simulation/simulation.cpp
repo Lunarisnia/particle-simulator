@@ -1,6 +1,8 @@
 #include "particle/simulation/simulation.hpp"
+#include <format>
 #include <iostream>
 #include <memory>
+#include <print>
 #include <string>
 #include "GLFW/glfw3.h"
 #include "core/components/rigidbody2d.hpp"
@@ -8,6 +10,7 @@
 #include "core/object/object.hpp"
 #include "core/static_camera/static_camera.hpp"
 #include "glm/ext/vector_float3.hpp"
+#include "glm/geometric.hpp"
 #include "particle/primitive/primitive.hpp"
 
 std::shared_ptr<Core::Object> Particle::Simulation::cube;
@@ -19,7 +22,10 @@ const std::string diffuseFrag = "./shaders/diffuse/diffuse.frag";
 const std::string lightFrag = "./shaders/light/light.frag";
 
 void Particle::Simulation::Init() {
-  // TODO: fix the coordinate system
+  /*glm::vec3 a = glm::vec3(1.0f, 0.0f, 0.0f);*/
+  /*glm::vec3 b = glm::vec3(0.5f, 0.5f, 0.5f);*/
+  /*std::println("{}", glm::dot(a, b));*/
+
   Core::StaticCamera::transform->position.z = 1.0f;
   cube = Primitive::CreateCube(vertexPath, diffuseFrag);
   cube->transform->position.z = -1.0f;
