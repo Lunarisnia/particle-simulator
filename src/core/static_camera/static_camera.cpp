@@ -1,5 +1,4 @@
 #include "core/static_camera/static_camera.hpp"
-#include <iostream>
 #include <memory>
 #include "core/components/transform.hpp"
 #include "core/window/window.hpp"
@@ -10,12 +9,12 @@
 #include "glm/trigonometric.hpp"
 
 std::shared_ptr<Core::Transform> Core::StaticCamera::transform;
+glm::vec3 Core::StaticCamera::front = glm::vec3(0.0f, 0.0f, -1.0f);
 
 void Core::StaticCamera::Init() { transform = std::make_shared<Transform>(); }
 
 glm::mat4 Core::StaticCamera::GetViewMatrix() {
   glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-  glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f);
 
   glm::mat4 view =
       glm::lookAt(transform->position, transform->position + front, up);

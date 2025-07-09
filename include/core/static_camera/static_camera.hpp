@@ -2,10 +2,12 @@
 #include <memory>
 #include "core/components/transform.hpp"
 #include "glm/ext/matrix_float4x4.hpp"
+#include "glm/ext/vector_float3.hpp"
 namespace Core {
 class StaticCamera {
  public:
   static std::shared_ptr<Transform> transform;
+  static glm::vec3 front;
 
  public:
   static void Init();

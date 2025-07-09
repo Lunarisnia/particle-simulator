@@ -1,6 +1,7 @@
 #include "editor/editor.hpp"
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
+#include "core/static_camera/static_camera.hpp"
 #include "core/window/window.hpp"
 #include "imgui.h"
 #include "particle/simulation/simulation.hpp"
@@ -27,11 +28,14 @@ void Editor::Editor::NewFrame() {
 }
 
 void Editor::Editor::Update() {
-  ImGui::ShowDemoWindow();
-  ImGui::Begin("Test");
-  ImGui::SliderFloat3("Light Position",
-                      &Particle::Simulation::lightCube->transform->position.x,
-                      -10.0f, 10.0f);
+  // TODO: Abstract this out better
+  ImGui::Begin("Debug");
+  ImGui::DragFloat3("Camera Position",
+                    &Core::StaticCamera::transform->position.x, 0.05f);
+  ImGui::DragFloat3("Camera Lookat", &Core::StaticCamera::front.x, 0.05f);
+  ImGui::DragFloat3("Light Position",
+                    &Particle::Simulation::lightCube->transform->position.x,
+                    0.05f);
   ImGui::End();
 }
 

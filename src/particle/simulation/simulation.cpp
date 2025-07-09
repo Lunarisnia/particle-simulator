@@ -1,13 +1,13 @@
 #include "particle/simulation/simulation.hpp"
+#include <iostream>
 #include <memory>
 #include <string>
+#include "GLFW/glfw3.h"
 #include "core/components/rigidbody2d.hpp"
 #include "core/input/input.hpp"
 #include "core/object/object.hpp"
-#include "core/shader/shader.hpp"
 #include "core/static_camera/static_camera.hpp"
 #include "glm/ext/vector_float3.hpp"
-#include "glm/ext/vector_float4.hpp"
 #include "particle/primitive/primitive.hpp"
 
 std::shared_ptr<Core::Object> Particle::Simulation::cube;
@@ -37,10 +37,11 @@ void Particle::Simulation::Init() {
 }
 
 void Particle::Simulation::Update() {
-  if (Core::Input::GetMouseButton(0)) {
+  if (Core::Input::GetKey(GLFW_KEY_F)) {
     std::shared_ptr<Core::Object> obj =
         Primitive::CreatePlane(vertexPath, diffuseFrag);
     glm::vec3 wSpace = Core::Input::mouse.ToWorldPosition();
+    std::cout << wSpace.x << ":" << wSpace.y << std::endl;
     obj->mesh->material->SetVec3("objectColor", glm::vec3(1.0f, 0.0f, 0.0f));
     obj->mesh->material->SetVec3("lightColor", glm::vec3(1.0f));
 

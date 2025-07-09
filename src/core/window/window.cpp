@@ -2,8 +2,8 @@
 #include <stdexcept>
 #include "GLFW/glfw3.h"
 
-int Core::Window::width = 800;
-int Core::Window::height = 600;
+int Core::Window::width = 1280;
+int Core::Window::height = 768;
 GLFWwindow *Core::Window::window;
 
 void Core::Window::Init() {

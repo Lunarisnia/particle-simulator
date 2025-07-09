@@ -33,6 +33,10 @@ glm::vec3 Core::Mouse::ToWorldPosition() {
   // TODO: Maybe use glReadpixels for the depth?
   glm::vec4 wSpace = projInv * glm::vec4(ndcMouseCoord, -1.0f, 1.0f);
   wSpace = viewInv * wSpace;
+  // FIXME: this don't work if the camera is moved
+
+  /*wSpace.w = 1.0f / wSpace.w;*/
+  /*wSpace.y *= wSpace.w;*/
 
   return glm::vec3(wSpace.x, wSpace.y, wSpace.z);
 }
