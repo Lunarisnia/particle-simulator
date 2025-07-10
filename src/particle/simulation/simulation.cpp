@@ -6,6 +6,7 @@
 #include "core/input/input.hpp"
 #include "core/object/object.hpp"
 #include "core/static_camera/static_camera.hpp"
+#include "core/time/time.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/ext/vector_float4.hpp"
 #include "particle/primitive/primitive.hpp"
@@ -31,14 +32,34 @@ void Particle::Simulation::Init() {
 
   cube = Primitive::CreateCube(vertexPath, diffuseFrag);
   cube->transform->position.z = -1.0f;
-  cube->mesh->material->SetVec3("objectColor", glm::vec3(0.7f, 0.3f, 0.4f));
+  cube->mesh->material->SetVec3("objectColor", glm::vec3(0.3f, 0.8f, 0.2f));
   cube->mesh->material->SetVec3("lightColor", glm::vec3(1.0f));
+  cube->mesh->material->SetVec3("material.ambient", glm::vec3(0.0f));
+  cube->mesh->material->SetVec3("material.diffuse",
+                                glm::vec3(0.1f, 0.35f, 0.1f));
+  cube->mesh->material->SetVec3("material.specular",
+                                glm::vec3(0.45f, 0.55f, 0.45f));
+  cube->mesh->material->SetFloat("material.shininess", 36.0f);
+
+  cube->mesh->material->SetVec3("light.ambient", glm::vec3(1.0f));
+  cube->mesh->material->SetVec3("light.diffuse", glm::vec3(1.0f));
+  cube->mesh->material->SetVec3("light.specular", glm::vec3(1.0f));
 
   groundCube = Primitive::CreateCube(vertexPath, diffuseFrag);
   groundCube->transform->position = glm::vec3(0.0f, -1.5f, 0.0f);
   groundCube->transform->scale = glm::vec3(200.0f, 1.0f, 100.0f);
   groundCube->mesh->material->SetVec3("objectColor", glm::vec3(0.3f));
   groundCube->mesh->material->SetVec3("lightColor", glm::vec3(1.0f));
+  groundCube->mesh->material->SetVec3("material.ambient",
+                                      glm::vec3(1.0f, 0.5f, 0.31f));
+  groundCube->mesh->material->SetVec3("material.diffuse",
+                                      glm::vec3(1.0f, 0.5f, 0.31f));
+  groundCube->mesh->material->SetVec3("material.specular",
+                                      glm::vec3(0.5f, 0.5f, 0.5f));
+  groundCube->mesh->material->SetFloat("material.shininess", 32.0f);
+  groundCube->mesh->material->SetVec3("light.ambient", glm::vec3(0.4f));
+  groundCube->mesh->material->SetVec3("light.diffuse", glm::vec3(1.0f));
+  groundCube->mesh->material->SetVec3("light.specular", glm::vec3(1.0f));
 }
 
 void Particle::Simulation::Update() {
@@ -49,10 +70,11 @@ void Particle::Simulation::Update() {
       Core::StaticCamera::transform->GetTransformMatrix() *
       glm::vec4(Core::StaticCamera::transform->position, 1.0f);
 
-  cube->mesh->material->SetVec3("lightPosition", lightPosWorldSpace);
+  cube->mesh->material->SetVec3("light.position", lightPosWorldSpace);
   cube->mesh->material->SetVec3("cameraPosition", cameraWorldSpace);
   cube->mesh->material->SetFloat("globalFloat", globalFloat);
-  groundCube->mesh->material->SetVec3("lightPosition", lightPosWorldSpace);
+
+  groundCube->mesh->material->SetVec3("light.position", lightPosWorldSpace);
   groundCube->mesh->material->SetVec3("cameraPosition", cameraWorldSpace);
   groundCube->mesh->material->SetFloat("globalFloat", globalFloat);
 
