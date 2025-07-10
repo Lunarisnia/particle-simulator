@@ -36,6 +36,8 @@ void Editor::Editor::Update() {
   ImGui::DragFloat3("Light Position",
                     &Particle::Simulation::lightCube->transform->position.x,
                     0.05f);
+  ImGui::DragFloat3("Diffuse Light Color", &Particle::Simulation::lightColor.x,
+                    0.05f);
   ImGui::DragFloat("Global Shader Float", &Particle::Simulation::globalFloat,
                    0.05f);
   ImGui::End();

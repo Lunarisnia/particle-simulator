@@ -7,7 +7,6 @@ in vec3 normal;
 uniform vec3 cameraPosition;
 
 uniform vec3 objectColor;
-uniform vec3 lightColor;
 
 uniform float globalFloat;
 
