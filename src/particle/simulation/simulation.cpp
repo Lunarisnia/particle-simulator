@@ -20,6 +20,7 @@ const std::string vertexPath = "./shaders/diffuse/diffuse.vert";
 const std::string diffuseFrag = "./shaders/diffuse/diffuse.frag";
 const std::string lightFrag = "./shaders/light/light.frag";
 
+// TODO: Study lighting maps
 void Particle::Simulation::Init() {
   Core::StaticCamera::transform->position.z = 1.0f;
 
@@ -27,9 +28,10 @@ void Particle::Simulation::Init() {
   lightCube->transform->position = glm::vec3(1.5f, 1.5f, -1.5f);
 
   cube = Primitive::CreateCube(vertexPath, diffuseFrag);
+  cube->mesh->material->LoadTexture("./assets/container2.png");
   cube->transform->position.z = -1.0f;
   cube->mesh->material->SetVec3("objectColor", glm::vec3(0.3f, 0.8f, 0.2f));
-  cube->mesh->material->SetVec3("material.ambient", glm::vec3(0.0f));
+  cube->mesh->material->SetVec3("material.ambient", glm::vec3(0.5f));
   cube->mesh->material->SetVec3("material.diffuse",
                                 glm::vec3(0.1f, 0.35f, 0.1f));
   cube->mesh->material->SetVec3("material.specular",
@@ -39,6 +41,7 @@ void Particle::Simulation::Init() {
   cube->mesh->material->SetVec3("light.specular", glm::vec3(1.0f));
 
   groundCube = Primitive::CreateCube(vertexPath, diffuseFrag);
+  groundCube->mesh->isActive = false;
   groundCube->transform->position = glm::vec3(0.0f, -1.5f, 0.0f);
   groundCube->transform->scale = glm::vec3(200.0f, 1.0f, 100.0f);
   groundCube->mesh->material->SetVec3("objectColor", glm::vec3(0.3f));

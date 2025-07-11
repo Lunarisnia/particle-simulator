@@ -28,6 +28,9 @@ add_executable(${PROJECT_NAME}
 
 	# Material
 	core/material/material.cpp
+
+	# Texture
+	core/texture/texture.cpp
 	
 	# Static Camera
 	core/static_camera/static_camera.cpp
@@ -37,6 +40,7 @@ add_executable(${PROJECT_NAME}
 
 	# Physics
 	core/physics/physics_world.cpp
+
 
 	# Components
 	core/components/component.cpp

@@ -5,7 +5,6 @@
 #include <vector>
 #include "core/components/mesh.hpp"
 #include "core/object/object.hpp"
-#include "core/shader/shader.hpp"
 #include "core/static_camera/static_camera.hpp"
 #include "core/window/window.hpp"
 
@@ -27,6 +26,9 @@ void Core::Renderer::Init() {
 
 void Core::Renderer::Render() {
   for (std::shared_ptr<Mesh> &mesh : renderQueue) {
+    if (!mesh->isActive) {
+      continue;
+    }
     Object *owner = mesh->GetOwner();
 
     mesh->material->Use();

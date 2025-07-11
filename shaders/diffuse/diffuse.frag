@@ -1,6 +1,7 @@
 #version 330 core
 out vec4 FragColor;
 
+in vec2 textureCoord;
 in vec3 fragPos;
 in vec3 normal;
 
@@ -28,6 +29,8 @@ struct Light {
 uniform Material material;
 uniform Light light;
 
+uniform sampler2D objectTexture;
+
 void main()
 {
     // TODO: Create light data structure for each light type
@@ -43,6 +46,7 @@ void main()
     float specularDiff = pow(max(dot(cameraDir, reflectionDir), 0.0f), material.shininess);
     vec3 specular = light.specular * (specularDiff * material.specular);
 
-    vec3 color = (diffuse + ambient + specular) * objectColor;
+    vec4 tex = texture(objectTexture, textureCoord);
+    vec3 color = (diffuse + ambient + specular) * vec3(tex);
     FragColor = vec4(color, 1.0f);
 }
