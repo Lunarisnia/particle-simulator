@@ -21,10 +21,6 @@ const std::string diffuseFrag = "./shaders/diffuse/diffuse.frag";
 const std::string lightFrag = "./shaders/light/light.frag";
 
 void Particle::Simulation::Init() {
-  /*glm::vec3 a = glm::vec3(1.0f, 0.0f, 0.0f);*/
-  /*glm::vec3 b = glm::vec3(0.5f, 0.5f, 0.5f);*/
-  /*std::println("{}", glm::dot(a, b));*/
-
   Core::StaticCamera::transform->position.z = 1.0f;
 
   lightCube = Primitive::CreateCube(vertexPath, lightFrag);
@@ -65,6 +61,7 @@ void Particle::Simulation::Update() {
       Core::StaticCamera::transform->GetTransformMatrix() *
       glm::vec4(Core::StaticCamera::transform->position, 1.0f);
 
+  // TODO: add stbi_image and texture support
   lightCube->mesh->material->SetVec3("lightColor", lightColor);
 
   cube->mesh->material->SetVec3("light.position", lightPosWorldSpace);

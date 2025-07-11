@@ -53,7 +53,7 @@ add_executable(${PROJECT_NAME}
 	editor/editor.cpp
 
 	# stbi image
-	# vendor/stbi_image/stbi_image.cpp
+	vendor/stbi_image/stbi_image.cpp
 
 	# Imgui
 	${SOURCES}
