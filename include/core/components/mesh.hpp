@@ -12,7 +12,6 @@ class Mesh : public Component {
   std::vector<int> indice;
 
  public:
-  bool isActive = true;
   std::shared_ptr<Material> material;
   void Update() override;
   ComponentType GetType() override;

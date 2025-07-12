@@ -21,6 +21,7 @@ const std::string diffuseFrag = "./shaders/diffuse/diffuse.frag";
 const std::string lightFrag = "./shaders/light/light.frag";
 
 // TODO: Study lighting maps
+// FIXME: Move isActive flag to component instead of mesh
 void Particle::Simulation::Init() {
   Core::StaticCamera::transform->position.z = 1.0f;
 

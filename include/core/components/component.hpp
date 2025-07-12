@@ -1,5 +1,4 @@
 #pragma once
-#include <exception>
 #include <memory>
 namespace Core {
 
@@ -13,6 +12,7 @@ enum ComponentType {
 
 class Component {
  public:
+  bool isActive = true;
   Object *owner;
 
  public:
