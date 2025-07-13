@@ -6,7 +6,8 @@
 
 Core::Texture::Texture() {}
 
-Core::Texture::Texture(const std::string &path) {
+Core::Texture::Texture(const std::string &path, int textureLocation)
+    : textureLocation(textureLocation) {
   glGenTextures(1, &id);
   glBindTexture(GL_TEXTURE_2D, id);
   // set the texture wrapping/filtering options (on the currently bound texture
@@ -27,6 +28,9 @@ Core::Texture::Texture(const std::string &path) {
   stbi_image_free(data);
 }
 
-void Core::Texture::Bind() { glBindTexture(GL_TEXTURE_2D, id); }
+void Core::Texture::Bind() {
+  glActiveTexture(textureLocation);
+  glBindTexture(GL_TEXTURE_2D, id);
+}
 
 Core::Texture::~Texture() {}

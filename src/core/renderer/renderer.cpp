@@ -1,5 +1,4 @@
 #include "core/renderer/renderer.hpp"
-#include <OpenGL/gl.h>
 #include <memory>
 #include <stdexcept>
 #include <vector>

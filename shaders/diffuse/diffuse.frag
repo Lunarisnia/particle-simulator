@@ -12,9 +12,8 @@ uniform vec3 objectColor;
 uniform float globalFloat;
 
 struct Material {
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+    sampler2D diffuse;
+    sampler2D specular;
     float shininess;
 };
 
@@ -29,24 +28,23 @@ struct Light {
 uniform Material material;
 uniform Light light;
 
-uniform sampler2D objectTexture;
-
 void main()
 {
-    // TODO: Create light data structure for each light type
-    vec3 ambient = light.ambient * material.ambient;
+    vec4 tex = texture(material.diffuse, textureCoord);
+    vec4 specularMap = texture(material.specular, textureCoord);
+
+    vec3 ambient = light.ambient * tex.rgb;
 
     vec3 lightDir = normalize(light.position - fragPos);
     float diff = max(dot(normal, lightDir), 0.0f);
-    vec3 diffuse = light.diffuse * (diff * material.diffuse);
+    vec3 diffuse = light.diffuse * diff * tex.rgb;
 
     vec3 cameraDir = normalize(cameraPosition - fragPos);
     vec3 reflectionDir = reflect(-lightDir, normal);
 
     float specularDiff = pow(max(dot(cameraDir, reflectionDir), 0.0f), material.shininess);
-    vec3 specular = light.specular * (specularDiff * material.specular);
+    vec3 specular = light.specular * specularDiff * specularMap.rgb;
 
-    vec4 tex = texture(objectTexture, textureCoord);
-    vec3 color = (diffuse + ambient + specular) * vec3(tex);
+    vec3 color = diffuse + ambient + specular;
     FragColor = vec4(color, 1.0f);
 }
