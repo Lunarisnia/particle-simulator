@@ -41,6 +41,9 @@ void Particle::Simulation::Init() {
   cube->mesh->material->SetFloat("material.shininess", 36.0f);
   cube->mesh->material->SetVec3("light.ambient", glm::vec3(1.0f));
   cube->mesh->material->SetVec3("light.specular", glm::vec3(1.0f));
+  cube->mesh->material->SetFloat("light.constant", 1.0f);
+  cube->mesh->material->SetFloat("light.linear", 0.14f);
+  cube->mesh->material->SetFloat("light.quadratic", 0.07f);
 
   groundCube = Primitive::CreateCube(vertexPath, diffuseFrag);
   groundCube->mesh->isActive = false;
