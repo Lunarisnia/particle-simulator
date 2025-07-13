@@ -6,7 +6,8 @@
 
 Core::Texture::Texture() {}
 
-Core::Texture::Texture(const std::string &path, int textureLocation)
+Core::Texture::Texture(const std::string &path, int textureLocation,
+                       int colorCode)
     : textureLocation(textureLocation) {
   glGenTextures(1, &id);
   glBindTexture(GL_TEXTURE_2D, id);
@@ -19,7 +20,7 @@ Core::Texture::Texture(const std::string &path, int textureLocation)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   data = stbi_load(path.c_str(), &width, &height, &numberOfChannel, 0);
   if (data) {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
+    glTexImage2D(GL_TEXTURE_2D, 0, colorCode, width, height, 0, colorCode,
                  GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
   } else {

@@ -14,6 +14,7 @@ uniform float globalFloat;
 struct Material {
     sampler2D diffuse;
     sampler2D specular;
+    sampler2D emission;
     float shininess;
 };
 
@@ -32,8 +33,9 @@ void main()
 {
     vec4 tex = texture(material.diffuse, textureCoord);
     vec4 specularMap = texture(material.specular, textureCoord);
+    vec4 emissionMap = texture(material.emission, textureCoord);
 
-    vec3 ambient = light.ambient * tex.rgb;
+    vec3 ambient = light.ambient * tex.rgb + (step(1.0f, vec3(1.0f) - specularMap.rgb) * emissionMap.rgb);
 
     vec3 lightDir = normalize(light.position - fragPos);
     float diff = max(dot(normal, lightDir), 0.0f);

@@ -28,23 +28,26 @@ void Particle::Simulation::Init() {
   lightCube->transform->position = glm::vec3(1.5f, 1.5f, -1.5f);
 
   cube = Primitive::CreateCube(vertexPath, diffuseFrag);
-  cube->mesh->material->LoadTexture("./assets/container2.png", GL_TEXTURE0);
+  cube->mesh->material->LoadTexture("./assets/container2.png", GL_TEXTURE0,
+                                    GL_RGBA);
   cube->mesh->material->LoadTexture("./assets/container2_specular.png",
-                                    GL_TEXTURE1);
+                                    GL_TEXTURE1, GL_RGBA);
+  cube->mesh->material->LoadTexture("./assets/matrix.jpg", GL_TEXTURE2, GL_RGB);
   cube->transform->position.z = -1.0f;
   cube->mesh->material->SetVec3("objectColor", glm::vec3(0.3f, 0.8f, 0.2f));
   cube->mesh->material->SetInt("material.diffuse", 0);
   cube->mesh->material->SetInt("material.specular", 1);
+  cube->mesh->material->SetInt("material.emission", 2);
   cube->mesh->material->SetFloat("material.shininess", 36.0f);
   cube->mesh->material->SetVec3("light.ambient", glm::vec3(1.0f));
   cube->mesh->material->SetVec3("light.specular", glm::vec3(1.0f));
 
   groundCube = Primitive::CreateCube(vertexPath, diffuseFrag);
-  groundCube->mesh->isActive = true;
+  groundCube->mesh->isActive = false;
   groundCube->mesh->material->LoadTexture("./assets/container2.png",
-                                          GL_TEXTURE0);
+                                          GL_TEXTURE0, GL_RGBA);
   groundCube->mesh->material->LoadTexture("./assets/container2_specular.png",
-                                          GL_TEXTURE1);
+                                          GL_TEXTURE1, GL_RGBA);
   groundCube->transform->position = glm::vec3(0.0f, -1.5f, 0.0f);
   groundCube->transform->scale = glm::vec3(200.0f, 1.0f, 100.0f);
   groundCube->mesh->material->SetVec3("objectColor", glm::vec3(0.3f));

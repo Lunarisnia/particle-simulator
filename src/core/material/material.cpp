@@ -30,6 +30,7 @@ void Core::Material::SetFloat(const std::string &uniform, float f) {
   shader.SetFloat(uniform, f);
 }
 
-void Core::Material::LoadTexture(const std::string &path, int textureLocation) {
-  textures.emplace_back(Texture{path, textureLocation});
+void Core::Material::LoadTexture(const std::string &path, int textureLocation,
+                                 int colorCode) {
+  textures.emplace_back(Texture{path, textureLocation, colorCode});
 }

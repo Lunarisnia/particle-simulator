@@ -17,7 +17,7 @@ class Material {
   void SetInt(const std::string &uniform, int i);
   void SetFloat(const std::string &uniform, float f);
 
-  void LoadTexture(const std::string &path, int textureLocation);
+  void LoadTexture(const std::string &path, int textureLocation, int colorCode);
 
  public:
   Material(Shader shader);

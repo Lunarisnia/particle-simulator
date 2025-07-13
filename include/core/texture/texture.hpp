@@ -16,7 +16,7 @@ class Texture {
 
  public:
   Texture();
-  Texture(const std::string &path, int textureLocation);
+  Texture(const std::string &path, int textureLocation, int colorCode);
   ~Texture();
 };
 };  // namespace Core
