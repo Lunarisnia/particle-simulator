@@ -8,6 +8,7 @@
 #include "core/static_camera/static_camera.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/ext/vector_float4.hpp"
+#include "glm/trigonometric.hpp"
 #include "particle/primitive/primitive.hpp"
 
 float Particle::Simulation::globalFloat = 0.0f;
@@ -44,9 +45,13 @@ void Particle::Simulation::Init() {
   cube->mesh->material->SetFloat("light.constant", 1.0f);
   cube->mesh->material->SetFloat("light.linear", 0.14f);
   cube->mesh->material->SetFloat("light.quadratic", 0.07f);
+  cube->mesh->material->SetVec3("light.spotDirection",
+                                glm::vec3(0.0f, -1.0f, 0.0f));
+  cube->mesh->material->SetFloat("light.cutoff", glm::radians(45.0f));
+  cube->mesh->material->SetFloat("light.outerCutoff", glm::radians(50.0f));
 
   groundCube = Primitive::CreateCube(vertexPath, diffuseFrag);
-  groundCube->mesh->isActive = false;
+  groundCube->mesh->isActive = true;
   groundCube->mesh->material->LoadTexture("./assets/container2.png",
                                           GL_TEXTURE0, GL_RGBA);
   groundCube->mesh->material->LoadTexture("./assets/container2_specular.png",
@@ -59,6 +64,14 @@ void Particle::Simulation::Init() {
   groundCube->mesh->material->SetFloat("material.shininess", 32.0f);
   groundCube->mesh->material->SetVec3("light.ambient", glm::vec3(0.4f));
   groundCube->mesh->material->SetVec3("light.specular", glm::vec3(1.0f));
+  groundCube->mesh->material->SetFloat("light.constant", 1.0f);
+  groundCube->mesh->material->SetFloat("light.linear", 0.14f);
+  groundCube->mesh->material->SetFloat("light.quadratic", 0.07f);
+  groundCube->mesh->material->SetVec3("light.spotDirection",
+                                      glm::vec3(0.0f, -1.0f, 0.0f));
+  groundCube->mesh->material->SetFloat("light.cutoff", glm::radians(45.0f));
+  groundCube->mesh->material->SetFloat("light.outerCutoff",
+                                       glm::radians(50.0f));
 }
 
 void Particle::Simulation::Update() {
