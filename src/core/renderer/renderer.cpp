@@ -20,6 +20,7 @@ void Core::Renderer::Init() {
   glViewport(0, 0, Window::GetWidth() * 2, Window::GetHeight() * 2);
 #endif
 
+  /*SetClearColor(1.0f, 1.0f, 1.0f, 1.0f);*/
   glEnable(GL_DEPTH_TEST);
 }
 

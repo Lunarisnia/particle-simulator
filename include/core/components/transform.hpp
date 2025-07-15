@@ -13,5 +13,6 @@ class Transform : public Component {
   void Update() override;
   ComponentType GetType() override;
   glm::mat4 GetTransformMatrix();
+  glm::vec3 GetWorldPosition();
 };
 }  // namespace Core

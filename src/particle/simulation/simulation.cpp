@@ -12,11 +12,9 @@
 #include "core/static_camera/static_camera.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/ext/vector_float4.hpp"
-#include "glm/trigonometric.hpp"
 #include "particle/primitive/primitive.hpp"
 
 float Particle::Simulation::globalFloat = 0.0f;
-std::shared_ptr<Core::Object> Particle::Simulation::cube;
 std::shared_ptr<Core::Object> Particle::Simulation::lightCube;
 std::vector<std::shared_ptr<Core::Object>> Particle::Simulation::cubes;
 std::vector<std::shared_ptr<Core::Object>> Particle::Simulation::lightCubes;
@@ -28,7 +26,6 @@ const std::string diffuseFrag = "./shaders/diffuse/diffuse.frag";
 const std::string diffuseFrag2 = "./shaders/diffuse/multi_light_diffuse.frag";
 const std::string lightFrag = "./shaders/light/light.frag";
 
-// TODO: Study lighting maps
 void Particle::Simulation::Init() {
   Core::StaticCamera::transform->position.z = 1.0f;
 
@@ -36,13 +33,9 @@ void Particle::Simulation::Init() {
   lightCube->transform->position = glm::vec3(1.5f, 1.5f, -1.5f);
   lightCube->name = "PointLight1";
 
-  /*cube = Primitive::CreateCube(vertexPath, diffuseFrag2);*/
-  /*cube->name = "BetaCube";*/
-
   std::random_device dev;
   std::mt19937 rng(dev());
-  std::uniform_real_distribution<float> dist(
-      -3.5f, 3.5f);  // distribution in range [1, 6]
+  std::uniform_real_distribution<float> dist(-3.5f, 3.5f);
 
   for (size_t i = 0; i < 10; i++) {
     std::shared_ptr<Core::Object> obj =
@@ -54,7 +47,6 @@ void Particle::Simulation::Init() {
                                      GL_TEXTURE1, GL_RGBA);
     obj->mesh->material->LoadTexture("./assets/matrix.jpg", GL_TEXTURE2,
                                      GL_RGB);
-    /*obj->transform->position.z = -1.0f;*/
     obj->transform->position = glm::vec3(dist(rng), dist(rng), -2.0f);
 
     obj->mesh->material->SetVec3("objectColor", glm::vec3(0.3f, 0.8f, 0.2f));
@@ -85,22 +77,30 @@ void Particle::Simulation::Init() {
 
     cubes.emplace_back(obj);
   }
+
+  for (size_t i = 0; i < 2; i++) {
+    std::shared_ptr<Core::Object> light =
+        Primitive::CreateCube(vertexPath, lightFrag);
+    light->name = std::format("Light ({})", i);
+    light->mesh->material->SetVec3("lightColor", glm::vec3(1.0f));
+
+    light->transform->position = glm::vec3(dist(rng), dist(rng), -2.0f);
+  }
 }
 
 void Particle::Simulation::Update() {
-  glm::vec3 lightPosWorldSpace =
-      lightCube->transform->GetTransformMatrix() *
-      glm::vec4(lightCube->transform->position, 1.0f);
-  glm::vec3 cameraWorldSpace =
-      Core::StaticCamera::transform->GetTransformMatrix() *
-      glm::vec4(Core::StaticCamera::transform->position, 1.0f);
-
   // TODO: add stbi_image and texture support
   lightCube->mesh->material->SetVec3("lightColor", lightColor);
   for (std::shared_ptr<Core::Object> &cube : cubes) {
-    cube->mesh->material->SetVec3("pointLight.position", lightPosWorldSpace);
-    cube->mesh->material->SetVec3("light.position", lightPosWorldSpace);
-    cube->mesh->material->SetVec3("cameraPosition", cameraWorldSpace);
+    for (std::shared_ptr<Core::Object> &light : lightCubes) {
+    }
+
+    cube->mesh->material->SetVec3("pointLight.position",
+                                  lightCube->transform->GetWorldPosition());
+    cube->mesh->material->SetVec3("light.position",
+                                  lightCube->transform->GetWorldPosition());
+    cube->mesh->material->SetVec3(
+        "cameraPosition", Core::StaticCamera::transform->GetWorldPosition());
     cube->mesh->material->SetFloat("globalFloat", globalFloat);
     cube->mesh->material->SetVec3("light.diffuse", lightColor);
   }
