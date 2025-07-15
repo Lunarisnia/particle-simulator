@@ -51,7 +51,7 @@ void Particle::Simulation::Init() {
   cube->mesh->material->SetFloat("light.outerCutoff", glm::radians(50.0f));
 
   groundCube = Primitive::CreateCube(vertexPath, diffuseFrag);
-  groundCube->mesh->isActive = true;
+  groundCube->mesh->isActive = false;
   groundCube->mesh->material->LoadTexture("./assets/container2.png",
                                           GL_TEXTURE0, GL_RGBA);
   groundCube->mesh->material->LoadTexture("./assets/container2_specular.png",

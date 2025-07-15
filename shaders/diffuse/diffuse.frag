@@ -43,16 +43,10 @@ void main()
     vec4 emissionMap = texture(material.emission, textureCoord);
 
     // Light
-    float fragDistance = length(light.position - fragPos);
-    float attenuation = 1.0f / (light.constant + light.linear * fragDistance + light.quadratic * fragDistance * fragDistance);
-
     vec3 ambient = light.ambient * tex.rgb + (step(1.0f, vec3(1.0f) - specularMap.rgb) * emissionMap.rgb);
 
     vec3 lightDir = normalize(light.position - fragPos);
     float theta = dot(lightDir, -light.spotDirection);
-    // if (theta < light.cutoff) {
-    //     theta = 0.0f;
-    // }
     float epsilon = light.outerCutoff - light.cutoff;
     float intensity = clamp((theta - light.outerCutoff) / epsilon, 0.0f, 1.0f);
 
@@ -64,10 +58,14 @@ void main()
 
     float specularDiff = pow(max(dot(cameraDir, reflectionDir), 0.0f), material.shininess);
     vec3 specular = light.specular * specularDiff * specularMap.rgb;
-
     diffuse *= intensity;
-    ambient *= intensity;
     specular *= intensity;
+
+    float fragDistance = length(light.position - fragPos);
+    float attenuation = 1.0f / (light.constant + light.linear * fragDistance + light.quadratic * fragDistance * fragDistance);
+    diffuse *= attenuation;
+    ambient *= attenuation;
+    specular *= attenuation;
 
     vec3 color = diffuse + ambient + specular;
     FragColor = vec4(color, 1.0f);
