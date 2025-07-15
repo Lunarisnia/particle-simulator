@@ -4,6 +4,7 @@
 #include "core/static_camera/static_camera.hpp"
 #include "core/window/window.hpp"
 #include "editor/hierarchy/hierarchy.hpp"
+#include "editor/inspector/inspector.hpp"
 #include "imgui.h"
 #include "particle/simulation/simulation.hpp"
 
@@ -34,15 +35,13 @@ void Editor::Editor::Update() {
   ImGui::DragFloat3("Camera Position",
                     &Core::StaticCamera::transform->position.x, 0.05f);
   ImGui::DragFloat3("Camera Lookat", &Core::StaticCamera::front.x, 0.05f);
-  ImGui::DragFloat3("Light Position",
-                    &Particle::Simulation::lightCube->transform->position.x,
-                    0.05f);
   ImGui::DragFloat3("Diffuse Light Color", &Particle::Simulation::lightColor.x,
                     0.05f);
   ImGui::DragFloat("Global Shader Float", &Particle::Simulation::globalFloat,
                    0.05f);
   ImGui::End();
   Hierarchy::Tick();
+  Inspector::Tick();
 }
 
 void Editor::Editor::Render() {

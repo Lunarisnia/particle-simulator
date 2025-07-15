@@ -6,6 +6,7 @@
 #include "core/renderer/renderer.hpp"
 
 std::vector<std::shared_ptr<Core::Object>> Core::World::hierarchy;
+std::shared_ptr<Core::Object> Core::World::selectedObject;
 
 void Core::World::Init() {}
 

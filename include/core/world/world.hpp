@@ -6,6 +6,7 @@ namespace Core {
 class World {
  public:
   static std::vector<std::shared_ptr<Object>> hierarchy;
+  static std::shared_ptr<Object> selectedObject;
 
  public:
   static void Init();
