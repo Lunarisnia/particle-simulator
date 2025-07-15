@@ -3,6 +3,7 @@
 #include "backends/imgui_impl_opengl3.h"
 #include "core/static_camera/static_camera.hpp"
 #include "core/window/window.hpp"
+#include "editor/hierarchy/hierarchy.hpp"
 #include "imgui.h"
 #include "particle/simulation/simulation.hpp"
 
@@ -41,6 +42,7 @@ void Editor::Editor::Update() {
   ImGui::DragFloat("Global Shader Float", &Particle::Simulation::globalFloat,
                    0.05f);
   ImGui::End();
+  Hierarchy::Tick();
 }
 
 void Editor::Editor::Render() {

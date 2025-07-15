@@ -8,13 +8,11 @@
 #include "core/static_camera/static_camera.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/ext/vector_float4.hpp"
-#include "glm/trigonometric.hpp"
 #include "particle/primitive/primitive.hpp"
 
 float Particle::Simulation::globalFloat = 0.0f;
 std::shared_ptr<Core::Object> Particle::Simulation::cube;
 std::shared_ptr<Core::Object> Particle::Simulation::lightCube;
-std::shared_ptr<Core::Object> Particle::Simulation::groundCube;
 glm::vec3 Particle::Simulation::lightColor = glm::vec3(1.0f);
 
 const std::string vertexPath = "./shaders/diffuse/diffuse.vert";
@@ -28,8 +26,10 @@ void Particle::Simulation::Init() {
 
   lightCube = Primitive::CreateCube(vertexPath, lightFrag);
   lightCube->transform->position = glm::vec3(1.5f, 1.5f, -1.5f);
+  lightCube->name = "Test2";
 
   cube = Primitive::CreateCube(vertexPath, diffuseFrag2);
+  cube->name = "Test1";
   cube->mesh->material->LoadTexture("./assets/container2.png", GL_TEXTURE0,
                                     GL_RGBA);
   cube->mesh->material->LoadTexture("./assets/container2_specular.png",
@@ -61,29 +61,6 @@ void Particle::Simulation::Init() {
   /*                              glm::vec3(0.0f, -1.0f, 0.0f));*/
   /*cube->mesh->material->SetFloat("light.cutoff", glm::radians(45.0f));*/
   /*cube->mesh->material->SetFloat("light.outerCutoff", glm::radians(50.0f));*/
-
-  groundCube = Primitive::CreateCube(vertexPath, diffuseFrag);
-  groundCube->mesh->isActive = true;
-  groundCube->mesh->material->LoadTexture("./assets/container2.png",
-                                          GL_TEXTURE0, GL_RGBA);
-  groundCube->mesh->material->LoadTexture("./assets/container2_specular.png",
-                                          GL_TEXTURE1, GL_RGBA);
-  groundCube->transform->position = glm::vec3(0.0f, -1.5f, 0.0f);
-  groundCube->transform->scale = glm::vec3(200.0f, 1.0f, 100.0f);
-  groundCube->mesh->material->SetVec3("objectColor", glm::vec3(0.3f));
-  groundCube->mesh->material->SetInt("material.diffuse", 0);
-  groundCube->mesh->material->SetInt("material.specular", 1);
-  groundCube->mesh->material->SetFloat("material.shininess", 32.0f);
-  groundCube->mesh->material->SetVec3("light.ambient", glm::vec3(0.4f));
-  groundCube->mesh->material->SetVec3("light.specular", glm::vec3(1.0f));
-  groundCube->mesh->material->SetFloat("light.constant", 1.0f);
-  groundCube->mesh->material->SetFloat("light.linear", 0.14f);
-  groundCube->mesh->material->SetFloat("light.quadratic", 0.07f);
-  groundCube->mesh->material->SetVec3("light.spotDirection",
-                                      glm::vec3(0.0f, -1.0f, 0.0f));
-  groundCube->mesh->material->SetFloat("light.cutoff", glm::radians(45.0f));
-  groundCube->mesh->material->SetFloat("light.outerCutoff",
-                                       glm::radians(50.0f));
 }
 
 void Particle::Simulation::Update() {
@@ -102,11 +79,6 @@ void Particle::Simulation::Update() {
   cube->mesh->material->SetVec3("cameraPosition", cameraWorldSpace);
   cube->mesh->material->SetFloat("globalFloat", globalFloat);
   cube->mesh->material->SetVec3("light.diffuse", lightColor);
-
-  groundCube->mesh->material->SetVec3("light.position", lightPosWorldSpace);
-  groundCube->mesh->material->SetVec3("cameraPosition", cameraWorldSpace);
-  groundCube->mesh->material->SetFloat("globalFloat", globalFloat);
-  groundCube->mesh->material->SetVec3("light.diffuse", lightColor);
 
   if (Core::Input::GetKey(GLFW_KEY_F)) {
     std::shared_ptr<Core::Object> obj =

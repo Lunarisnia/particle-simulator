@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <string>
 #include <vector>
 #include "core/components/component.hpp"
 #include "core/components/mesh.hpp"
@@ -7,6 +8,7 @@
 namespace Core {
 class Object {
  public:
+  std::string name;
   std::shared_ptr<Transform> transform;
   std::shared_ptr<Mesh> mesh;
 

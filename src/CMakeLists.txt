@@ -55,6 +55,7 @@ add_executable(${PROJECT_NAME}
 
 	# Editor
 	editor/editor.cpp
+	editor/hierarchy/hierarchy.cpp
 
 	# stbi image
 	vendor/stbi_image/stbi_image.cpp

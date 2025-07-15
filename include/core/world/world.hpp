@@ -4,7 +4,7 @@
 #include "core/object/object.hpp"
 namespace Core {
 class World {
- private:
+ public:
   static std::vector<std::shared_ptr<Object>> hierarchy;
 
  public:

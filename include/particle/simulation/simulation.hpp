@@ -9,7 +9,6 @@ class Simulation {
   static glm::vec3 lightColor;
   static std::shared_ptr<Core::Object> cube;
   static std::shared_ptr<Core::Object> lightCube;
-  static std::shared_ptr<Core::Object> groundCube;
 
  public:
   static void Init();
