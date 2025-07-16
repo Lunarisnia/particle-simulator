@@ -49,7 +49,7 @@ struct PointLight {
 uniform Material material;
 uniform Light light;
 uniform DirectionalLight directionalLight;
-uniform PointLight pointLight;
+uniform PointLight pointLight[2];
 
 vec3 calculateDirectionalLight(vec4 tex, vec4 specularHighlight) {
     vec3 ambient = directionalLight.ambient * tex.rgb;
@@ -65,17 +65,17 @@ vec3 calculateDirectionalLight(vec4 tex, vec4 specularHighlight) {
     return ambient + diffuse + specular;
 }
 
-vec3 calculatePointLight(vec4 tex, vec4 specularHighlight) {
-    vec3 ambient = pointLight.ambient * tex.rgb;
+vec3 calculatePointLight(vec4 tex, vec4 specularHighlight, PointLight pLight) {
+    vec3 ambient = pLight.ambient * tex.rgb;
 
-    vec3 lightDir = normalize(pointLight.position - fragPos);
+    vec3 lightDir = normalize(pLight.position - fragPos);
     float diff = max(dot(normal, lightDir), 0.0f);
-    vec3 diffuse = pointLight.diffuse * diff * tex.rgb;
+    vec3 diffuse = pLight.diffuse * diff * tex.rgb;
 
     vec3 lightReflectionDir = reflect(-lightDir, normal);
     vec3 viewDir = normalize(cameraPosition - fragPos);
     float specDiff = pow(max(dot(viewDir, lightReflectionDir), 0.0f), material.shininess);
-    vec3 specular = pointLight.specular * specDiff * specularHighlight.rgb;
+    vec3 specular = pLight.specular * specDiff * specularHighlight.rgb;
 
     return ambient + diffuse + specular;
 }
@@ -86,8 +86,9 @@ void main()
     vec4 specularMap = texture(material.specular, textureCoord);
     vec4 emissionMap = texture(material.emission, textureCoord);
 
-    vec3 color = calculateDirectionalLight(tex, specularMap);
-    color += calculatePointLight(tex, specularMap);
+    // vec3 color = calculateDirectionalLight(tex, specularMap);
+    // color += calculatePointLight(tex, specularMap, pointLight[0]);
+    vec3 color = calculatePointLight(tex, specularMap, pointLight[0]);
 
     // Light
     // vec3 ambient = light.ambient * tex.rgb + (step(1.0f, vec3(1.0f) - specularMap.rgb) * emissionMap.rgb);

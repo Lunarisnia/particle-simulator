@@ -89,10 +89,10 @@ void Particle::Simulation::Init() {
 }
 
 void Particle::Simulation::Update() {
-  // TODO: add stbi_image and texture support
   lightCube->mesh->material->SetVec3("lightColor", lightColor);
   for (std::shared_ptr<Core::Object> &cube : cubes) {
     for (std::shared_ptr<Core::Object> &light : lightCubes) {
+      // TODO: add multiple lights to the gl uniform
     }
 
     cube->mesh->material->SetVec3("pointLight.position",
