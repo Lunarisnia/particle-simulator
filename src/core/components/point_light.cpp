@@ -22,4 +22,9 @@ void Core::PointLight::SetMeshUniform(const std::string &uniform,
   object->mesh->material->SetVec3(std::format("{}.diffuse", uniform), diffuse);
   object->mesh->material->SetVec3(std::format("{}.specular", uniform),
                                   specular);
+  object->mesh->material->SetFloat(std::format("{}.constant", uniform),
+                                   constant);
+  object->mesh->material->SetFloat(std::format("{}.linear", uniform), linear);
+  object->mesh->material->SetFloat(std::format("{}.quadratic", uniform),
+                                   quadratic);
 }

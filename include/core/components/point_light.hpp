@@ -10,6 +10,10 @@ class PointLight : public Component {
   glm::vec3 diffuse;
   glm::vec3 specular;
 
+  float constant;
+  float linear;
+  float quadratic;
+
  public:
   ComponentType GetType() override;
   void Update() override;

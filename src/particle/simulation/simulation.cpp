@@ -41,6 +41,10 @@ void Particle::Simulation::Init() {
     pointLight->diffuse = glm::vec3(1.0f);
     pointLight->specular = glm::vec3(1.0f);
 
+    pointLight->constant = 1.0f;
+    pointLight->linear = 0.14f;
+    pointLight->quadratic = 0.07f;
+
     light->name = std::format("Point Light ({})", i);
     light->mesh->material->SetVec3("lightColor", glm::vec3(1.0f));
 

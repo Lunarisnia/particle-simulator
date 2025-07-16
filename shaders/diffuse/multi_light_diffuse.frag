@@ -44,6 +44,10 @@ struct PointLight {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+
+    float constant;
+    float linear;
+    float quadratic;
 };
 
 #define NUMBER_OF_POINT_LIGHT 2
@@ -79,6 +83,13 @@ vec3 calculatePointLight(vec4 tex, vec4 specularHighlight, PointLight pLight) {
     float specDiff = pow(max(dot(viewDir, lightReflectionDir), 0.0f), material.shininess);
     vec3 specular = pLight.specular * specDiff * specularHighlight.rgb;
 
+    float fragDistance = length(pLight.position - fragPos);
+    float attenuation = 1.0f / (pLight.constant + pLight.linear * fragDistance + pLight.quadratic * fragDistance * fragDistance);
+
+    ambient *= attenuation;
+    diffuse *= attenuation;
+    specular *= attenuation;
+
     return ambient + diffuse + specular;
 }
 
@@ -92,6 +103,8 @@ void main()
     for (int i = 0; i < NUMBER_OF_POINT_LIGHT; i++) {
         color += calculatePointLight(tex, specularMap, pointLight[i]);
     }
+
+    color += (step(1.0f, vec3(1.0f) - specularMap.rgb) * emissionMap.rgb);
 
     FragColor = vec4(color, 1.0f);
 
@@ -114,8 +127,6 @@ void main()
     // diffuse *= intensity;
     // specular *= intensity;
     //
-    // float fragDistance = length(light.position - fragPos);
-    // float attenuation = 1.0f / (light.constant + light.linear * fragDistance + light.quadratic * fragDistance * fragDistance);
     // diffuse *= attenuation;
     // ambient *= attenuation;
     // specular *= attenuation;
