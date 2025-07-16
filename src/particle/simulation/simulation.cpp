@@ -11,7 +11,6 @@
 #include "core/object/object.hpp"
 #include "core/static_camera/static_camera.hpp"
 #include "glm/ext/vector_float3.hpp"
-#include "glm/ext/vector_float4.hpp"
 #include "particle/primitive/primitive.hpp"
 
 float Particle::Simulation::globalFloat = 0.0f;
@@ -61,9 +60,9 @@ void Particle::Simulation::Init() {
     obj->mesh->material->SetVec3("directionalLight.diffuse", glm::vec3(1.0f));
     obj->mesh->material->SetVec3("directionalLight.specular", glm::vec3(1.0f));
 
-    obj->mesh->material->SetVec3("pointLight.ambient", glm::vec3(0.5f));
-    obj->mesh->material->SetVec3("pointLight.diffuse", glm::vec3(1.0f));
-    obj->mesh->material->SetVec3("pointLight.specular", glm::vec3(1.0f));
+    /*obj->mesh->material->SetVec3("pointLight.ambient", glm::vec3(0.5f));*/
+    /*obj->mesh->material->SetVec3("pointLight.diffuse", glm::vec3(1.0f));*/
+    /*obj->mesh->material->SetVec3("pointLight.specular", glm::vec3(1.0f));*/
 
     /*obj->mesh->material->SetVec3("light.ambient", glm::vec3(1.0f));*/
     /*obj->mesh->material->SetVec3("light.specular", glm::vec3(1.0f));*/
@@ -91,12 +90,24 @@ void Particle::Simulation::Init() {
 void Particle::Simulation::Update() {
   lightCube->mesh->material->SetVec3("lightColor", lightColor);
   for (std::shared_ptr<Core::Object> &cube : cubes) {
-    for (std::shared_ptr<Core::Object> &light : lightCubes) {
+    for (size_t i = 0; i < lightCubes.size(); i++) {
       // TODO: add multiple lights to the gl uniform
+      /*cube->mesh->material->SetVec3(*/
+      /*    std::format("pointLight[{}].position", i),*/
+      /*    lightCubes[i]->transform->GetWorldPosition());*/
+      /*cube->mesh->material->SetVec3(std::format("pointLight[{}].ambient",
+       * i),*/
+      /*                              glm::vec3(0.5f));*/
+      /*cube->mesh->material->SetVec3(std::format("pointLight[{}].diffuse",
+       * i),*/
+      /*                              glm::vec3(1.0f));*/
+      /*cube->mesh->material->SetVec3(std::format("pointLight[{}].position",
+       * i),*/
+      /*                              glm::vec3(1.0f));*/
     }
 
-    cube->mesh->material->SetVec3("pointLight.position",
-                                  lightCube->transform->GetWorldPosition());
+    /*cube->mesh->material->SetVec3("pointLight.position",*/
+    /*                              lightCube->transform->GetWorldPosition());*/
     cube->mesh->material->SetVec3("light.position",
                                   lightCube->transform->GetWorldPosition());
     cube->mesh->material->SetVec3(
