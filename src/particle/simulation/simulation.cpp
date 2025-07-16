@@ -64,7 +64,7 @@ void Particle::Simulation::Init() {
         Primitive::CreateCube(vertexPath, lightFrag);
     std::shared_ptr<Core::SpotLight> spotLight =
         light->AddComponent<Core::SpotLight>();
-    spotLight->direction = glm::vec3(0.0f, -1.0f, 0.0f);
+    spotLight->direction = glm::vec3(0.0f, 0.0f, -1.0f);
     spotLight->ambient = glm::vec3(0.5f);
     spotLight->diffuse = glm::vec3(1.0f);
     spotLight->specular = glm::vec3(1.0f);
@@ -73,12 +73,12 @@ void Particle::Simulation::Init() {
     spotLight->outerCutoff = glm::radians(50.0f);
     spotLight->constant = 1.0f;
     spotLight->linear = 0.14f;
-    spotLight->quadratic = 0.07f;
+    spotLight->quadratic = 0.0007f;
 
     light->name = std::format("Spot Light ({})", i);
     light->mesh->material->SetVec3("lightColor", glm::vec3(1.0f));
 
-    light->transform->position = glm::vec3(dist(rng), dist(rng), -2.0f);
+    light->transform->position = glm::vec3(0.0f, 0.0f, 4.0f);
 
     spotLightCubes.emplace_back(light);
   }

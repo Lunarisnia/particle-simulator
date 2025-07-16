@@ -19,7 +19,7 @@ void Core::SpotLight::SetMeshUniform(const std::string &uniform,
   object->mesh->material->SetVec3(std::format("{}.position", uniform),
                                   lightOwner->transform->GetWorldPosition());
   object->mesh->material->SetVec3(std::format("{}.direction", uniform),
-                                  direction);
+                                  glm::normalize(direction));
   object->mesh->material->SetVec3(std::format("{}.ambient", uniform), ambient);
   object->mesh->material->SetVec3(std::format("{}.diffuse", uniform), diffuse);
   object->mesh->material->SetVec3(std::format("{}.specular", uniform),
