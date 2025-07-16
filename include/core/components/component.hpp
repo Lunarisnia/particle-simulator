@@ -9,6 +9,7 @@ enum ComponentType {
   MESH,
   RIGIDBODY_2D,
   POINT_LIGHT,
+  SPOT_LIGHT,
 };
 
 class Component {

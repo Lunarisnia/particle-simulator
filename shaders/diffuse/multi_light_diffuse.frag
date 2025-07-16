@@ -50,12 +50,29 @@ struct PointLight {
     float quadratic;
 };
 
+struct SpotLight {
+    vec3 position;
+    vec3 direction;
+
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+
+    float cutoff;
+    float outerCutoff;
+    float constant;
+    float linear;
+    float quadratic;
+};
+
 #define NUMBER_OF_POINT_LIGHT 2
+#define NUMBER_OF_SPOT_LIGHT 1
 
 uniform Material material;
 uniform Light light;
 uniform DirectionalLight directionalLight;
 uniform PointLight pointLight[NUMBER_OF_POINT_LIGHT];
+uniform SpotLight spotLight[NUMBER_OF_SPOT_LIGHT];
 
 vec3 calculateDirectionalLight(vec4 tex, vec4 specularHighlight) {
     vec3 ambient = directionalLight.ambient * tex.rgb;
@@ -93,6 +110,35 @@ vec3 calculatePointLight(vec4 tex, vec4 specularHighlight, PointLight pLight) {
     return ambient + diffuse + specular;
 }
 
+vec3 calculateSpotLight(vec4 tex, vec4 specularHighlight, SpotLight sLight) {
+    vec3 lightDir = normalize(sLight.position - fragPos);
+    float theta = dot(lightDir, -sLight.direction);
+    float epsilon = sLight.outerCutoff - sLight.cutoff;
+    float intensity = clamp((theta - sLight.outerCutoff) / epsilon, 0.0f, 1.0f);
+
+    vec3 ambient = sLight.ambient * tex.rgb;
+
+    float diff = max(dot(normal, lightDir), 0.0f);
+    vec3 diffuse = sLight.diffuse * diff * tex.rgb;
+
+    vec3 lightReflectionDir = reflect(-lightDir, normal);
+    vec3 viewDir = normalize(cameraPosition - fragPos);
+    float specDiff = pow(max(dot(viewDir, lightReflectionDir), 0.0f), material.shininess);
+    vec3 specular = sLight.specular * specDiff * specularHighlight.rgb;
+    diffuse *= intensity;
+    ambient *= intensity;
+    specular *= intensity;
+
+    float fragDistance = length(sLight.position - fragPos);
+    float attenuation = 1.0f / (sLight.constant + sLight.linear * fragDistance + sLight.quadratic * fragDistance * fragDistance);
+
+    ambient *= attenuation;
+    diffuse *= attenuation;
+    specular *= attenuation;
+
+    return ambient + diffuse + specular;
+}
+
 void main()
 {
     vec4 tex = texture(material.diffuse, textureCoord);
@@ -102,6 +148,9 @@ void main()
     vec3 color = calculateDirectionalLight(tex, specularMap);
     for (int i = 0; i < NUMBER_OF_POINT_LIGHT; i++) {
         color += calculatePointLight(tex, specularMap, pointLight[i]);
+    }
+    for (int i = 0; i < NUMBER_OF_SPOT_LIGHT; i++) {
+        color += calculateSpotLight(tex, specularMap, spotLight[i]);
     }
 
     color += (step(1.0f, vec3(1.0f) - specularMap.rgb) * emissionMap.rgb);

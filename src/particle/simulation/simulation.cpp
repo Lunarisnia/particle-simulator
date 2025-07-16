@@ -2,26 +2,32 @@
 #include <cstddef>
 #include <format>
 #include <memory>
+#include <print>
 #include <random>
 #include <string>
 #include <vector>
 #include "GLFW/glfw3.h"
 #include "core/components/point_light.hpp"
 #include "core/components/rigidbody2d.hpp"
+#include "core/components/spot_light.hpp"
 #include "core/input/input.hpp"
 #include "core/object/object.hpp"
 #include "core/static_camera/static_camera.hpp"
 #include "glm/ext/vector_float3.hpp"
+#include "glm/geometric.hpp"
+#include "glm/trigonometric.hpp"
 #include "particle/primitive/primitive.hpp"
 
 float Particle::Simulation::globalFloat = 0.0f;
 std::vector<std::shared_ptr<Core::Object>> Particle::Simulation::lightCubes;
+std::vector<std::shared_ptr<Core::Object>> Particle::Simulation::spotLightCubes;
 std::vector<std::shared_ptr<Core::Object>> Particle::Simulation::cubes;
 
 glm::vec3 Particle::Simulation::lightColor = glm::vec3(1.0f);
 
 const std::string vertexPath = "./shaders/diffuse/diffuse.vert";
 const std::string diffuseFrag = "./shaders/diffuse/diffuse.frag";
+const std::string demoFrag = "./shaders/diffuse/demo.frag";
 const std::string diffuseFrag2 = "./shaders/diffuse/multi_light_diffuse.frag";
 const std::string lightFrag = "./shaders/light/light.frag";
 
@@ -51,6 +57,30 @@ void Particle::Simulation::Init() {
     light->transform->position = glm::vec3(dist(rng), dist(rng), -2.0f);
 
     lightCubes.emplace_back(light);
+  }
+
+  for (size_t i = 0; i < 1; i++) {
+    std::shared_ptr<Core::Object> light =
+        Primitive::CreateCube(vertexPath, lightFrag);
+    std::shared_ptr<Core::SpotLight> spotLight =
+        light->AddComponent<Core::SpotLight>();
+    spotLight->direction = glm::vec3(0.0f, -1.0f, 0.0f);
+    spotLight->ambient = glm::vec3(0.5f);
+    spotLight->diffuse = glm::vec3(1.0f);
+    spotLight->specular = glm::vec3(1.0f);
+
+    spotLight->cutoff = glm::radians(45.0f);
+    spotLight->outerCutoff = glm::radians(50.0f);
+    spotLight->constant = 1.0f;
+    spotLight->linear = 0.14f;
+    spotLight->quadratic = 0.07f;
+
+    light->name = std::format("Spot Light ({})", i);
+    light->mesh->material->SetVec3("lightColor", glm::vec3(1.0f));
+
+    light->transform->position = glm::vec3(dist(rng), dist(rng), -2.0f);
+
+    spotLightCubes.emplace_back(light);
   }
 
   for (size_t i = 0; i < 10; i++) {
@@ -97,6 +127,12 @@ void Particle::Simulation::Update() {
       std::shared_ptr<Core::PointLight> pointLight =
           lightCubes[i]->GetComponent<Core::PointLight>();
       pointLight->SetMeshUniform(std::format("pointLight[{}]", i), cube);
+    }
+
+    for (size_t i = 0; i < spotLightCubes.size(); i++) {
+      std::shared_ptr<Core::SpotLight> spotLight =
+          spotLightCubes[i]->GetComponent<Core::SpotLight>();
+      spotLight->SetMeshUniform(std::format("spotLight[{}]", i), cube);
     }
 
     cube->mesh->material->SetVec3(

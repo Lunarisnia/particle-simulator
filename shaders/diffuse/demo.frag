@@ -14,7 +14,7 @@ uniform float globalFloat;
 void main()
 {
     vec3 lightDirection = normalize(lightPosition - fragPos);
-    float diff = max(dot(normal, lightDirection), 0.0f);
+    float diff = dot(normal, lightDirection);
     vec3 diffuse = diff * objectColor;
     FragColor = vec4(diffuse, 1.0f);
 }
