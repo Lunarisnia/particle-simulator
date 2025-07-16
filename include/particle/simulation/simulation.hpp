@@ -11,8 +11,6 @@ class Simulation {
   static std::vector<std::shared_ptr<Core::Object>> cubes;
   static std::vector<std::shared_ptr<Core::Object>> lightCubes;
 
-  static std::shared_ptr<Core::Object> lightCube;
-
  public:
   static void Init();
   static void Update();

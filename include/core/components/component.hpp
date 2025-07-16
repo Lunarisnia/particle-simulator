@@ -8,6 +8,7 @@ enum ComponentType {
   TRANSFORM,
   MESH,
   RIGIDBODY_2D,
+  POINT_LIGHT,
 };
 
 class Component {

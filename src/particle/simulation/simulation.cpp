@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include "GLFW/glfw3.h"
+#include "core/components/point_light.hpp"
 #include "core/components/rigidbody2d.hpp"
 #include "core/input/input.hpp"
 #include "core/object/object.hpp"
@@ -14,9 +15,8 @@
 #include "particle/primitive/primitive.hpp"
 
 float Particle::Simulation::globalFloat = 0.0f;
-std::shared_ptr<Core::Object> Particle::Simulation::lightCube;
-std::vector<std::shared_ptr<Core::Object>> Particle::Simulation::cubes;
 std::vector<std::shared_ptr<Core::Object>> Particle::Simulation::lightCubes;
+std::vector<std::shared_ptr<Core::Object>> Particle::Simulation::cubes;
 
 glm::vec3 Particle::Simulation::lightColor = glm::vec3(1.0f);
 
@@ -28,13 +28,26 @@ const std::string lightFrag = "./shaders/light/light.frag";
 void Particle::Simulation::Init() {
   Core::StaticCamera::transform->position.z = 1.0f;
 
-  lightCube = Primitive::CreateCube(vertexPath, lightFrag);
-  lightCube->transform->position = glm::vec3(1.5f, 1.5f, -1.5f);
-  lightCube->name = "PointLight1";
-
   std::random_device dev;
   std::mt19937 rng(dev());
   std::uniform_real_distribution<float> dist(-3.5f, 3.5f);
+
+  for (size_t i = 0; i < 2; i++) {
+    std::shared_ptr<Core::Object> light =
+        Primitive::CreateCube(vertexPath, lightFrag);
+    std::shared_ptr<Core::PointLight> pointLight =
+        light->AddComponent<Core::PointLight>();
+    pointLight->ambient = glm::vec3(0.5f);
+    pointLight->diffuse = glm::vec3(1.0f);
+    pointLight->specular = glm::vec3(1.0f);
+
+    light->name = std::format("Point Light ({})", i);
+    light->mesh->material->SetVec3("lightColor", glm::vec3(1.0f));
+
+    light->transform->position = glm::vec3(dist(rng), dist(rng), -2.0f);
+
+    lightCubes.emplace_back(light);
+  }
 
   for (size_t i = 0; i < 10; i++) {
     std::shared_ptr<Core::Object> obj =
@@ -60,10 +73,6 @@ void Particle::Simulation::Init() {
     obj->mesh->material->SetVec3("directionalLight.diffuse", glm::vec3(1.0f));
     obj->mesh->material->SetVec3("directionalLight.specular", glm::vec3(1.0f));
 
-    /*obj->mesh->material->SetVec3("pointLight.ambient", glm::vec3(0.5f));*/
-    /*obj->mesh->material->SetVec3("pointLight.diffuse", glm::vec3(1.0f));*/
-    /*obj->mesh->material->SetVec3("pointLight.specular", glm::vec3(1.0f));*/
-
     /*obj->mesh->material->SetVec3("light.ambient", glm::vec3(1.0f));*/
     /*obj->mesh->material->SetVec3("light.specular", glm::vec3(1.0f));*/
     /*obj->mesh->material->SetFloat("light.constant", 1.0f);*/
@@ -76,44 +85,19 @@ void Particle::Simulation::Init() {
 
     cubes.emplace_back(obj);
   }
-
-  for (size_t i = 0; i < 2; i++) {
-    std::shared_ptr<Core::Object> light =
-        Primitive::CreateCube(vertexPath, lightFrag);
-    light->name = std::format("Light ({})", i);
-    light->mesh->material->SetVec3("lightColor", glm::vec3(1.0f));
-
-    light->transform->position = glm::vec3(dist(rng), dist(rng), -2.0f);
-  }
 }
 
 void Particle::Simulation::Update() {
-  lightCube->mesh->material->SetVec3("lightColor", lightColor);
   for (std::shared_ptr<Core::Object> &cube : cubes) {
     for (size_t i = 0; i < lightCubes.size(); i++) {
-      // TODO: add multiple lights to the gl uniform
-      /*cube->mesh->material->SetVec3(*/
-      /*    std::format("pointLight[{}].position", i),*/
-      /*    lightCubes[i]->transform->GetWorldPosition());*/
-      /*cube->mesh->material->SetVec3(std::format("pointLight[{}].ambient",
-       * i),*/
-      /*                              glm::vec3(0.5f));*/
-      /*cube->mesh->material->SetVec3(std::format("pointLight[{}].diffuse",
-       * i),*/
-      /*                              glm::vec3(1.0f));*/
-      /*cube->mesh->material->SetVec3(std::format("pointLight[{}].position",
-       * i),*/
-      /*                              glm::vec3(1.0f));*/
+      std::shared_ptr<Core::PointLight> pointLight =
+          lightCubes[i]->GetComponent<Core::PointLight>();
+      pointLight->SetMeshUniform(std::format("pointLight[{}]", i), cube);
     }
 
-    /*cube->mesh->material->SetVec3("pointLight.position",*/
-    /*                              lightCube->transform->GetWorldPosition());*/
-    cube->mesh->material->SetVec3("light.position",
-                                  lightCube->transform->GetWorldPosition());
     cube->mesh->material->SetVec3(
         "cameraPosition", Core::StaticCamera::transform->GetWorldPosition());
     cube->mesh->material->SetFloat("globalFloat", globalFloat);
-    cube->mesh->material->SetVec3("light.diffuse", lightColor);
   }
 
   if (Core::Input::GetKey(GLFW_KEY_F)) {

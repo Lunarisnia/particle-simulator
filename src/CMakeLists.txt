@@ -47,6 +47,7 @@ add_executable(${PROJECT_NAME}
 	core/components/mesh.cpp
 	core/components/transform.cpp
 	core/components/rigidbody2d.cpp
+	core/components/point_light.cpp
 
 	# Particle
 	particle/app.cpp

@@ -46,10 +46,12 @@ struct PointLight {
     vec3 specular;
 };
 
+#define NUMBER_OF_POINT_LIGHT 2
+
 uniform Material material;
 uniform Light light;
 uniform DirectionalLight directionalLight;
-uniform PointLight pointLight[2];
+uniform PointLight pointLight[NUMBER_OF_POINT_LIGHT];
 
 vec3 calculateDirectionalLight(vec4 tex, vec4 specularHighlight) {
     vec3 ambient = directionalLight.ambient * tex.rgb;
@@ -86,9 +88,12 @@ void main()
     vec4 specularMap = texture(material.specular, textureCoord);
     vec4 emissionMap = texture(material.emission, textureCoord);
 
-    // vec3 color = calculateDirectionalLight(tex, specularMap);
-    // color += calculatePointLight(tex, specularMap, pointLight[0]);
-    vec3 color = calculatePointLight(tex, specularMap, pointLight[0]);
+    vec3 color = calculateDirectionalLight(tex, specularMap);
+    for (int i = 0; i < NUMBER_OF_POINT_LIGHT; i++) {
+        color += calculatePointLight(tex, specularMap, pointLight[i]);
+    }
+
+    FragColor = vec4(color, 1.0f);
 
     // Light
     // vec3 ambient = light.ambient * tex.rgb + (step(1.0f, vec3(1.0f) - specularMap.rgb) * emissionMap.rgb);
@@ -116,6 +121,4 @@ void main()
     // specular *= attenuation;
     //
     // vec3 color = diffuse + ambient + specular;
-
-    FragColor = vec4(color, 1.0f);
 }
