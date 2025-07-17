@@ -3,6 +3,8 @@
 # pollute upwards into our configuration.
 # add_subdirectory(SDL EXCLUDE_FROM_ALL)
 
+# Assimp
+add_subdirectory(assimp EXCLUDE_FROM_ALL)
 
 # GLM
 add_subdirectory(glm EXCLUDE_FROM_ALL)
@@ -20,3 +22,4 @@ add_library(vendor INTERFACE)
 target_link_libraries(vendor INTERFACE glad)
 target_link_libraries(vendor INTERFACE glfw)
 target_link_libraries(vendor INTERFACE glm::glm)
+target_link_libraries(vendor INTERFACE assimp)

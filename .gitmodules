@@ -7,3 +7,6 @@
 [submodule "src/vendor/imgui"]
 	path = src/vendor/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "vendor/assimp"]
+	path = vendor/assimp
+	url = https://github.com/assimp/assimp.git
