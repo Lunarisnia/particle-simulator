@@ -3,6 +3,7 @@
 #include "glm/ext/vector_float3.hpp"
 namespace Core {
 class VertexData {
+ public:
   glm::vec3 position;
   glm::vec2 textureCoord;
   glm::vec3 normal;
