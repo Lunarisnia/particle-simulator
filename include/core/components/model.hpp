@@ -1,14 +1,23 @@
 #pragma once
+#include <memory>
+#include <string>
+#include <vector>
 #include "core/components/component.hpp"
+#include "core/components/mesh.hpp"
 namespace Core {
-// TODO: Implement cpp file for model, it is basically a class that can contain
-// a vector of mesh and have it be handled by the renderer
 class Model : public Component {
+ public:
+  std::vector<std::shared_ptr<Mesh>> meshes;
+
  public:
   Core::ComponentType GetType() override;
   void Update() override;
 
+  std::vector<std::shared_ptr<Mesh>>& GetMeshes();
+  void AddMesh(std::shared_ptr<Mesh>& mesh);
+
  public:
   Model();
+  Model(const std::string& path);
 };
 };  // namespace Core
