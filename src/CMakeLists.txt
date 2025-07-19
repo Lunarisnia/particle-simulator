@@ -54,6 +54,7 @@ add_executable(${PROJECT_NAME}
 	particle/app.cpp
 	particle/simulation/simulation.cpp
 	particle/primitive/primitive.cpp
+	particle/model/model.cpp
 
 	# Editor
 	editor/editor.cpp
