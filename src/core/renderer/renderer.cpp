@@ -30,6 +30,9 @@ void Core::Renderer::Render() {
       continue;
     }
     Object *owner = mesh->GetOwner();
+    if (!owner) {
+      continue;
+    }
 
     mesh->material->Use();
     mesh->material->SetMat4("model", owner->transform->GetTransformMatrix());

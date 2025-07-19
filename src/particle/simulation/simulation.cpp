@@ -1,5 +1,6 @@
 #include "particle/simulation/simulation.hpp"
 #include <cstddef>
+#include <exception>
 #include <format>
 #include <memory>
 #include <print>
@@ -13,6 +14,7 @@
 #include "core/input/input.hpp"
 #include "core/object/object.hpp"
 #include "core/static_camera/static_camera.hpp"
+#include "core/world/world.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/geometric.hpp"
 #include "glm/trigonometric.hpp"
@@ -33,7 +35,11 @@ const std::string lightFrag = "./shaders/light/light.frag";
 
 void Particle::Simulation::Init() {
   Core::StaticCamera::transform->position.z = 1.0f;
+}
 
+void Particle::Simulation::Update() {}
+
+void Particle::Simulation::placeObjects() {
   std::random_device dev;
   std::mt19937 rng(dev());
   std::uniform_real_distribution<float> dist(-3.5f, 3.5f);
@@ -121,7 +127,7 @@ void Particle::Simulation::Init() {
   }
 }
 
-void Particle::Simulation::Update() {
+void Particle::Simulation::objectUpdate() {
   for (std::shared_ptr<Core::Object> &cube : cubes) {
     for (size_t i = 0; i < lightCubes.size(); i++) {
       std::shared_ptr<Core::PointLight> pointLight =

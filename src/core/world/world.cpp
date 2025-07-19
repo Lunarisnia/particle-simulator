@@ -1,4 +1,5 @@
 #include "core/world/world.hpp"
+#include <cstddef>
 #include <memory>
 #include <vector>
 #include "core/components/mesh.hpp"
@@ -20,9 +21,8 @@ void Core::World::AddObject(std::shared_ptr<Object> object) {
   hierarchy.emplace_back(object);
 
   std::shared_ptr<Mesh> mesh = object->GetComponent<Mesh>();
-  if (mesh != nullptr) {
+  if (mesh) {
     Renderer::AddToRenderQueue(mesh);
-    /*Voxedit::Hierarchy::AddObjectToHierarchy(object->id, object);*/
   }
 }
 
