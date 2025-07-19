@@ -9,7 +9,7 @@ class Mesh : public Component {
  private:
   unsigned int VAO, VBO, EBO;
   std::vector<VertexData> vertice;
-  std::vector<int> indice;
+  std::vector<unsigned int> indice;
 
  public:
   std::shared_ptr<Material> material;
@@ -19,7 +19,7 @@ class Mesh : public Component {
 
   void BindVertexArray();
   void AddVertex(VertexData vertex);
-  void AddIndex(int index);
+  void AddIndex(unsigned int index);
   int GetIndiceLength();
 
  public:

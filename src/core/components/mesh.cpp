@@ -43,7 +43,7 @@ void Core::Mesh::AddVertex(Core::VertexData vertex) {
   vertice.emplace_back(vertex);
 }
 
-void Core::Mesh::AddIndex(int index) { indice.emplace_back(index); }
+void Core::Mesh::AddIndex(unsigned int index) { indice.emplace_back(index); }
 
 int Core::Mesh::GetIndiceLength() { return indice.size(); }
 

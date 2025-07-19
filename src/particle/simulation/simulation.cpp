@@ -18,6 +18,7 @@
 #include "glm/ext/vector_float3.hpp"
 #include "glm/geometric.hpp"
 #include "glm/trigonometric.hpp"
+#include "particle/model/model.hpp"
 #include "particle/primitive/primitive.hpp"
 
 float Particle::Simulation::globalFloat = 0.0f;
@@ -35,6 +36,7 @@ const std::string lightFrag = "./shaders/light/light.frag";
 
 void Particle::Simulation::Init() {
   Core::StaticCamera::transform->position.z = 1.0f;
+  Model::LoadModel("./assets/backpack/backpack.obj");
 }
 
 void Particle::Simulation::Update() {}
