@@ -12,6 +12,7 @@ struct Material {
     sampler2D diffuse;
     sampler2D specular;
     sampler2D emission;
+    sampler2D normalMap;
     float shininess;
 };
 
@@ -74,7 +75,7 @@ uniform DirectionalLight directionalLight;
 uniform PointLight pointLight[NUMBER_OF_POINT_LIGHT];
 uniform SpotLight spotLight[NUMBER_OF_SPOT_LIGHT];
 
-vec3 calculateDirectionalLight(vec4 tex, vec4 specularHighlight) {
+vec3 calculateDirectionalLight(vec4 tex, vec4 specularHighlight, vec3 normal, float roughness) {
     vec3 ambient = directionalLight.ambient * tex.rgb;
 
     float diff = max(dot(normal, -directionalLight.direction), 0.0f);
@@ -82,13 +83,13 @@ vec3 calculateDirectionalLight(vec4 tex, vec4 specularHighlight) {
 
     vec3 lightReflectionDir = reflect(directionalLight.direction, normal);
     vec3 viewDir = normalize(cameraPosition - fragPos);
-    float specDiff = pow(max(dot(viewDir, lightReflectionDir), 0.0f), material.shininess);
+    float specDiff = pow(max(dot(viewDir, lightReflectionDir), 0.0f), roughness);
     vec3 specular = directionalLight.specular * specDiff * specularHighlight.rgb;
 
     return ambient + diffuse + specular;
 }
 
-vec3 calculatePointLight(vec4 tex, vec4 specularHighlight, PointLight pLight) {
+vec3 calculatePointLight(vec4 tex, vec4 specularHighlight, PointLight pLight, vec3 normal, float roughness) {
     vec3 ambient = pLight.ambient * tex.rgb;
 
     vec3 lightDir = normalize(pLight.position - fragPos);
@@ -97,7 +98,7 @@ vec3 calculatePointLight(vec4 tex, vec4 specularHighlight, PointLight pLight) {
 
     vec3 lightReflectionDir = reflect(-lightDir, normal);
     vec3 viewDir = normalize(cameraPosition - fragPos);
-    float specDiff = pow(max(dot(viewDir, lightReflectionDir), 0.0f), material.shininess);
+    float specDiff = pow(max(dot(viewDir, lightReflectionDir), 0.0f), roughness);
     vec3 specular = pLight.specular * specDiff * specularHighlight.rgb;
 
     float fragDistance = length(pLight.position - fragPos);
@@ -110,7 +111,7 @@ vec3 calculatePointLight(vec4 tex, vec4 specularHighlight, PointLight pLight) {
     return ambient + diffuse + specular;
 }
 
-vec3 calculateSpotLight(vec4 tex, vec4 specularHighlight, SpotLight sLight) {
+vec3 calculateSpotLight(vec4 tex, vec4 specularHighlight, SpotLight sLight, vec3 normal, float roughness) {
     vec3 ambient = sLight.ambient * tex.rgb;
 
     vec3 lightDir = normalize(sLight.position - fragPos);
@@ -119,7 +120,7 @@ vec3 calculateSpotLight(vec4 tex, vec4 specularHighlight, SpotLight sLight) {
 
     vec3 lightReflectionDir = reflect(-lightDir, normal);
     vec3 viewDir = normalize(cameraPosition - fragPos);
-    float specDiff = pow(max(dot(viewDir, lightReflectionDir), 0.0f), material.shininess);
+    float specDiff = pow(max(dot(viewDir, lightReflectionDir), 0.0f), roughness);
     vec3 specular = sLight.specular * specDiff * specularHighlight.rgb;
 
     float theta = dot(lightDir, -sLight.direction);
@@ -144,42 +145,19 @@ void main()
     vec4 tex = texture(material.diffuse, textureCoord);
     vec4 specularMap = texture(material.specular, textureCoord);
     vec4 emissionMap = texture(material.emission, textureCoord);
+    vec4 normalMap = texture(material.normalMap, textureCoord);
+    normalMap = normalize(normalMap * 2.0f - 1.0f);
 
-    vec3 color = calculateDirectionalLight(tex, specularMap);
+    vec3 color = calculateDirectionalLight(tex, specularMap, normalMap.rgb, material.shininess);
     for (int i = 0; i < NUMBER_OF_POINT_LIGHT; i++) {
-        color += calculatePointLight(tex, specularMap, pointLight[i]);
+        color += calculatePointLight(tex, specularMap, pointLight[i], normalMap.rgb, material.shininess);
     }
 
     for (int i = 0; i < NUMBER_OF_SPOT_LIGHT; i++) {
-        color += calculateSpotLight(tex, specularMap, spotLight[i]);
+        color += calculateSpotLight(tex, specularMap, spotLight[i], normalMap.rgb, material.shininess);
     }
 
     color += (step(1.0f, vec3(1.0f) - specularMap.rgb) * emissionMap.rgb);
 
     FragColor = vec4(color, 1.0f);
-
-    // Light
-    // vec3 ambient = light.ambient * tex.rgb + (step(1.0f, vec3(1.0f) - specularMap.rgb) * emissionMap.rgb);
-    //
-    // vec3 lightDir = normalize(light.position - fragPos);
-    // float theta = dot(lightDir, -light.spotDirection);
-    // float epsilon = light.outerCutoff - light.cutoff;
-    // float intensity = clamp((theta - light.outerCutoff) / epsilon, 0.0f, 1.0f);
-    //
-    // float diff = max(dot(normal, lightDir), 0.0f);
-    // vec3 diffuse = light.diffuse * diff * tex.rgb;
-    //
-    // vec3 cameraDir = normalize(cameraPosition - fragPos);
-    // vec3 reflectionDir = reflect(-lightDir, normal);
-    //
-    // float specularDiff = pow(max(dot(cameraDir, reflectionDir), 0.0f), material.shininess);
-    // vec3 specular = light.specular * specularDiff * specularMap.rgb;
-    // diffuse *= intensity;
-    // specular *= intensity;
-    //
-    // diffuse *= attenuation;
-    // ambient *= attenuation;
-    // specular *= attenuation;
-    //
-    // vec3 color = diffuse + ambient + specular;
 }

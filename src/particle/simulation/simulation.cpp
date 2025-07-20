@@ -88,8 +88,11 @@ void Particle::Simulation::Init() {
   for (std::shared_ptr<Core::Object> &obj : guitarBackpack->objects) {
     obj->mesh->material->SetInt("material.diffuse", 0);
     obj->mesh->material->SetInt("material.specular", 1);
+    obj->mesh->material->SetInt("material.normalMap", 2);
     /*obj->mesh->material->SetInt("material.emission", 2);*/
     obj->mesh->material->SetFloat("material.shininess", 36.0f);
+    obj->mesh->material->AddTexture(
+        Core::TextureManager::LoadTexture("./assets/backpack/normal.png"));
 
     obj->mesh->material->SetVec3("directionalLight.direction",
                                  glm::normalize(glm::vec3(1.0f, -1.0f, 0.0f)));

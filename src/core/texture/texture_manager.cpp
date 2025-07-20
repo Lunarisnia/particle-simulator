@@ -15,9 +15,10 @@ Core::Texture Core::TextureManager::LoadTexture(const std::string &path) {
   std::string fileType =
       path.substr(path.find_last_of(".") + 1, std::string::npos);
   int colorCode = GL_RGB;
-  if (fileType == "png") {
-    colorCode = GL_RGBA;
-  }
+  // FIXME: need to determine this with the image metadata instead
+  /*if (fileType == "png") {*/
+  /*  colorCode = GL_RGBA;*/
+  /*}*/
   Core::Texture texture{path, nextAvailableTextureId++, colorCode};
   loadedTextures.emplace(path, texture);
 

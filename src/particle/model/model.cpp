@@ -5,7 +5,6 @@
 #include "glad/glad.h"
 #include <format>
 #include <memory>
-#include <print>
 #include <stdexcept>
 #include <string>
 #include "assimp/Importer.hpp"
@@ -28,8 +27,7 @@ Particle::Model::Model() {}
 void Particle::Model::LoadModel(const std::string& path) {
   Assimp::Importer importer;
 
-  const aiScene* scene =
-      importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenNormals);
+  const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate);
   if (!scene || !scene->mRootNode ||
       scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) {
     throw std::runtime_error(importer.GetErrorString());
@@ -91,6 +89,7 @@ void Particle::Model::processMesh(aiMesh* mesh, const aiScene* scene) {
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
     loadTextures(material, aiTextureType_DIFFUSE, objectMesh);
     loadTextures(material, aiTextureType_SPECULAR, objectMesh);
+    loadTextures(material, aiTextureType_NORMALS, objectMesh);
   }
 
   objectMesh->SetupMesh();
