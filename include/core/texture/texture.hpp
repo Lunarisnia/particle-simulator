@@ -1,11 +1,10 @@
 #pragma once
 #include <string>
 namespace Core {
-
 class Texture {
  private:
   unsigned int id;
-  int textureLocation;
+  unsigned int textureLocation;
 
  public:
   int width, height, numberOfChannel;
@@ -16,7 +15,7 @@ class Texture {
 
  public:
   Texture();
-  Texture(const std::string &path, int textureLocation, int colorCode);
+  Texture(const std::string &path, unsigned int textureLocation, int colorCode);
   ~Texture();
 };
 };  // namespace Core

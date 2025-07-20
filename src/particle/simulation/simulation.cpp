@@ -1,9 +1,7 @@
 #include "particle/simulation/simulation.hpp"
 #include <cstddef>
-#include <exception>
 #include <format>
 #include <memory>
-#include <print>
 #include <random>
 #include <string>
 #include <vector>
@@ -14,7 +12,7 @@
 #include "core/input/input.hpp"
 #include "core/object/object.hpp"
 #include "core/static_camera/static_camera.hpp"
-#include "core/world/world.hpp"
+#include "core/texture/texture_manager.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/geometric.hpp"
 #include "glm/trigonometric.hpp"

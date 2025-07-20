@@ -31,6 +31,7 @@ add_executable(${PROJECT_NAME}
 
 	# Texture
 	core/texture/texture.cpp
+	core/texture/texture_manager.cpp
 	
 	# Static Camera
 	core/static_camera/static_camera.cpp

@@ -1,11 +1,18 @@
 #include "particle/model/model.hpp"
 #include <cstddef>
+#include "core/texture/texture_manager.hpp"
+#include "glad/glad.h"
+#include <format>
 #include <memory>
+#include <print>
 #include <stdexcept>
+#include <string>
 #include "assimp/Importer.hpp"
+#include "assimp/material.h"
 #include "assimp/mesh.h"
 #include "assimp/postprocess.h"
 #include "assimp/scene.h"
+#include "assimp/types.h"
 #include "assimp/vector3.h"
 #include "core/components/mesh.hpp"
 #include "core/object/object.hpp"
@@ -15,22 +22,26 @@
 #include "glm/ext/vector_float2.hpp"
 #include "glm/ext/vector_float3.hpp"
 
+std::string Particle::Model::directory;
+
 void Particle::Model::LoadModel(const std::string& path) {
   Assimp::Importer importer;
 
-  const aiScene* scene = importer.ReadFile(
-      path, aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_FlipUVs);
+  const aiScene* scene =
+      importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenNormals);
   if (!scene || !scene->mRootNode ||
       scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) {
     throw std::runtime_error(importer.GetErrorString());
   }
+
+  directory = path.substr(0, path.find_last_of("/"));
 
   processScene(scene->mRootNode, scene);
 }
 
 void Particle::Model::processScene(aiNode* node, const aiScene* scene) {
   for (size_t i = 0; i < node->mNumMeshes; i++) {
-    processMesh(scene->mMeshes[node->mMeshes[i]]);
+    processMesh(scene->mMeshes[node->mMeshes[i]], scene);
   }
 
   for (size_t i = 0; i < node->mNumChildren; i++) {
@@ -38,7 +49,7 @@ void Particle::Model::processScene(aiNode* node, const aiScene* scene) {
   }
 }
 
-void Particle::Model::processMesh(aiMesh* mesh) {
+void Particle::Model::processMesh(aiMesh* mesh, const aiScene* scene) {
   std::shared_ptr<Core::Object> object = std::make_shared<Core::Object>();
   object->name = mesh->mName.C_Str();
 
@@ -75,6 +86,22 @@ void Particle::Model::processMesh(aiMesh* mesh) {
     }
   }
 
+  if (mesh->mMaterialIndex >= 0) {
+    aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+    loadTextures(material, aiTextureType_DIFFUSE, objectMesh);
+    /*loadTextures(material, aiTextureType_SPECULAR, objectMesh);*/
+  }
+
   objectMesh->SetupMesh();
   Core::World::AddObject(object);
+}
+
+void Particle::Model::loadTextures(aiMaterial* material, aiTextureType type,
+                                   std::shared_ptr<Core::Mesh>& objectMesh) {
+  for (size_t i = 0; i < material->GetTextureCount(type); i++) {
+    aiString str;
+    material->GetTexture(type, i, &str);
+    Core::TextureManager::LoadTexture(
+        std::format("{}/{}", directory.c_str(), str.C_Str()));
+  }
 }
