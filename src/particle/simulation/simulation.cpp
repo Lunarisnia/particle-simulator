@@ -23,6 +23,7 @@ float Particle::Simulation::globalFloat = 0.0f;
 std::vector<std::shared_ptr<Core::Object>> Particle::Simulation::lightCubes;
 std::vector<std::shared_ptr<Core::Object>> Particle::Simulation::spotLightCubes;
 std::vector<std::shared_ptr<Core::Object>> Particle::Simulation::cubes;
+std::shared_ptr<Particle::Model> Particle::Simulation::guitarBackpack;
 
 glm::vec3 Particle::Simulation::lightColor = glm::vec3(1.0f);
 
@@ -34,10 +35,89 @@ const std::string lightFrag = "./shaders/light/light.frag";
 
 void Particle::Simulation::Init() {
   Core::StaticCamera::transform->position.z = 1.0f;
-  Model::LoadModel("./assets/backpack/backpack.obj");
+
+  std::random_device dev;
+  std::mt19937 rng(dev());
+  std::uniform_real_distribution<float> dist(-3.5f, 3.5f);
+  for (size_t i = 0; i < 2; i++) {
+    std::shared_ptr<Core::Object> light =
+        Primitive::CreateCube(vertexPath, lightFrag);
+    std::shared_ptr<Core::PointLight> pointLight =
+        light->AddComponent<Core::PointLight>();
+    pointLight->ambient = glm::vec3(0.5f);
+    pointLight->diffuse = glm::vec3(1.0f);
+    pointLight->specular = glm::vec3(1.0f);
+
+    pointLight->constant = 1.0f;
+    pointLight->linear = 0.14f;
+    pointLight->quadratic = 0.07f;
+
+    light->name = std::format("Point Light ({})", i);
+    light->mesh->material->SetVec3("lightColor", glm::vec3(1.0f));
+
+    light->transform->position = glm::vec3(dist(rng), dist(rng), -2.0f);
+
+    lightCubes.emplace_back(light);
+  }
+  for (size_t i = 0; i < 1; i++) {
+    std::shared_ptr<Core::Object> light =
+        Primitive::CreateCube(vertexPath, lightFrag);
+    std::shared_ptr<Core::SpotLight> spotLight =
+        light->AddComponent<Core::SpotLight>();
+    spotLight->direction = glm::vec3(0.0f, 0.0f, -1.0f);
+    spotLight->ambient = glm::vec3(0.5f);
+    spotLight->diffuse = glm::vec3(1.0f);
+    spotLight->specular = glm::vec3(1.0f);
+
+    spotLight->cutoff = glm::radians(45.0f);
+    spotLight->outerCutoff = glm::radians(50.0f);
+    spotLight->constant = 1.0f;
+    spotLight->linear = 0.14f;
+    spotLight->quadratic = 0.0007f;
+
+    light->name = std::format("Spot Light ({})", i);
+    light->mesh->material->SetVec3("lightColor", glm::vec3(1.0f));
+
+    light->transform->position = glm::vec3(0.0f, 0.0f, 4.0f);
+
+    spotLightCubes.emplace_back(light);
+  }
+
+  guitarBackpack = std::make_shared<Model>();
+  guitarBackpack->LoadModel("./assets/backpack/backpack.obj");
+  for (std::shared_ptr<Core::Object> &obj : guitarBackpack->objects) {
+    obj->mesh->material->SetInt("material.diffuse", 0);
+    obj->mesh->material->SetInt("material.specular", 1);
+    /*obj->mesh->material->SetInt("material.emission", 2);*/
+    obj->mesh->material->SetFloat("material.shininess", 36.0f);
+
+    obj->mesh->material->SetVec3("directionalLight.direction",
+                                 glm::normalize(glm::vec3(1.0f, -1.0f, 0.0f)));
+    obj->mesh->material->SetVec3("directionalLight.ambient", glm::vec3(0.5f));
+    obj->mesh->material->SetVec3("directionalLight.diffuse", glm::vec3(1.0f));
+    obj->mesh->material->SetVec3("directionalLight.specular", glm::vec3(1.0f));
+  }
 }
 
-void Particle::Simulation::Update() {}
+void Particle::Simulation::Update() {
+  for (std::shared_ptr<Core::Object> &object : guitarBackpack->objects) {
+    for (size_t i = 0; i < lightCubes.size(); i++) {
+      std::shared_ptr<Core::PointLight> pointLight =
+          lightCubes[i]->GetComponent<Core::PointLight>();
+      pointLight->SetMeshUniform(std::format("pointLight[{}]", i), object);
+    }
+
+    for (size_t i = 0; i < spotLightCubes.size(); i++) {
+      std::shared_ptr<Core::SpotLight> spotLight =
+          spotLightCubes[i]->GetComponent<Core::SpotLight>();
+      spotLight->SetMeshUniform(std::format("spotLight[{}]", i), object);
+    }
+
+    object->mesh->material->SetVec3(
+        "cameraPosition", Core::StaticCamera::transform->GetWorldPosition());
+    object->mesh->material->SetFloat("globalFloat", globalFloat);
+  }
+}
 
 void Particle::Simulation::placeObjects() {
   std::random_device dev;

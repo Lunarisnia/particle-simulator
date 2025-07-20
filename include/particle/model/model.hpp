@@ -1,24 +1,28 @@
 #pragma once
 #include <memory>
 #include <string>
+#include <vector>
 #include "assimp/material.h"
 #include "assimp/mesh.h"
 #include "assimp/scene.h"
 #include "core/components/mesh.hpp"
+#include "core/object/object.hpp"
 namespace Particle {
 class Model {
  private:
-  static std::string directory;
+  std::string directory;
 
  public:
-  // TODO: load model, create a new object for each mesh, assign all the
-  // required information to those
-  static void LoadModel(const std::string &path);
+  std::vector<std::shared_ptr<Core::Object>> objects;
+  void LoadModel(const std::string &path);
 
  private:
-  static void processScene(aiNode *node, const aiScene *scene);
-  static void processMesh(aiMesh *mesh, const aiScene *scene);
-  static void loadTextures(aiMaterial *material, aiTextureType type,
-                           std::shared_ptr<Core::Mesh> &objectMesh);
+  void processScene(aiNode *node, const aiScene *scene);
+  void processMesh(aiMesh *mesh, const aiScene *scene);
+  void loadTextures(aiMaterial *material, aiTextureType type,
+                    std::shared_ptr<Core::Mesh> &objectMesh);
+
+ public:
+  Model();
 };
 };  // namespace Particle

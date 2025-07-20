@@ -1,5 +1,6 @@
 #include "particle/model/model.hpp"
 #include <cstddef>
+#include "core/texture/texture.hpp"
 #include "core/texture/texture_manager.hpp"
 #include "glad/glad.h"
 #include <format>
@@ -22,7 +23,7 @@
 #include "glm/ext/vector_float2.hpp"
 #include "glm/ext/vector_float3.hpp"
 
-std::string Particle::Model::directory;
+Particle::Model::Model() {}
 
 void Particle::Model::LoadModel(const std::string& path) {
   Assimp::Importer importer;
@@ -33,7 +34,6 @@ void Particle::Model::LoadModel(const std::string& path) {
       scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) {
     throw std::runtime_error(importer.GetErrorString());
   }
-
   directory = path.substr(0, path.find_last_of("/"));
 
   processScene(scene->mRootNode, scene);
@@ -52,9 +52,10 @@ void Particle::Model::processScene(aiNode* node, const aiScene* scene) {
 void Particle::Model::processMesh(aiMesh* mesh, const aiScene* scene) {
   std::shared_ptr<Core::Object> object = std::make_shared<Core::Object>();
   object->name = mesh->mName.C_Str();
+  objects.emplace_back(object);
 
   Core::Shader shader{"./shaders/diffuse/diffuse.vert",
-                      "./shaders/diffuse/solid.frag"};
+                      "./shaders/diffuse/multi_light_diffuse.frag"};
   std::shared_ptr<Core::Material> material =
       std::make_shared<Core::Material>(shader);
   std::shared_ptr<Core::Mesh> objectMesh =
@@ -89,7 +90,7 @@ void Particle::Model::processMesh(aiMesh* mesh, const aiScene* scene) {
   if (mesh->mMaterialIndex >= 0) {
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
     loadTextures(material, aiTextureType_DIFFUSE, objectMesh);
-    /*loadTextures(material, aiTextureType_SPECULAR, objectMesh);*/
+    loadTextures(material, aiTextureType_SPECULAR, objectMesh);
   }
 
   objectMesh->SetupMesh();
@@ -101,7 +102,8 @@ void Particle::Model::loadTextures(aiMaterial* material, aiTextureType type,
   for (size_t i = 0; i < material->GetTextureCount(type); i++) {
     aiString str;
     material->GetTexture(type, i, &str);
-    Core::TextureManager::LoadTexture(
+    Core::Texture texture = Core::TextureManager::LoadTexture(
         std::format("{}/{}", directory.c_str(), str.C_Str()));
+    objectMesh->material->AddTexture(texture);
   }
 }

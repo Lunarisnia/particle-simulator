@@ -6,7 +6,7 @@
 
 Core::Texture::Texture() {}
 
-Core::Texture::Texture(const std::string &path, unsigned int textureLocation,
+Core::Texture::Texture(const std::string &path, int textureLocation,
                        int colorCode)
     : textureLocation(textureLocation) {
   glGenTextures(1, &id);

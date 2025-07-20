@@ -20,8 +20,7 @@ class Material {
   void AddTexture(Texture texture);
 
   // NOTE: Deprecated
-  void LoadTexture(const std::string &path, unsigned int textureLocation,
-                   int colorCode);
+  void LoadTexture(const std::string &path, int textureLocation, int colorCode);
 
  public:
   Material(Shader shader);

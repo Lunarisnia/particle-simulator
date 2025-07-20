@@ -4,7 +4,7 @@
 #include <string>
 #include "core/texture/texture.hpp"
 
-unsigned int Core::TextureManager::nextAvailableTextureId = 0;
+int Core::TextureManager::nextAvailableTextureId = GL_TEXTURE0;
 std::map<std::string, Core::Texture> Core::TextureManager::loadedTextures;
 
 Core::Texture Core::TextureManager::LoadTexture(const std::string &path) {

@@ -5,7 +5,7 @@
 namespace Core {
 class TextureManager {
  private:
-  static unsigned int nextAvailableTextureId;
+  static int nextAvailableTextureId;
   static std::map<std::string, Core::Texture> loadedTextures;
 
  public:

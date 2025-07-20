@@ -3,11 +3,13 @@
 #include <vector>
 #include "core/object/object.hpp"
 #include "glm/ext/vector_float3.hpp"
+#include "particle/model/model.hpp"
 namespace Particle {
 class Simulation {
  public:
   static float globalFloat;
   static glm::vec3 lightColor;
+  static std::shared_ptr<Particle::Model> guitarBackpack;
   static std::vector<std::shared_ptr<Core::Object>> cubes;
   static std::vector<std::shared_ptr<Core::Object>> lightCubes;
   static std::vector<std::shared_ptr<Core::Object>> spotLightCubes;
