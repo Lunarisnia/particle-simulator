@@ -1,5 +1,6 @@
 #include "core/material/material.hpp"
 #include <string>
+#include "core/texture/texture_manager.hpp"
 #include "glad/glad.h"
 #include "core/shader/shader.hpp"
 #include "core/texture/texture.hpp"
@@ -30,9 +31,8 @@ void Core::Material::SetFloat(const std::string &uniform, float f) {
   shader.SetFloat(uniform, f);
 }
 
-void Core::Material::LoadTexture(const std::string &path, int textureLocation,
-                                 int colorCode) {
-  textures.emplace_back(Texture{path, textureLocation, colorCode});
+void Core::Material::LoadTexture(const std::string &path) {
+  textures.emplace_back(TextureManager::LoadTexture(path));
 }
 
 void Core::Material::AddTexture(Texture texture) {

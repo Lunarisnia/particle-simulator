@@ -12,7 +12,6 @@
 #include "core/input/input.hpp"
 #include "core/object/object.hpp"
 #include "core/static_camera/static_camera.hpp"
-#include "core/texture/texture_manager.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/geometric.hpp"
 #include "glm/trigonometric.hpp"
@@ -32,6 +31,8 @@ const std::string diffuseFrag = "./shaders/diffuse/diffuse.frag";
 const std::string demoFrag = "./shaders/diffuse/demo.frag";
 const std::string diffuseFrag2 = "./shaders/diffuse/multi_light_diffuse.frag";
 const std::string lightFrag = "./shaders/light/light.frag";
+const std::string tangentNormalFrag = "./shaders/diffuse/tangent_normal.frag";
+const std::string tangentNormalVert = "./shaders/diffuse/tangent_normal.vert";
 
 void Particle::Simulation::Init() {
   Core::StaticCamera::transform->position.z = 1.0f;
@@ -83,16 +84,26 @@ void Particle::Simulation::Init() {
     spotLightCubes.emplace_back(light);
   }
 
+  std::shared_ptr<Core::Object> wall =
+      Primitive::CreatePlane(tangentNormalVert, tangentNormalFrag);
+  wall->name = "Wall";
+  /*wall->mesh->material->LoadTexture("./assets/brickwall.jpg");*/
+  /*wall->mesh->material->LoadTexture("./assets/brickwall_normal.jpg");*/
+  /*wall->mesh->material->SetInt("material.diffuse", 0);*/
+  /*wall->mesh->material->SetInt("material.specular", 1);*/
+  /*wall->mesh->material->SetInt("material.normalMap", 1);*/
+  /*wall->mesh->material->SetFloat("material.shininess", 36.0f);*/
+
+  cubes.emplace_back(wall);
+
   guitarBackpack = std::make_shared<Model>();
   guitarBackpack->LoadModel("./assets/backpack/backpack.obj");
   for (std::shared_ptr<Core::Object> &obj : guitarBackpack->objects) {
-    obj->mesh->material->SetInt("material.diffuse", 0);
-    obj->mesh->material->SetInt("material.specular", 1);
-    obj->mesh->material->SetInt("material.normalMap", 2);
+    obj->mesh->material->SetInt("material.diffuse", 2);
+    obj->mesh->material->SetInt("material.specular", 3);
+    obj->mesh->material->SetInt("material.normalMap", 4);
     /*obj->mesh->material->SetInt("material.emission", 2);*/
     obj->mesh->material->SetFloat("material.shininess", 36.0f);
-    obj->mesh->material->AddTexture(
-        Core::TextureManager::LoadTexture("./assets/backpack/normal.png"));
 
     obj->mesh->material->SetVec3("directionalLight.direction",
                                  glm::normalize(glm::vec3(1.0f, -1.0f, 0.0f)));
@@ -103,6 +114,23 @@ void Particle::Simulation::Init() {
 }
 
 void Particle::Simulation::Update() {
+  for (std::shared_ptr<Core::Object> &object : cubes) {
+    for (size_t i = 0; i < lightCubes.size(); i++) {
+      std::shared_ptr<Core::PointLight> pointLight =
+          lightCubes[i]->GetComponent<Core::PointLight>();
+      pointLight->SetMeshUniform(std::format("pointLight[{}]", i), object);
+    }
+
+    for (size_t i = 0; i < spotLightCubes.size(); i++) {
+      std::shared_ptr<Core::SpotLight> spotLight =
+          spotLightCubes[i]->GetComponent<Core::SpotLight>();
+      spotLight->SetMeshUniform(std::format("spotLight[{}]", i), object);
+    }
+
+    object->mesh->material->SetVec3(
+        "cameraPosition", Core::StaticCamera::transform->GetWorldPosition());
+    object->mesh->material->SetFloat("globalFloat", globalFloat);
+  }
   for (std::shared_ptr<Core::Object> &object : guitarBackpack->objects) {
     for (size_t i = 0; i < lightCubes.size(); i++) {
       std::shared_ptr<Core::PointLight> pointLight =
@@ -176,12 +204,9 @@ void Particle::Simulation::placeObjects() {
     std::shared_ptr<Core::Object> obj =
         Primitive::CreateCube(vertexPath, diffuseFrag2);
     obj->name = std::format("Cube ({})", i);
-    obj->mesh->material->LoadTexture("./assets/container2.png", GL_TEXTURE0,
-                                     GL_RGBA);
-    obj->mesh->material->LoadTexture("./assets/container2_specular.png",
-                                     GL_TEXTURE1, GL_RGBA);
-    obj->mesh->material->LoadTexture("./assets/matrix.jpg", GL_TEXTURE2,
-                                     GL_RGB);
+    obj->mesh->material->LoadTexture("./assets/container2.png");
+    obj->mesh->material->LoadTexture("./assets/container2_specular.png");
+    obj->mesh->material->LoadTexture("./assets/matrix.jpg");
     obj->transform->position = glm::vec3(dist(rng), dist(rng), -2.0f);
 
     obj->mesh->material->SetVec3("objectColor", glm::vec3(0.3f, 0.8f, 0.2f));
