@@ -10,20 +10,17 @@
 #include "core/components/rigidbody2d.hpp"
 #include "core/components/spot_light.hpp"
 #include "core/input/input.hpp"
-#include "core/math/math.hpp"
 #include "core/object/object.hpp"
 #include "core/static_camera/static_camera.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/geometric.hpp"
 #include "glm/trigonometric.hpp"
-#include "particle/model/model.hpp"
 #include "particle/primitive/primitive.hpp"
 
 float Particle::Simulation::globalFloat = 0.0f;
 std::vector<std::shared_ptr<Core::Object>> Particle::Simulation::lightCubes;
 std::vector<std::shared_ptr<Core::Object>> Particle::Simulation::spotLightCubes;
 std::vector<std::shared_ptr<Core::Object>> Particle::Simulation::cubes;
-std::shared_ptr<Particle::Model> Particle::Simulation::guitarBackpack;
 
 glm::vec3 Particle::Simulation::lightColor = glm::vec3(1.0f);
 
@@ -32,8 +29,8 @@ const std::string diffuseFrag = "./shaders/diffuse/diffuse.frag";
 const std::string demoFrag = "./shaders/diffuse/demo.frag";
 const std::string diffuseFrag2 = "./shaders/diffuse/multi_light_diffuse.frag";
 const std::string lightFrag = "./shaders/light/light.frag";
-const std::string tangentNormalFrag = "./shaders/diffuse/tangent_normal.frag";
-const std::string tangentNormalVert = "./shaders/diffuse/tangent_normal.vert";
+const std::string blinPhongFrag = "./shaders/diffuse/blin_phong.frag";
+const std::string vertexPathV2 = "./shaders/diffuse/diffuse_v2.vert";
 
 void Particle::Simulation::Init() {
   Core::StaticCamera::transform->position.z = 1.0f;
@@ -61,7 +58,7 @@ void Particle::Simulation::Init() {
 
     lightCubes.emplace_back(light);
   }
-  for (size_t i = 0; i < 1; i++) {
+  for (size_t i = 0; i < 0; i++) {
     std::shared_ptr<Core::Object> light =
         Primitive::CreateCube(vertexPath, lightFrag);
     std::shared_ptr<Core::SpotLight> spotLight =
@@ -86,31 +83,13 @@ void Particle::Simulation::Init() {
   }
 
   std::shared_ptr<Core::Object> wall =
-      Primitive::CreateUVSphere(tangentNormalVert, tangentNormalFrag, "Hello");
+      Primitive::CreateUVSphere(vertexPathV2, blinPhongFrag, "Hello", 256, 256);
   wall->name = "Wall";
+  wall->mesh->material->SetVec3("material.diffuse",
+                                glm::vec3(0.5f, 0.2f, 0.3f));
+  wall->mesh->material->SetVec3("material.specular",
+                                glm::vec3(0.5f, 0.2f, 0.3f));
   cubes.emplace_back(wall);
-  /*wall->mesh->material->LoadTexture("./assets/brickwall.jpg");*/
-  /*wall->mesh->material->LoadTexture("./assets/brickwall_normal.jpg");*/
-  /*wall->mesh->material->SetInt("material.diffuse", 0);*/
-  /*wall->mesh->material->SetInt("material.specular", 1);*/
-  /*wall->mesh->material->SetInt("material.normalMap", 1);*/
-  /*wall->mesh->material->SetFloat("material.shininess", 36.0f);*/
-
-  guitarBackpack = std::make_shared<Model>();
-  guitarBackpack->LoadModel("./assets/backpack/backpack.obj");
-  for (std::shared_ptr<Core::Object> &obj : guitarBackpack->objects) {
-    obj->mesh->material->SetInt("material.diffuse", 2);
-    obj->mesh->material->SetInt("material.specular", 3);
-    obj->mesh->material->SetInt("material.normalMap", 4);
-    /*obj->mesh->material->SetInt("material.emission", 2);*/
-    obj->mesh->material->SetFloat("material.shininess", 36.0f);
-
-    obj->mesh->material->SetVec3("directionalLight.direction",
-                                 glm::normalize(glm::vec3(1.0f, -1.0f, 0.0f)));
-    obj->mesh->material->SetVec3("directionalLight.ambient", glm::vec3(0.5f));
-    obj->mesh->material->SetVec3("directionalLight.diffuse", glm::vec3(1.0f));
-    obj->mesh->material->SetVec3("directionalLight.specular", glm::vec3(1.0f));
-  }
 }
 
 void Particle::Simulation::Update() {
@@ -128,24 +107,7 @@ void Particle::Simulation::Update() {
     }
 
     object->mesh->material->SetVec3(
-        "cameraPosition", Core::StaticCamera::transform->GetWorldPosition());
-    object->mesh->material->SetFloat("globalFloat", globalFloat);
-  }
-  for (std::shared_ptr<Core::Object> &object : guitarBackpack->objects) {
-    for (size_t i = 0; i < lightCubes.size(); i++) {
-      std::shared_ptr<Core::PointLight> pointLight =
-          lightCubes[i]->GetComponent<Core::PointLight>();
-      pointLight->SetMeshUniform(std::format("pointLight[{}]", i), object);
-    }
-
-    for (size_t i = 0; i < spotLightCubes.size(); i++) {
-      std::shared_ptr<Core::SpotLight> spotLight =
-          spotLightCubes[i]->GetComponent<Core::SpotLight>();
-      spotLight->SetMeshUniform(std::format("spotLight[{}]", i), object);
-    }
-
-    object->mesh->material->SetVec3(
-        "cameraPosition", Core::StaticCamera::transform->GetWorldPosition());
+        "camera.position", Core::StaticCamera::transform->GetWorldPosition());
     object->mesh->material->SetFloat("globalFloat", globalFloat);
   }
 }
@@ -220,16 +182,6 @@ void Particle::Simulation::placeObjects() {
     obj->mesh->material->SetVec3("directionalLight.ambient", glm::vec3(0.5f));
     obj->mesh->material->SetVec3("directionalLight.diffuse", glm::vec3(1.0f));
     obj->mesh->material->SetVec3("directionalLight.specular", glm::vec3(1.0f));
-
-    /*obj->mesh->material->SetVec3("light.ambient", glm::vec3(1.0f));*/
-    /*obj->mesh->material->SetVec3("light.specular", glm::vec3(1.0f));*/
-    /*obj->mesh->material->SetFloat("light.constant", 1.0f);*/
-    /*obj->mesh->material->SetFloat("light.linear", 0.14f);*/
-    /*obj->mesh->material->SetFloat("light.quadratic", 0.07f);*/
-    /*obj->mesh->material->SetVec3("light.spotDirection",*/
-    /*                             glm::vec3(0.0f, -1.0f, 0.0f));*/
-    /*obj->mesh->material->SetFloat("light.cutoff", glm::radians(45.0f));*/
-    /*obj->mesh->material->SetFloat("light.outerCutoff", glm::radians(50.0f));*/
 
     cubes.emplace_back(obj);
   }

@@ -6,8 +6,6 @@ layout(location = 2) in vec3 aNormal;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
-uniform vec3 lightPosition;
-uniform vec3 cameraPosition;
 
 struct VertexAttribute {
     vec3 fragPos;
