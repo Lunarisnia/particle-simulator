@@ -5,7 +5,6 @@ struct VertexAttribute {
     vec3 fragPos;
     vec3 normal;
     vec2 textureCoord;
-    vec3 tangent;
 
     mat3 TBN;
 };
@@ -32,13 +31,14 @@ struct Camera {
 uniform Camera camera;
 
 vec3 calculatePointLight(PointLight light, vec3 diffuseTexture, vec3 specularTexture, vec3 normal) {
+    // All calculation are done in tangent space
     vec3 color = vec3(0.0f);
 
-    vec3 lightDir = normalize(light.position - vertexAttribute.fragPos);
+    vec3 lightDir = vertexAttribute.TBN * normalize(light.position - vertexAttribute.fragPos);
     float diff = max(0.0f, dot(lightDir, normal));
     vec3 diffuse = light.diffuse * diff * diffuseTexture;
 
-    vec3 viewDir = normalize(camera.position - vertexAttribute.fragPos);
+    vec3 viewDir = vertexAttribute.TBN * normalize(camera.position - vertexAttribute.fragPos);
     vec3 halfVector = normalize(lightDir + viewDir);
     float spec = pow(max(0.0f, dot(halfVector, normal)), 16.0f);
     vec3 specular = light.specular * spec * specularTexture;
@@ -53,7 +53,7 @@ void main()
     vec4 specularTexture = texture(material.specular, vertexAttribute.textureCoord);
     vec4 normalTexture = texture(material.normal, vertexAttribute.textureCoord);
     normalTexture = normalTexture * 2.0f - 1.0f;
-    normalTexture = vec4(normalize(vertexAttribute.TBN * normalTexture.rgb), 0.0f);
+    // normalTexture = vec4(normalize(vertexAttribute.TBN * normalTexture.rgb), 0.0f);
 
     vec3 color = vec3(0.0f);
     for (int i = 0; i < 1; i++) {

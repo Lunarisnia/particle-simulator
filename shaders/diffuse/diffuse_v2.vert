@@ -12,7 +12,6 @@ struct VertexAttribute {
     vec3 fragPos;
     vec3 normal;
     vec2 textureCoord;
-    vec3 tangent;
 
     mat3 TBN;
 };
@@ -28,6 +27,5 @@ void main()
     vec3 N = normalize(vec3(model * vec4(aNormal, 0.0f)));
     vec3 T = normalize(vec3(model * vec4(aTangent, 0.0f)));
     vec3 B = cross(N, T);
-    vertexAttribute.tangent = aTangent;
-    vertexAttribute.TBN = mat3(T, B, N);
+    vertexAttribute.TBN = transpose(mat3(T, B, N));
 }
