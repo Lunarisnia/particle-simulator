@@ -22,6 +22,7 @@ class Mesh : public Component {
   void AddVertex(VertexData vertex);
   void AddIndex(unsigned int index);
   int GetIndiceLength();
+  int GetVertexLength();
   VertexData *GetVertex(size_t i);
 
  public:

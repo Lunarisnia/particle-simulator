@@ -11,6 +11,8 @@ class Math {
                                       glm::vec2 deltaUV1, glm::vec2 deltaUV2);
 
  public:
+  static glm::vec3 CalculateTangent(VertexData v0, VertexData v1,
+                                    VertexData v2);
   static glm::mat3 CreateTBNMatrix(VertexData v0, VertexData v1, VertexData v2);
 };
 };  // namespace Core

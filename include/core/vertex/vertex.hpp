@@ -7,6 +7,7 @@ class VertexData {
   glm::vec3 position;
   glm::vec2 textureCoord;
   glm::vec3 normal;
+  glm::vec3 tangent;
 
  public:
   inline void SetPosition(glm::vec3 p) { position = p; }
@@ -14,6 +15,7 @@ class VertexData {
     textureCoord = texCoord;
   }
   inline void SetNormal(glm::vec3 n) { normal = n; }
+  inline void SetTangent(glm::vec3 t) { tangent = t; }
 
  public:
   inline VertexData(float x, float y, float z) : position(x, y, z) {};

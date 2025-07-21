@@ -5,6 +5,9 @@ struct VertexAttribute {
     vec3 fragPos;
     vec3 normal;
     vec2 textureCoord;
+    vec3 tangent;
+
+    mat3 TBN;
 };
 in VertexAttribute vertexAttribute;
 
@@ -17,8 +20,9 @@ struct PointLight {
 uniform PointLight pointLight[2];
 
 struct Material {
-    vec3 diffuse;
-    vec3 specular;
+    sampler2D diffuse;
+    sampler2D specular;
+    sampler2D normal;
 };
 uniform Material material;
 
@@ -27,17 +31,17 @@ struct Camera {
 };
 uniform Camera camera;
 
-vec3 calculatePointLight(PointLight light) {
+vec3 calculatePointLight(PointLight light, vec3 diffuseTexture, vec3 specularTexture, vec3 normal) {
     vec3 color = vec3(0.0f);
 
     vec3 lightDir = normalize(light.position - vertexAttribute.fragPos);
-    float diff = max(0.0f, dot(lightDir, vertexAttribute.normal));
-    vec3 diffuse = light.diffuse * diff * material.diffuse;
+    float diff = max(0.0f, dot(lightDir, normal));
+    vec3 diffuse = light.diffuse * diff * diffuseTexture;
 
     vec3 viewDir = normalize(camera.position - vertexAttribute.fragPos);
-    vec3 reflectDir = reflect(lightDir, vertexAttribute.normal);
-    float spec = pow(max(0.0f, dot(-reflectDir, viewDir)), 16.0f);
-    vec3 specular = light.specular * spec * material.specular;
+    vec3 halfVector = normalize(lightDir + viewDir);
+    float spec = pow(max(0.0f, dot(halfVector, normal)), 16.0f);
+    vec3 specular = light.specular * spec * specularTexture;
 
     color += diffuse + specular;
     return color;
@@ -45,9 +49,15 @@ vec3 calculatePointLight(PointLight light) {
 
 void main()
 {
+    vec4 diffuseTexture = texture(material.diffuse, vertexAttribute.textureCoord);
+    vec4 specularTexture = texture(material.specular, vertexAttribute.textureCoord);
+    vec4 normalTexture = texture(material.normal, vertexAttribute.textureCoord);
+    normalTexture = normalTexture * 2.0f - 1.0f;
+    normalTexture = vec4(normalize(vertexAttribute.TBN * normalTexture.rgb), 0.0f);
+
     vec3 color = vec3(0.0f);
     for (int i = 0; i < 1; i++) {
-        color += calculatePointLight(pointLight[i]);
+        color += calculatePointLight(pointLight[i], diffuseTexture.rgb, specularTexture.rgb, normalTexture.rgb);
     }
     FragColor = vec4(color, 1.0f);
 }

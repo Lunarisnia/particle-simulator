@@ -37,3 +37,20 @@ glm::mat3 Core::Math::CreateTBNMatrix(VertexData v0, VertexData v1,
 
   return glm::mat3(tangent, bitangent, v0.normal);
 }
+
+glm::vec3 Core::Math::CalculateTangent(VertexData v0, VertexData v1,
+                                       VertexData v2) {
+  glm::vec3 edge1 = v1.position - v0.position;
+  glm::vec3 edge2 = v2.position - v0.position;
+  glm::vec2 deltaUV1 = v1.textureCoord - v0.textureCoord;
+  glm::vec2 deltaUV2 = v2.textureCoord - v0.textureCoord;
+
+  float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+  glm::vec3 tangent;
+  tangent.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+  tangent.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+  tangent.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+
+  return tangent;
+}

@@ -1,6 +1,9 @@
 #include "particle/primitive/primitive.hpp"
+#include <cstddef>
 #include <memory>
+#include <print>
 #include <string>
+#include "core/math/math.hpp"
 #include "core/object/object.hpp"
 #include "core/shader/shader.hpp"
 #include "core/vertex/vertex.hpp"
@@ -41,10 +44,19 @@ std::shared_ptr<Core::Object> Particle::Primitive::CreatePlane(
   mesh->AddIndex(0);
   mesh->AddIndex(1);
   mesh->AddIndex(2);
-
   mesh->AddIndex(2);
   mesh->AddIndex(3);
   mesh->AddIndex(0);
+
+  glm::vec3 tangent1 = Core::Math::CalculateTangent(
+      *mesh->GetVertex(0), *mesh->GetVertex(1), *mesh->GetVertex(2));
+  glm::vec3 tangent2 = Core::Math::CalculateTangent(
+      *mesh->GetVertex(0), *mesh->GetVertex(2), *mesh->GetVertex(3));
+
+  mesh->GetVertex(0)->tangent = tangent1;
+  mesh->GetVertex(1)->tangent = tangent1;
+  mesh->GetVertex(2)->tangent = tangent1;
+  mesh->GetVertex(3)->tangent = tangent2;
 
   mesh->SetupMesh();
 
@@ -274,10 +286,20 @@ std::shared_ptr<Core::Object> Particle::Primitive::CreateUVSphere(
       mesh->AddIndex(first);
       mesh->AddIndex(second);
       mesh->AddIndex(first + 1);
+      glm::vec3 tangent1 = Core::Math::CalculateTangent(
+          *mesh->GetVertex(first), *mesh->GetVertex(second),
+          *mesh->GetVertex(first + 1));
+      mesh->GetVertex(first)->tangent = tangent1;
+      mesh->GetVertex(second)->tangent = tangent1;
+      mesh->GetVertex(first + 1)->tangent = tangent1;
 
       mesh->AddIndex(first + 1);
       mesh->AddIndex(second);
       mesh->AddIndex(second + 1);
+      glm::vec3 tangent2 = Core::Math::CalculateTangent(
+          *mesh->GetVertex(first + 1), *mesh->GetVertex(second),
+          *mesh->GetVertex(second + 1));
+      mesh->GetVertex(second + 1)->tangent = tangent2;
     }
   }
 

@@ -33,6 +33,9 @@ void Core::Mesh::SetupMesh() {
   glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData),
                         (void *)offsetof(VertexData, normal));
   glEnableVertexAttribArray(2);
+  glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData),
+                        (void *)offsetof(VertexData, tangent));
+  glEnableVertexAttribArray(3);
 
   glBindVertexArray(0);
 }
@@ -46,13 +49,8 @@ void Core::Mesh::AddVertex(Core::VertexData vertex) {
 void Core::Mesh::AddIndex(unsigned int index) { indice.emplace_back(index); }
 
 int Core::Mesh::GetIndiceLength() { return indice.size(); }
+int Core::Mesh::GetVertexLength() { return vertice.size(); }
 
-Core::VertexData *Core::Mesh::GetVertex(size_t i) {
-  if (i >= vertice.size()) {
-    return nullptr;
-  }
-
-  return &vertice.at(i);
-}
+Core::VertexData *Core::Mesh::GetVertex(size_t i) { return &vertice.at(i); }
 
 Core::ComponentType Core::Mesh::GetType() { return ComponentType::MESH; }

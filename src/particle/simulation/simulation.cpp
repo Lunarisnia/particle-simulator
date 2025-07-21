@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <format>
 #include <memory>
+#include <print>
 #include <random>
 #include <string>
 #include <vector>
@@ -85,10 +86,11 @@ void Particle::Simulation::Init() {
   std::shared_ptr<Core::Object> wall =
       Primitive::CreateUVSphere(vertexPathV2, blinPhongFrag, "Hello", 256, 256);
   wall->name = "Wall";
-  wall->mesh->material->SetVec3("material.diffuse",
-                                glm::vec3(0.5f, 0.2f, 0.3f));
-  wall->mesh->material->SetVec3("material.specular",
-                                glm::vec3(0.5f, 0.2f, 0.3f));
+  wall->mesh->material->LoadTexture("./assets/brickwall.jpg");
+  wall->mesh->material->LoadTexture("./assets/brickwall_normal.jpg");
+  wall->mesh->material->SetInt("material.diffuse", 0);
+  wall->mesh->material->SetInt("material.specular", 0);
+  wall->mesh->material->SetInt("material.normal", 1);
   cubes.emplace_back(wall);
 }
 
