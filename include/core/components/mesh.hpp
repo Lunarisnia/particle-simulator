@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <memory>
 #include <vector>
 #include "core/components/component.hpp"
@@ -21,6 +22,7 @@ class Mesh : public Component {
   void AddVertex(VertexData vertex);
   void AddIndex(unsigned int index);
   int GetIndiceLength();
+  VertexData *GetVertex(size_t i);
 
  public:
   Mesh();

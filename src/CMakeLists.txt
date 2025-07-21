@@ -39,6 +39,9 @@ add_executable(${PROJECT_NAME}
 	# Time
 	core/time/time.cpp
 
+	# Math
+	core/math/math.cpp
+
 	# Physics
 	core/physics/physics_world.cpp
 

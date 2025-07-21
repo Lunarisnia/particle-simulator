@@ -15,6 +15,16 @@ std::shared_ptr<Core::Object> Particle::Primitive::CreatePlane(
   std::shared_ptr<Core::Mesh> mesh = obj->AddComponent<Core::Mesh>(material);
   obj->mesh = mesh;
   mesh->AddVertex(Core::VertexData{
+      glm::vec3(-0.5f, 0.5f, 0.0f),
+      glm::vec2(0.0f, 1.0f),
+      glm::vec3(0.0f, 0.0f, 1.0f),
+  });
+  mesh->AddVertex(Core::VertexData{
+      glm::vec3(-0.5f, -0.5f, 0.0f),
+      glm::vec2(0.0f, 0.0f),
+      glm::vec3(0.0f, 0.0f, 1.0f),
+  });
+  mesh->AddVertex(Core::VertexData{
       glm::vec3(0.5f, -0.5f, 0.0f),
       glm::vec2(1.0f, 0.0f),
       glm::vec3(0.0f, 0.0f, 1.0f),
@@ -24,22 +34,13 @@ std::shared_ptr<Core::Object> Particle::Primitive::CreatePlane(
       glm::vec2(1.0f, 1.0f),
       glm::vec3(0.0f, 0.0f, 1.0f),
   });
-  mesh->AddVertex(Core::VertexData{
-      glm::vec3(-0.5f, -0.5f, 0.0f),
-      glm::vec2(0.0f, 0.0f),
-      glm::vec3(0.0f, 0.0f, 1.0f),
-  });
-  mesh->AddVertex(Core::VertexData{
-      glm::vec3(-0.5f, 0.5f, 0.0f),
-      glm::vec2(0.0f, 1.0f),
-      glm::vec3(0.0f, 0.0f, 1.0f),
-  });
   mesh->AddIndex(0);
   mesh->AddIndex(1);
   mesh->AddIndex(2);
-  mesh->AddIndex(3);
-  mesh->AddIndex(1);
+
   mesh->AddIndex(2);
+  mesh->AddIndex(3);
+  mesh->AddIndex(0);
 
   mesh->SetupMesh();
 

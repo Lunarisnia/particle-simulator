@@ -10,6 +10,7 @@
 #include "core/components/rigidbody2d.hpp"
 #include "core/components/spot_light.hpp"
 #include "core/input/input.hpp"
+#include "core/math/math.hpp"
 #include "core/object/object.hpp"
 #include "core/static_camera/static_camera.hpp"
 #include "glm/ext/vector_float3.hpp"
@@ -87,14 +88,13 @@ void Particle::Simulation::Init() {
   std::shared_ptr<Core::Object> wall =
       Primitive::CreatePlane(tangentNormalVert, tangentNormalFrag);
   wall->name = "Wall";
+  cubes.emplace_back(wall);
   /*wall->mesh->material->LoadTexture("./assets/brickwall.jpg");*/
   /*wall->mesh->material->LoadTexture("./assets/brickwall_normal.jpg");*/
   /*wall->mesh->material->SetInt("material.diffuse", 0);*/
   /*wall->mesh->material->SetInt("material.specular", 1);*/
   /*wall->mesh->material->SetInt("material.normalMap", 1);*/
   /*wall->mesh->material->SetFloat("material.shininess", 36.0f);*/
-
-  cubes.emplace_back(wall);
 
   guitarBackpack = std::make_shared<Model>();
   guitarBackpack->LoadModel("./assets/backpack/backpack.obj");

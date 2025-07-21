@@ -47,4 +47,12 @@ void Core::Mesh::AddIndex(unsigned int index) { indice.emplace_back(index); }
 
 int Core::Mesh::GetIndiceLength() { return indice.size(); }
 
+Core::VertexData *Core::Mesh::GetVertex(size_t i) {
+  if (i >= vertice.size()) {
+    return nullptr;
+  }
+
+  return &vertice.at(i);
+}
+
 Core::ComponentType Core::Mesh::GetType() { return ComponentType::MESH; }
