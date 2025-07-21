@@ -40,8 +40,8 @@ void Core::Renderer::Render() {
     mesh->material->SetMat4("projection", StaticCamera::GetProjectionMatrix());
     mesh->BindVertexArray();
     // TODO: add toggle for wireframe rendering somewhere
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    /*glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);*/
+    /*glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);*/
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     glDrawElements(GL_TRIANGLES, mesh->GetIndiceLength(), GL_UNSIGNED_INT, 0);
   }

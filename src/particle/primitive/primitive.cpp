@@ -1,10 +1,14 @@
 #include "particle/primitive/primitive.hpp"
 #include <memory>
+#include <string>
 #include "core/object/object.hpp"
 #include "core/shader/shader.hpp"
+#include "core/vertex/vertex.hpp"
 #include "core/world/world.hpp"
 #include "glm/ext/vector_float2.hpp"
 #include "glm/ext/vector_float3.hpp"
+
+const float PI = 3.14159265358979323846f;
 
 std::shared_ptr<Core::Object> Particle::Primitive::CreatePlane(
     const std::string& vertPath, const std::string& fragPath) {
@@ -223,5 +227,61 @@ std::shared_ptr<Core::Object> Particle::Primitive::CreateCube(
   mesh->SetupMesh();
   Core::World::AddObject(obj);
 
+  return obj;
+}
+
+std::shared_ptr<Core::Object> Particle::Primitive::CreateUVSphere(
+    const std::string& vertPath, const std::string& fragPath,
+    const std::string& name, int sectorCount, int stackCount, float radius) {
+  std::shared_ptr<Core::Object> obj = std::make_shared<Core::Object>();
+  Core::Shader shader{vertPath, fragPath};
+  std::shared_ptr<Core::Material> material =
+      std::make_shared<Core::Material>(shader);
+  std::shared_ptr<Core::Mesh> mesh = obj->AddComponent<Core::Mesh>(material);
+  obj->mesh = mesh;
+
+  for (int i = 0; i <= stackCount; ++i) {
+    float stackAngle = PI / 2 - i * (PI / stackCount);  // from +pi/2 to -pi/2
+    float xy = radius * cosf(stackAngle);               // r * cos(phi)
+    float y = radius * sinf(stackAngle);                // r * sin(phi)
+
+    for (int j = 0; j <= sectorCount; ++j) {
+      Core::VertexData vertex;
+      float sectorAngle = j * 2 * PI / sectorCount;  // from 0 to 2pi
+
+      float x = xy * cosf(sectorAngle);  // x = r * cos(phi) * cos(theta)
+      float z = xy * sinf(sectorAngle);  // y = r * cos(phi) * sin(theta)
+
+      float u = static_cast<float>(j) / sectorCount;
+      float v = static_cast<float>(i) / stackCount;
+
+      glm::vec3 position(x, y, z);
+      glm::vec3 normal = glm::normalize(position);
+      glm::vec2 texCoord(u, v);
+
+      vertex.position = position;
+      vertex.normal = normal;
+      vertex.textureCoord = texCoord;
+      mesh->AddVertex(vertex);
+    }
+  }
+
+  for (int i = 0; i < stackCount; ++i) {
+    for (int j = 0; j < sectorCount; ++j) {
+      int first = i * (sectorCount + 1) + j;
+      int second = first + sectorCount + 1;
+
+      mesh->AddIndex(first);
+      mesh->AddIndex(second);
+      mesh->AddIndex(first + 1);
+
+      mesh->AddIndex(first + 1);
+      mesh->AddIndex(second);
+      mesh->AddIndex(second + 1);
+    }
+  }
+
+  mesh->SetupMesh();
+  Core::World::AddObject(obj);
   return obj;
 }

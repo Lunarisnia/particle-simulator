@@ -86,7 +86,7 @@ void Particle::Simulation::Init() {
   }
 
   std::shared_ptr<Core::Object> wall =
-      Primitive::CreatePlane(tangentNormalVert, tangentNormalFrag);
+      Primitive::CreateUVSphere(tangentNormalVert, tangentNormalFrag, "Hello");
   wall->name = "Wall";
   cubes.emplace_back(wall);
   /*wall->mesh->material->LoadTexture("./assets/brickwall.jpg");*/
