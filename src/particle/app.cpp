@@ -2,6 +2,7 @@
 #include <exception>
 #include <memory>
 #include <print>
+#include <stdexcept>
 #include "core/app.hpp"
 #include "core/framebuffer/framebuffer.hpp"
 #include "core/input/input.hpp"
@@ -33,7 +34,9 @@ void Particle::App::initFramebuffer() {
       Core::Window::GetWidth(), Core::Window::GetHeight()));
   framebuffer->AttachRenderbuffer(std::make_shared<Core::Renderbuffer>(
       Core::Window::GetWidth(), Core::Window::GetHeight()));
-  std::println("{}", framebuffer->CheckStatus());  // Confirmed to return true
+  if (!framebuffer->CheckStatus()) {
+    throw std::runtime_error("framebuffer incomplete");
+  }
 }
 
 void Particle::App::initRenderPlane() {
@@ -55,19 +58,20 @@ void Particle::App::Run() {
       Editor::Editor::Update();
 
       framebuffer->Bind();
+      Core::Renderer::AdjustViewport(false);
       Core::Renderer::DepthTest(true);
-      Core::Renderer::SetClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+      Core::Renderer::SetClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       Core::Renderer::Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
       Core::Renderer::Render();
 
       framebuffer->Unbind();
+      Core::Renderer::AdjustViewport(true);
       Core::Renderer::DepthTest(false);
-      Core::Renderer::SetClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+      Core::Renderer::SetClearColor(0.3f, 0.3f, 0.3f, 1.0f);
       Core::Renderer::Clear(GL_COLOR_BUFFER_BIT);
 
       // TODO: find a way to just use the existing renderer here later
-      //
       renderPlane->mesh->material->Use();
       renderPlane->mesh->material->SetInt("screenTexture", 0);
       renderPlane->mesh->BindVertexArray();

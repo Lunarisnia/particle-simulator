@@ -32,6 +32,15 @@ void Core::Renderer::DepthTest(bool enable) {
   glDisable(GL_DEPTH_TEST);
 }
 
+void Core::Renderer::AdjustViewport(bool scaleUp) {
+  int multiplier = 1;
+  if (scaleUp) {
+    multiplier = 2;
+  }
+  glViewport(0, 0, Window::GetWidth() * multiplier,
+             Window::GetHeight() * multiplier);
+}
+
 void Core::Renderer::Render() {
   for (std::shared_ptr<Mesh> &mesh : renderQueue) {
     if (!mesh->isActive) {

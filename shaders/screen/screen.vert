@@ -11,6 +11,6 @@ out VertexAttribute vertexAttribute;
 
 void main()
 {
-    gl_Position = vec4(aPos, 1.0);
+    gl_Position = vec4(aPos.xy * 2.0f, 0.0f, 1.0);
     vertexAttribute.textureCoord = aTexCoord;
 }
