@@ -45,6 +45,12 @@ add_executable(${PROJECT_NAME}
 	# Physics
 	core/physics/physics_world.cpp
 
+	# Framebuffer
+	core/framebuffer/framebuffer.cpp
+
+	# Renderbuffer
+	core/renderbuffer/renderbuffer.cpp
+
 
 	# Components
 	core/components/component.cpp
