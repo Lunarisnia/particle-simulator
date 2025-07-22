@@ -3,6 +3,7 @@
 #include <memory>
 #include <print>
 #include <string>
+#include "assimp/code/AssetLib/MMD/MMDPmxParser.h"
 #include "core/math/math.hpp"
 #include "core/object/object.hpp"
 #include "core/shader/shader.hpp"
@@ -234,6 +235,24 @@ std::shared_ptr<Core::Object> Particle::Primitive::CreateCube(
 
     mesh->AddIndex(22);
     mesh->AddIndex(21);
+  }
+
+  for (size_t i = 0; i < mesh->GetVertexLength(); i += 4) {
+    size_t first = i;
+    size_t second = i + 1;
+    size_t third = i + 2;
+    size_t fourth = i + 3;
+
+    glm::vec3 tangent1 = Core::Math::CalculateTangent(*mesh->GetVertex(first),
+                                                      *mesh->GetVertex(second),
+                                                      *mesh->GetVertex(third));
+    glm::vec3 tangent2 = Core::Math::CalculateTangent(*mesh->GetVertex(fourth),
+                                                      *mesh->GetVertex(second),
+                                                      *mesh->GetVertex(third));
+    mesh->GetVertex(first)->tangent = tangent1;
+    mesh->GetVertex(second)->tangent = tangent1;
+    mesh->GetVertex(third)->tangent = tangent1;
+    mesh->GetVertex(fourth)->tangent = tangent2;
   }
 
   mesh->SetupMesh();

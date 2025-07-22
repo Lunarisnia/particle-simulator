@@ -10,12 +10,9 @@
 #include "core/components/point_light.hpp"
 #include "core/components/rigidbody2d.hpp"
 #include "core/components/spot_light.hpp"
-#include "core/framebuffer/framebuffer.hpp"
 #include "core/input/input.hpp"
 #include "core/object/object.hpp"
-#include "core/renderbuffer/renderbuffer.hpp"
 #include "core/static_camera/static_camera.hpp"
-#include "core/texture/texture.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/geometric.hpp"
 #include "glm/trigonometric.hpp"
@@ -58,7 +55,8 @@ void Particle::Simulation::Init() {
     light->name = std::format("Point Light ({})", i);
     light->mesh->material->SetVec3("lightColor", glm::vec3(1.0f));
 
-    light->transform->position = glm::vec3(dist(rng), dist(rng), -2.0f);
+    /*light->transform->position = glm::vec3(dist(rng), dist(rng), -2.0f);*/
+    light->transform->position = glm::vec3(3.0f, 1.0f, 4.0f);
 
     lightCubes.emplace_back(light);
   }
@@ -86,16 +84,31 @@ void Particle::Simulation::Init() {
     spotLightCubes.emplace_back(light);
   }
 
-  std::shared_ptr<Core::Object> wall =
+  std::shared_ptr<Core::Object> ball =
       Primitive::CreateUVSphere(vertexPathV2, blinPhongFrag, "Hello", 256, 256);
-  wall->name = "Wall";
-  wall->mesh->material->LoadTexture("./assets/brickwall.jpg", GL_SRGB, GL_RGB);
-  wall->mesh->material->LoadTexture("./assets/brickwall_normal.jpg", GL_RGB,
+  ball->name = "Ball";
+  ball->mesh->material->LoadTexture("./assets/brickwall.jpg", GL_SRGB, GL_RGB);
+  ball->mesh->material->LoadTexture("./assets/brickwall_normal.jpg", GL_RGB,
                                     GL_RGB);
-  wall->mesh->material->SetInt("material.diffuse", 1);
-  wall->mesh->material->SetInt("material.specular", 1);
-  wall->mesh->material->SetInt("material.normal", 2);
-  cubes.emplace_back(wall);
+  ball->mesh->material->SetInt("material.diffuse", 1);
+  ball->mesh->material->SetInt("material.specular", 1);
+  ball->mesh->material->SetInt("material.normal", 2);
+  cubes.emplace_back(ball);
+
+  std::shared_ptr<Core::Object> cube =
+      Primitive::CreateCube(vertexPathV2, blinPhongFrag);
+  cube->transform->position = glm::vec3(0.0f, -2.0f, -1.0f);
+  cube->transform->scale = glm::vec3(10.0f, 1.0f, 10.0f);
+
+  cube->name = "Floor";
+  cube->mesh->material->LoadTexture("./assets/container2.png", GL_SRGB_ALPHA,
+                                    GL_RGBA);
+  cube->mesh->material->LoadTexture("./assets/container2_specular.png",
+                                    GL_SRGB_ALPHA, GL_RGBA);
+  cube->mesh->material->SetInt("material.diffuse", 3);
+  cube->mesh->material->SetInt("material.specular", 4);
+  cube->mesh->material->SetInt("material.normal", 2);
+  cubes.emplace_back(cube);
 }
 
 // TODO: Update TBN matrix every frame

@@ -40,7 +40,7 @@ vec3 calculatePointLight(PointLight light, vec3 diffuseTexture, vec3 specularTex
 
     vec3 viewDir = vertexAttribute.TBN * normalize(camera.position - vertexAttribute.fragPos);
     vec3 halfVector = normalize(lightDir + viewDir);
-    float spec = pow(max(0.0f, dot(halfVector, normal)), 16.0f);
+    float spec = pow(max(0.0f, dot(halfVector, normal)), 32.0f);
     vec3 specular = light.specular * spec * specularTexture;
 
     color += diffuse + specular;
