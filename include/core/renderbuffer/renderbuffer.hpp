@@ -10,6 +10,7 @@ class Renderbuffer {
   unsigned int GetID();
 
  public:
+  Renderbuffer();
   Renderbuffer(int width, int height);
   ~Renderbuffer();
 };

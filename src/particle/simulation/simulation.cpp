@@ -92,9 +92,9 @@ void Particle::Simulation::Init() {
   wall->mesh->material->LoadTexture("./assets/brickwall.jpg", GL_SRGB, GL_RGB);
   wall->mesh->material->LoadTexture("./assets/brickwall_normal.jpg", GL_RGB,
                                     GL_RGB);
-  wall->mesh->material->SetInt("material.diffuse", 0);
-  wall->mesh->material->SetInt("material.specular", 0);
-  wall->mesh->material->SetInt("material.normal", 1);
+  wall->mesh->material->SetInt("material.diffuse", 1);
+  wall->mesh->material->SetInt("material.specular", 1);
+  wall->mesh->material->SetInt("material.normal", 2);
   cubes.emplace_back(wall);
 }
 

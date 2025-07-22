@@ -1,5 +1,8 @@
 #include "core/renderbuffer/renderbuffer.hpp"
+#include <print>
 #include "glad/glad.h"
+
+Core::Renderbuffer::Renderbuffer() {}
 
 Core::Renderbuffer::Renderbuffer(int width, int height) {
   glGenRenderbuffers(1, &id);
@@ -14,4 +17,4 @@ void Core::Renderbuffer::Unbind() { glBindRenderbuffer(GL_RENDERBUFFER, 0); }
 
 unsigned int Core::Renderbuffer::GetID() { return id; }
 
-Core::Renderbuffer::~Renderbuffer() { glDeleteRenderbuffers(1, &id); }
+Core::Renderbuffer::~Renderbuffer() { /*glDeleteRenderbuffers(1, &id);*/ }

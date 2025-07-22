@@ -14,6 +14,7 @@ void Core::App::Init() {
   StaticCamera::Init();
 }
 
+// NOTE: why the hell does this exist???
 void Core::App::Run() {
   while (!Window::ShouldClose()) {
     Time::Tick();
@@ -24,7 +25,7 @@ void Core::App::Run() {
     Renderer::Render();
 
     Window::SwapBuffer();
-    Renderer::Clear();
+    Renderer::Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   }
 }
 

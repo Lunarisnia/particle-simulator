@@ -1,12 +1,18 @@
 #include "particle/app.hpp"
 #include <exception>
+#include <memory>
+#include <print>
 #include "core/app.hpp"
+#include "core/framebuffer/framebuffer.hpp"
 #include "core/input/input.hpp"
 #include "core/renderer/renderer.hpp"
+#include "core/texture/texture.hpp"
+#include "core/texture/texture_manager.hpp"
 #include "core/time/time.hpp"
 #include "core/window/window.hpp"
 #include "core/world/world.hpp"
 #include "editor/editor.hpp"
+#include "particle/primitive/primitive.hpp"
 #include "particle/simulation/simulation.hpp"
 Particle::App::App() {
   core = Core::App();
@@ -14,9 +20,26 @@ Particle::App::App() {
     core.Init();
     Simulation::Init();
     Editor::Editor::Init();
+    initFramebuffer();
+    initRenderPlane();
   } catch (const std::exception& error) {
     throw error;
   }
+}
+
+void Particle::App::initFramebuffer() {
+  framebuffer = std::make_shared<Core::Framebuffer>();
+  framebuffer->AttachTexture(std::make_shared<Core::Texture>(
+      Core::Window::GetWidth(), Core::Window::GetHeight()));
+  framebuffer->AttachRenderbuffer(std::make_shared<Core::Renderbuffer>(
+      Core::Window::GetWidth(), Core::Window::GetHeight()));
+  std::println("{}", framebuffer->CheckStatus());  // Confirmed to return true
+}
+
+void Particle::App::initRenderPlane() {
+  renderPlane = Primitive::CreatePlane("./shaders/screen/screen.vert",
+                                       "./shaders/screen/screen.frag");
+  renderPlane->name = "RenderPlane";
 }
 
 void Particle::App::Run() {
@@ -31,11 +54,29 @@ void Particle::App::Run() {
       Editor::Editor::NewFrame();
       Editor::Editor::Update();
 
+      framebuffer->Bind();
+      Core::Renderer::DepthTest(true);
+      Core::Renderer::SetClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+      Core::Renderer::Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
       Core::Renderer::Render();
+
+      framebuffer->Unbind();
+      Core::Renderer::DepthTest(false);
+      Core::Renderer::SetClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+      Core::Renderer::Clear(GL_COLOR_BUFFER_BIT);
+
+      // TODO: find a way to just use the existing renderer here later
+      //
+      renderPlane->mesh->material->Use();
+      renderPlane->mesh->material->SetInt("screenTexture", 0);
+      renderPlane->mesh->BindVertexArray();
+      framebuffer->textureBuffer->Bind();
+      glDrawElements(GL_TRIANGLES, renderPlane->mesh->GetIndiceLength(),
+                     GL_UNSIGNED_INT, 0);
       Editor::Editor::Render();
 
       Core::Window::SwapBuffer();
-      Core::Renderer::Clear();
     }
   } catch (const std::exception& error) {
     throw error;

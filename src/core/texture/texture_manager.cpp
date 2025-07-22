@@ -4,8 +4,10 @@
 #include <string>
 #include "core/texture/texture.hpp"
 
-int Core::TextureManager::nextAvailableTextureId = GL_TEXTURE0;
+int Core::TextureManager::nextAvailableTextureId = GL_TEXTURE0 + 1;
 std::map<std::string, Core::Texture> Core::TextureManager::loadedTextures;
+
+int Core::TextureManager::ScreenTextureLocation() { return GL_TEXTURE0; }
 
 Core::Texture Core::TextureManager::LoadTexture(const std::string &path,
                                                 int colorSpace, int colorCode) {

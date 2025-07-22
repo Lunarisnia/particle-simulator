@@ -1,17 +1,18 @@
 #include "core/texture/texture.hpp"
 #include <stdexcept>
 #include <string>
+#include "core/texture/texture_manager.hpp"
 #include "glad/glad.h"
 #include "stbi_image/stbi_image.h"
 
 Core::Texture::Texture() {}
 
-Core::Texture::Texture(int width, int height) {
+Core::Texture::Texture(int width, int height)
+    : textureLocation(TextureManager::ScreenTextureLocation()) {
   glGenTextures(1, &id);
   glBindTexture(GL_TEXTURE_2D, id);
 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                  GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
                GL_UNSIGNED_BYTE, nullptr);

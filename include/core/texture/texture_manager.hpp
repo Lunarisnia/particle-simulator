@@ -9,6 +9,7 @@ class TextureManager {
   static std::map<std::string, Core::Texture> loadedTextures;
 
  public:
+  static int ScreenTextureLocation();
   static Texture LoadTexture(const std::string &path, int colorSpace,
                              int colorCode);
 };

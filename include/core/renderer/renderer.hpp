@@ -12,7 +12,8 @@ class Renderer {
   static void Init();
   static void SetClearColor(float r, float g, float b, float a);
   static void Render();
-  static void Clear();
+  static void Clear(int bit);
+  static void DepthTest(bool enable);
   static void AddToRenderQueue(std::shared_ptr<Mesh> mesh);
   static void Cleanup();
 };

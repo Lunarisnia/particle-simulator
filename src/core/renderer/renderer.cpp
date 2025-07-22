@@ -21,7 +21,15 @@ void Core::Renderer::Init() {
 #endif
 
   /*SetClearColor(1.0f, 1.0f, 1.0f, 1.0f);*/
-  glEnable(GL_DEPTH_TEST);
+  DepthTest(true);
+}
+
+void Core::Renderer::DepthTest(bool enable) {
+  if (enable) {
+    glEnable(GL_DEPTH_TEST);
+    return;
+  }
+  glDisable(GL_DEPTH_TEST);
 }
 
 void Core::Renderer::Render() {
@@ -31,6 +39,10 @@ void Core::Renderer::Render() {
     }
     Object *owner = mesh->GetOwner();
     if (!owner) {
+      continue;
+    }
+    // FIXME: Do better than this
+    if (owner->name == "RenderPlane") {
       continue;
     }
 
@@ -51,9 +63,7 @@ void Core::Renderer::SetClearColor(float r, float g, float b, float a) {
   glClearColor(r, g, b, a);
 }
 
-void Core::Renderer::Clear() {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
+void Core::Renderer::Clear(int bit) { glClear(bit); }
 
 void Core::Renderer::AddToRenderQueue(std::shared_ptr<Mesh> mesh) {
   renderQueue.emplace_back(mesh);
