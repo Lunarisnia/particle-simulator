@@ -9,6 +9,7 @@ class TextureManager {
   static std::map<std::string, Core::Texture> loadedTextures;
 
  public:
-  static Texture LoadTexture(const std::string &path);
+  static Texture LoadTexture(const std::string &path, int colorSpace,
+                             int colorCode);
 };
 };  // namespace Core

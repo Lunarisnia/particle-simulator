@@ -100,11 +100,17 @@ void Particle::Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 
 void Particle::Model::loadTextures(aiMaterial* material, aiTextureType type,
                                    std::shared_ptr<Core::Mesh>& objectMesh) {
+  int colorSpace = GL_RGB;
+  int colorCode = GL_RGB;
   for (size_t i = 0; i < material->GetTextureCount(type); i++) {
     aiString str;
     material->GetTexture(type, i, &str);
+    if (type == aiTextureType_DIFFUSE) {
+      colorSpace = GL_SRGB;
+    }
     Core::Texture texture = Core::TextureManager::LoadTexture(
-        std::format("{}/{}", directory.c_str(), str.C_Str()));
+        std::format("{}/{}", directory.c_str(), str.C_Str()), colorSpace,
+        colorCode);
     objectMesh->material->AddTexture(texture);
   }
 }

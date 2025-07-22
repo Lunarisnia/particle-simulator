@@ -19,7 +19,7 @@ class Material {
 
   void AddTexture(Texture texture);
 
-  void LoadTexture(const std::string &path);
+  void LoadTexture(const std::string &path, int colorSpace, int colorCode);
 
  public:
   Material(Shader shader);

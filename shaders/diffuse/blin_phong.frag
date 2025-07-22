@@ -53,11 +53,13 @@ void main()
     vec4 specularTexture = texture(material.specular, vertexAttribute.textureCoord);
     vec4 normalTexture = texture(material.normal, vertexAttribute.textureCoord);
     normalTexture = normalTexture * 2.0f - 1.0f;
-    // normalTexture = vec4(normalize(vertexAttribute.TBN * normalTexture.rgb), 0.0f);
 
     vec3 color = vec3(0.0f);
     for (int i = 0; i < 1; i++) {
         color += calculatePointLight(pointLight[i], diffuseTexture.rgb, specularTexture.rgb, normalTexture.rgb);
     }
+
+    float gamma = 2.2f;
+    color = pow(color, vec3(1.0f / gamma));
     FragColor = vec4(color, 1.0f);
 }

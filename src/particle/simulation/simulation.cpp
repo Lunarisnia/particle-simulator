@@ -86,14 +86,16 @@ void Particle::Simulation::Init() {
   std::shared_ptr<Core::Object> wall =
       Primitive::CreateUVSphere(vertexPathV2, blinPhongFrag, "Hello", 256, 256);
   wall->name = "Wall";
-  wall->mesh->material->LoadTexture("./assets/brickwall.jpg");
-  wall->mesh->material->LoadTexture("./assets/brickwall_normal.jpg");
+  wall->mesh->material->LoadTexture("./assets/brickwall.jpg", GL_SRGB, GL_RGB);
+  wall->mesh->material->LoadTexture("./assets/brickwall_normal.jpg", GL_RGB,
+                                    GL_RGB);
   wall->mesh->material->SetInt("material.diffuse", 0);
   wall->mesh->material->SetInt("material.specular", 0);
   wall->mesh->material->SetInt("material.normal", 1);
   cubes.emplace_back(wall);
 }
 
+// TODO: Update TBN matrix every frame
 void Particle::Simulation::Update() {
   for (std::shared_ptr<Core::Object> &object : cubes) {
     for (size_t i = 0; i < lightCubes.size(); i++) {
@@ -168,9 +170,11 @@ void Particle::Simulation::placeObjects() {
     std::shared_ptr<Core::Object> obj =
         Primitive::CreateCube(vertexPath, diffuseFrag2);
     obj->name = std::format("Cube ({})", i);
-    obj->mesh->material->LoadTexture("./assets/container2.png");
-    obj->mesh->material->LoadTexture("./assets/container2_specular.png");
-    obj->mesh->material->LoadTexture("./assets/matrix.jpg");
+    obj->mesh->material->LoadTexture("./assets/container2.png", GL_SRGB,
+                                     GL_RGB);
+    obj->mesh->material->LoadTexture("./assets/container2_specular.png", GL_RGB,
+                                     GL_RGB);
+    obj->mesh->material->LoadTexture("./assets/matrix.jpg", GL_SRGB, GL_RGB);
     obj->transform->position = glm::vec3(dist(rng), dist(rng), -2.0f);
 
     obj->mesh->material->SetVec3("objectColor", glm::vec3(0.3f, 0.8f, 0.2f));
