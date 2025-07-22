@@ -36,6 +36,8 @@ vec3 calculatePointLight(PointLight light, vec3 diffuseTexture, vec3 specularTex
 
     vec3 lightDir = vertexAttribute.TBN * normalize(light.position - vertexAttribute.fragPos);
     float diff = max(0.0f, dot(lightDir, normal));
+    // Cell shader
+    // diff *= smoothstep(0.5f, 0.599f, diff);
     vec3 diffuse = light.diffuse * diff * diffuseTexture;
 
     vec3 viewDir = vertexAttribute.TBN * normalize(camera.position - vertexAttribute.fragPos);

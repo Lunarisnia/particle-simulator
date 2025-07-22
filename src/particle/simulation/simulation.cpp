@@ -34,7 +34,7 @@ const std::string blinPhongFrag = "./shaders/diffuse/blin_phong.frag";
 const std::string vertexPathV2 = "./shaders/diffuse/diffuse_v2.vert";
 
 void Particle::Simulation::Init() {
-  Core::StaticCamera::transform->position.z = 1.0f;
+  Core::StaticCamera::transform->position.z = 2.0f;
 
   std::random_device dev;
   std::mt19937 rng(dev());
