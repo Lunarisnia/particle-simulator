@@ -8,35 +8,35 @@
 Core::Texture::Texture() {}
 
 Core::Texture::Texture(int width, int height)
-    : textureLocation(TextureManager::ScreenTextureLocation()) {
+    : textureLocation(TextureManager::ScreenTextureLocation()),
+      textureType(GL_TEXTURE_2D) {
   glGenTextures(1, &id);
-  glBindTexture(GL_TEXTURE_2D, id);
+  glBindTexture(textureType, id);
 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+  glTexParameteri(textureType, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(textureType, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexImage2D(textureType, 0, GL_RGB, width, height, 0, GL_RGB,
                GL_UNSIGNED_BYTE, nullptr);
-  glBindTexture(GL_TEXTURE_2D, 0);
+  glBindTexture(textureType, 0);
 }
 
 Core::Texture::Texture(const std::string &path, int textureLocation,
                        int colorSpace, int colorCode)
-    : textureLocation(textureLocation) {
+    : textureLocation(textureLocation), textureType(GL_TEXTURE_2D) {
   glGenTextures(1, &id);
-  glBindTexture(GL_TEXTURE_2D, id);
+  glBindTexture(textureType, id);
   // set the texture wrapping/filtering options (on the currently bound texture
   // object)
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                  GL_LINEAR_MIPMAP_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(textureType, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(textureType, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(textureType, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(textureType, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   stbi_set_flip_vertically_on_load(true);
   data = stbi_load(path.c_str(), &width, &height, &numberOfChannel, 0);
   if (data) {
     glTexImage2D(GL_TEXTURE_2D, 0, colorSpace, width, height, 0, colorCode,
                  GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
+    glGenerateMipmap(textureType);
   } else {
     throw std::runtime_error("failed to load texture");
   }
@@ -45,7 +45,7 @@ Core::Texture::Texture(const std::string &path, int textureLocation,
 
 void Core::Texture::Bind() {
   glActiveTexture(textureLocation);
-  glBindTexture(GL_TEXTURE_2D, id);
+  glBindTexture(textureType, id);
 }
 
 unsigned int Core::Texture::GetID() { return id; }

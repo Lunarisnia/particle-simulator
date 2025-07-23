@@ -4,6 +4,7 @@ namespace Core {
 class Texture {
  private:
   unsigned int id;
+  int textureType;
   int textureLocation;
 
  public:
