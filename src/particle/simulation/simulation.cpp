@@ -49,7 +49,6 @@ void Particle::Simulation::Init() {
                        "./assets/skybox/front.jpg");
   textureFaces.emplace(Core::TextureTarget::CUBE_MAP_NEGATIVE_Z,
                        "./assets/skybox/back.jpg");
-
   Core::StaticCamera::transform->position.z = 4.0f;
 
   std::random_device dev;
@@ -106,9 +105,9 @@ void Particle::Simulation::Init() {
   ball->mesh->material->LoadTexture("./assets/brickwall.jpg", GL_SRGB, GL_RGB);
   ball->mesh->material->LoadTexture("./assets/brickwall_normal.jpg", GL_RGB,
                                     GL_RGB);
-  ball->mesh->material->SetInt("material.diffuse", 1);
-  ball->mesh->material->SetInt("material.specular", 1);
-  ball->mesh->material->SetInt("material.normal", 2);
+  ball->mesh->material->SetInt("material.diffuse", 2);
+  ball->mesh->material->SetInt("material.specular", 2);
+  ball->mesh->material->SetInt("material.normal", 3);
   cubes.emplace_back(ball);
 
   std::shared_ptr<Core::Object> cube =
@@ -121,9 +120,9 @@ void Particle::Simulation::Init() {
                                     GL_RGBA);
   cube->mesh->material->LoadTexture("./assets/container2_specular.png",
                                     GL_SRGB_ALPHA, GL_RGBA);
-  cube->mesh->material->SetInt("material.diffuse", 3);
-  cube->mesh->material->SetInt("material.specular", 4);
-  cube->mesh->material->SetInt("material.normal", 2);
+  cube->mesh->material->SetInt("material.diffuse", 4);
+  cube->mesh->material->SetInt("material.specular", 5);
+  cube->mesh->material->SetInt("material.normal", 3);
   cubes.emplace_back(cube);
 
   std::shared_ptr<Core::Object> texturedCube =

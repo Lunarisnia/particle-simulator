@@ -51,6 +51,9 @@ add_executable(${PROJECT_NAME}
 	# Renderbuffer
 	core/renderbuffer/renderbuffer.cpp
 
+	# Procedural
+	core/procedural/procedural.cpp
+
 
 	# Components
 	core/components/component.cpp

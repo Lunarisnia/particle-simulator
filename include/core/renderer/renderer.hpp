@@ -8,9 +8,6 @@ namespace Core {
 class Renderer {
  private:
   static std::vector<std::shared_ptr<Mesh>> renderQueue;
-  // TODO: we need to create a cube without appending it to the hierarchy
-  // TODO: split the procedural generation function into 2part, the procedural
-  // one and the one appending it to the world
   static std::shared_ptr<Core::Object> skybox;
 
  public:
