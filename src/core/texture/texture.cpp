@@ -1,8 +1,8 @@
 #include "core/texture/texture.hpp"
+#include <map>
 #include <stdexcept>
 #include <string>
 #include "core/texture/texture_manager.hpp"
-#include "glad/glad.h"
 #include "stbi_image/stbi_image.h"
 
 Core::Texture::Texture() {}
@@ -41,6 +41,31 @@ Core::Texture::Texture(const std::string &path, int textureLocation,
     throw std::runtime_error("failed to load texture");
   }
   stbi_image_free(data);
+}
+
+Core::Texture::Texture(std::map<TextureTarget, std::string> textureFaces,
+                       int textureLocation, int colorSpace, int colorCode)
+    : textureLocation(textureLocation), textureType(GL_TEXTURE_CUBE_MAP) {
+  glGenTextures(1, &id);
+  glBindTexture(textureType, id);
+  stbi_set_flip_vertically_on_load(false);
+  for (auto &pair : textureFaces) {
+    data = stbi_load(pair.second.c_str(), &width, &height, &numberOfChannel, 0);
+    if (data) {
+      glTexImage2D(pair.first, 0, colorSpace, width, height, 0, colorCode,
+                   GL_UNSIGNED_BYTE, data);
+      stbi_image_free(data);
+    } else {
+      stbi_image_free(data);
+      throw std::runtime_error("failed to load texture");
+    }
+  }
+
+  glTexParameteri(textureType, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(textureType, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(textureType, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(textureType, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(textureType, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 }
 
 void Core::Texture::Bind() {

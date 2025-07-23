@@ -12,5 +12,8 @@ class TextureManager {
   static int ScreenTextureLocation();
   static Texture LoadTexture(const std::string &path, int colorSpace,
                              int colorCode);
+  static Texture LoadTextureCubeMap(
+      std::map<Core::TextureTarget, std::string> textureFaces, int colorSpace,
+      int colorCode);
 };
 };  // namespace Core

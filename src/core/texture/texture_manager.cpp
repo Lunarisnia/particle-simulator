@@ -22,3 +22,10 @@ Core::Texture Core::TextureManager::LoadTexture(const std::string &path,
 
   return texture;
 }
+Core::Texture Core::TextureManager::LoadTextureCubeMap(
+    std::map<Core::TextureTarget, std::string> textureFaces, int colorSpace,
+    int colorCode) {
+  Core::Texture texture{textureFaces, nextAvailableTextureId++, colorSpace,
+                        colorCode};
+  return texture;
+}

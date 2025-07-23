@@ -20,6 +20,9 @@ class Material {
   void AddTexture(Texture texture);
 
   void LoadTexture(const std::string &path, int colorSpace, int colorCode);
+  void LoadTextureCubeMap(
+      std::map<Core::TextureTarget, std::string> textureFaces, int colorSpace,
+      int colorCode);
 
  public:
   Material(Shader shader);

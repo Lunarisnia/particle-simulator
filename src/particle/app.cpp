@@ -1,14 +1,12 @@
 #include "particle/app.hpp"
 #include <exception>
 #include <memory>
-#include <print>
 #include <stdexcept>
 #include "core/app.hpp"
 #include "core/framebuffer/framebuffer.hpp"
 #include "core/input/input.hpp"
 #include "core/renderer/renderer.hpp"
 #include "core/texture/texture.hpp"
-#include "core/texture/texture_manager.hpp"
 #include "core/time/time.hpp"
 #include "core/window/window.hpp"
 #include "core/world/world.hpp"

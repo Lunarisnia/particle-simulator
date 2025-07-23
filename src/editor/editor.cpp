@@ -1,3 +1,4 @@
+#include "particle/simulation/simulation.hpp"
 #include "editor/editor.hpp"
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
@@ -6,7 +7,6 @@
 #include "editor/hierarchy/hierarchy.hpp"
 #include "editor/inspector/inspector.hpp"
 #include "imgui.h"
-#include "particle/simulation/simulation.hpp"
 
 void Editor::Editor::Init() {
   IMGUI_CHECKVERSION();

@@ -1,6 +1,7 @@
 #include "particle/simulation/simulation.hpp"
 #include <cstddef>
 #include <format>
+#include <map>
 #include <memory>
 #include <print>
 #include <random>
@@ -13,6 +14,7 @@
 #include "core/input/input.hpp"
 #include "core/object/object.hpp"
 #include "core/static_camera/static_camera.hpp"
+#include "core/texture/texture.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/geometric.hpp"
 #include "glm/trigonometric.hpp"
@@ -34,7 +36,21 @@ const std::string blinPhongFrag = "./shaders/diffuse/blin_phong.frag";
 const std::string vertexPathV2 = "./shaders/diffuse/diffuse_v2.vert";
 
 void Particle::Simulation::Init() {
-  Core::StaticCamera::transform->position.z = 2.0f;
+  std::map<Core::TextureTarget, std::string> textureFaces;
+  textureFaces.emplace(Core::TextureTarget::CUBE_MAP_POSITIVE_X,
+                       "./assets/skybox/right.jpg");
+  textureFaces.emplace(Core::TextureTarget::CUBE_MAP_NEGATIVE_X,
+                       "./assets/skybox/left.jpg");
+  textureFaces.emplace(Core::TextureTarget::CUBE_MAP_POSITIVE_Y,
+                       "./assets/skybox/top.jpg");
+  textureFaces.emplace(Core::TextureTarget::CUBE_MAP_NEGATIVE_Y,
+                       "./assets/skybox/bottom.jpg");
+  textureFaces.emplace(Core::TextureTarget::CUBE_MAP_POSITIVE_Z,
+                       "./assets/skybox/front.jpg");
+  textureFaces.emplace(Core::TextureTarget::CUBE_MAP_NEGATIVE_Z,
+                       "./assets/skybox/back.jpg");
+
+  Core::StaticCamera::transform->position.z = 4.0f;
 
   std::random_device dev;
   std::mt19937 rng(dev());
@@ -109,6 +125,18 @@ void Particle::Simulation::Init() {
   cube->mesh->material->SetInt("material.specular", 4);
   cube->mesh->material->SetInt("material.normal", 2);
   cubes.emplace_back(cube);
+
+  std::shared_ptr<Core::Object> texturedCube =
+      Primitive::CreateCube(vertexPathV2, "./shaders/diffuse/cubemap.frag");
+  texturedCube->transform->position = glm::vec3(0.0f, 1.0f, -1.0f);
+
+  texturedCube->name = "TexturedCube";
+  texturedCube->mesh->material->LoadTextureCubeMap(textureFaces, GL_RGB,
+                                                   GL_RGB);
+  /*texturedCube->mesh->material->SetInt("cubeTexture", 5);*/
+  /*texturedCube->mesh->material->SetInt("material.specular", 4);*/
+  /*texturedCube->mesh->material->SetInt("material.normal", 2);*/
+  cubes.emplace_back(texturedCube);
 }
 
 // TODO: Update TBN matrix every frame

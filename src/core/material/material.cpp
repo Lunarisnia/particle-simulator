@@ -37,6 +37,13 @@ void Core::Material::LoadTexture(const std::string &path, int colorSpace,
       TextureManager::LoadTexture(path, colorSpace, colorCode));
 }
 
+void Core::Material::LoadTextureCubeMap(
+    std::map<Core::TextureTarget, std::string> textureFaces, int colorSpace,
+    int colorCode) {
+  textures.emplace_back(Core::TextureManager::LoadTextureCubeMap(
+      textureFaces, colorSpace, colorCode));
+}
+
 void Core::Material::AddTexture(Texture texture) {
   textures.emplace_back(texture);
 }
