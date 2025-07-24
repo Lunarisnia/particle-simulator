@@ -19,6 +19,7 @@
 #include "particle/primitive/primitive.hpp"
 
 float Particle::Simulation::globalFloat = 0.0f;
+float Particle::Simulation::globalFloat2 = 0.0f;
 std::vector<std::shared_ptr<Core::Object>> Particle::Simulation::lightCubes;
 std::vector<std::shared_ptr<Core::Object>> Particle::Simulation::spotLightCubes;
 std::vector<std::shared_ptr<Core::Object>> Particle::Simulation::cubes;
@@ -152,7 +153,7 @@ void Particle::Simulation::Init() {
   cubes.emplace_back(reflectiveBall);
 
   Particle::Model model;
-  model.LoadModel("./assets/backpack/backpack.obj");
+  model.LoadModel("./assets/honkai-star-rail-jingliu/source/JingiluV3.fbx");
   model.StoreMeshes(cubes);
 }
 
@@ -174,5 +175,6 @@ void Particle::Simulation::Update() {
     object->mesh->material->SetVec3(
         "camera.position", Core::StaticCamera::transform->GetWorldPosition());
     object->mesh->material->SetFloat("globalFloat", globalFloat);
+    object->mesh->material->SetFloat("globalFloat2", globalFloat2);
   }
 }

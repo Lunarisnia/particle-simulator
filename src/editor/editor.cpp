@@ -39,6 +39,8 @@ void Editor::Editor::Update() {
                     0.05f);
   ImGui::DragFloat("Global Shader Float", &Particle::Simulation::globalFloat,
                    0.05f);
+  ImGui::DragFloat("Global Shader Float2", &Particle::Simulation::globalFloat2,
+                   0.05f);
   ImGui::End();
   Hierarchy::Tick();
   Inspector::Tick();

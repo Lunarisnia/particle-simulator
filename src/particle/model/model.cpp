@@ -34,9 +34,10 @@ void Particle::Model::StoreMeshes(
 void Particle::Model::LoadModel(const std::string& path) {
   Assimp::Importer importer;
 
-  const aiScene* scene = importer.ReadFile(
-      path, aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_FlipUVs |
-                aiProcess_CalcTangentSpace);
+  // TODO: Flip UV disabled because of jingliu model
+  const aiScene* scene =
+      importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenNormals |
+                                  aiProcess_CalcTangentSpace);
   if (!scene || !scene->mRootNode ||
       scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) {
     throw std::runtime_error(importer.GetErrorString());
@@ -59,12 +60,12 @@ void Particle::Model::processScene(aiNode* node, const aiScene* scene) {
 void Particle::Model::processMesh(aiMesh* mesh, const aiScene* scene) {
   std::shared_ptr<Core::Object> object = std::make_shared<Core::Object>();
   // FIXME: Remove
-  object->transform->position.z = -4.0f;
+  /*object->transform->position.z = -4.0f;*/
   object->name = mesh->mName.C_Str();
   objects.emplace_back(object);
 
   Core::Shader shader{"./shaders/diffuse/diffuse_v2.vert",
-                      "./shaders/diffuse/blin_phong.frag"};
+                      "./shaders/diffuse/demo.frag"};
   std::shared_ptr<Core::Material> material =
       std::make_shared<Core::Material>(shader);
   std::shared_ptr<Core::Mesh> objectMesh =
@@ -76,8 +77,9 @@ void Particle::Model::processMesh(aiMesh* mesh, const aiScene* scene) {
     aiVector3D norm = mesh->mNormals[i];
 
     Core::VertexData vertex;
-    vertex.SetPosition(glm::vec3(vert.x, vert.y, vert.z));
-    vertex.SetNormal(glm::vec3(norm.x, norm.y, norm.z));
+    // TODO: Flipped the z and y coordinate because of jingliu model
+    vertex.SetPosition(glm::vec3(vert.x, vert.z, vert.y));
+    vertex.SetNormal(glm::vec3(norm.x, norm.z, norm.y));
     if (mesh->mTextureCoords[0]) {
       vertex.SetTextureCoordinate(glm::vec2(mesh->mTextureCoords[0][i].x,
                                             mesh->mTextureCoords[0][i].y));
@@ -121,8 +123,13 @@ void Particle::Model::loadTextures(aiMaterial* material, aiTextureType type,
     if (type == aiTextureType_DIFFUSE) {
       colorSpace = GL_SRGB;
     }
+    std::string name = std::string(str.C_Str());
+    if (name.contains('\\')) {
+      name = name.substr(name.find_last_of("\\") + 1, std::string::npos);
+    }
+
     const std::string path =
-        std::format("{}/{}", directory.c_str(), str.C_Str());
+        std::format("{}/{}", directory.c_str(), name.c_str());
     Core::Texture texture =
         Core::TextureManager::LoadTexture(path, colorSpace, colorCode);
     objectMesh->material->SetInt(

@@ -4,6 +4,7 @@ struct VertexAttribute {
     vec3 fragPos;
     vec3 normal;
     vec2 textureCoord;
+    vec3 tangent;
 
     mat3 TBN;
 };

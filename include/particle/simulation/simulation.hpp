@@ -7,6 +7,7 @@ namespace Particle {
 class Simulation {
  public:
   static float globalFloat;
+  static float globalFloat2;
   static glm::vec3 lightColor;
   static std::vector<std::shared_ptr<Core::Object>> cubes;
   static std::vector<std::shared_ptr<Core::Object>> lightCubes;
