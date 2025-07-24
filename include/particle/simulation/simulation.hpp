@@ -12,10 +12,6 @@ class Simulation {
   static std::vector<std::shared_ptr<Core::Object>> lightCubes;
   static std::vector<std::shared_ptr<Core::Object>> spotLightCubes;
 
- private:
-  static void placeObjects();
-  static void objectUpdate();
-
  public:
   static void Init();
   static void Update();

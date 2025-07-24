@@ -15,12 +15,14 @@ class Model {
  public:
   std::vector<std::shared_ptr<Core::Object>> objects;
   void LoadModel(const std::string &path);
+  void StoreMeshes(std::vector<std::shared_ptr<Core::Object>> &storage);
 
  private:
   void processScene(aiNode *node, const aiScene *scene);
   void processMesh(aiMesh *mesh, const aiScene *scene);
   void loadTextures(aiMaterial *material, aiTextureType type,
-                    std::shared_ptr<Core::Mesh> &objectMesh);
+                    std::shared_ptr<Core::Mesh> &objectMesh,
+                    const std::string &uniform);
 
  public:
   Model();

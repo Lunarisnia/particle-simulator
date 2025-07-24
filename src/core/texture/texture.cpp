@@ -74,5 +74,6 @@ void Core::Texture::Bind() {
 }
 
 unsigned int Core::Texture::GetID() { return id; }
+int Core::Texture::GetLocation() { return textureLocation; }
 
 Core::Texture::~Texture() {}

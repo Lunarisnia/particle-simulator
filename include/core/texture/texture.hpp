@@ -23,6 +23,7 @@ class Texture {
 
  public:
   unsigned int GetID();
+  int GetLocation();
   void Bind();
 
  public:

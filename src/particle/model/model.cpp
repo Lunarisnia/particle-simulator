@@ -24,11 +24,19 @@
 
 Particle::Model::Model() {}
 
+void Particle::Model::StoreMeshes(
+    std::vector<std::shared_ptr<Core::Object>>& storage) {
+  for (std::shared_ptr<Core::Object>& obj : objects) {
+    storage.emplace_back(obj);
+  }
+}
+
 void Particle::Model::LoadModel(const std::string& path) {
   Assimp::Importer importer;
 
   const aiScene* scene = importer.ReadFile(
-      path, aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_FlipUVs);
+      path, aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_FlipUVs |
+                aiProcess_CalcTangentSpace);
   if (!scene || !scene->mRootNode ||
       scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) {
     throw std::runtime_error(importer.GetErrorString());
@@ -55,8 +63,8 @@ void Particle::Model::processMesh(aiMesh* mesh, const aiScene* scene) {
   object->name = mesh->mName.C_Str();
   objects.emplace_back(object);
 
-  Core::Shader shader{"./shaders/diffuse/diffuse.vert",
-                      "./shaders/diffuse/multi_light_diffuse.frag"};
+  Core::Shader shader{"./shaders/diffuse/diffuse_v2.vert",
+                      "./shaders/diffuse/blin_phong.frag"};
   std::shared_ptr<Core::Material> material =
       std::make_shared<Core::Material>(shader);
   std::shared_ptr<Core::Mesh> objectMesh =
@@ -76,6 +84,8 @@ void Particle::Model::processMesh(aiMesh* mesh, const aiScene* scene) {
     } else {
       vertex.SetTextureCoordinate(glm::vec2(0.0f));
     }
+    vertex.tangent = glm::vec3(mesh->mTangents[i].x, mesh->mTangents[i].y,
+                               mesh->mTangents[i].z);
 
     objectMesh->AddVertex(vertex);
   }
@@ -89,9 +99,11 @@ void Particle::Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 
   if (mesh->mMaterialIndex >= 0) {
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-    loadTextures(material, aiTextureType_DIFFUSE, objectMesh);
-    loadTextures(material, aiTextureType_SPECULAR, objectMesh);
-    loadTextures(material, aiTextureType_HEIGHT, objectMesh);
+    loadTextures(material, aiTextureType_DIFFUSE, objectMesh,
+                 "material.diffuse");
+    loadTextures(material, aiTextureType_SPECULAR, objectMesh,
+                 "material.specular");
+    loadTextures(material, aiTextureType_HEIGHT, objectMesh, "material.normal");
   }
 
   objectMesh->SetupMesh();
@@ -99,7 +111,8 @@ void Particle::Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 }
 
 void Particle::Model::loadTextures(aiMaterial* material, aiTextureType type,
-                                   std::shared_ptr<Core::Mesh>& objectMesh) {
+                                   std::shared_ptr<Core::Mesh>& objectMesh,
+                                   const std::string& uniform) {
   int colorSpace = GL_RGB;
   int colorCode = GL_RGB;
   for (size_t i = 0; i < material->GetTextureCount(type); i++) {
@@ -108,9 +121,12 @@ void Particle::Model::loadTextures(aiMaterial* material, aiTextureType type,
     if (type == aiTextureType_DIFFUSE) {
       colorSpace = GL_SRGB;
     }
-    Core::Texture texture = Core::TextureManager::LoadTexture(
-        std::format("{}/{}", directory.c_str(), str.C_Str()), colorSpace,
-        colorCode);
+    const std::string path =
+        std::format("{}/{}", directory.c_str(), str.C_Str());
+    Core::Texture texture =
+        Core::TextureManager::LoadTexture(path, colorSpace, colorCode);
+    objectMesh->material->SetInt(
+        uniform, Core::TextureManager::GetTextureLocation(path));
     objectMesh->material->AddTexture(texture);
   }
 }

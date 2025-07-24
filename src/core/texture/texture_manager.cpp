@@ -9,6 +9,14 @@ std::map<std::string, Core::Texture> Core::TextureManager::loadedTextures;
 
 int Core::TextureManager::ScreenTextureLocation() { return GL_TEXTURE0; }
 
+int Core::TextureManager::GetTextureLocation(const std::string &path) {
+  if (loadedTextures.count(path) < 1) {
+    return -1;
+  }
+  int number = loadedTextures.at(path).GetLocation();
+  return number - GL_TEXTURE0;
+}
+
 Core::Texture Core::TextureManager::LoadTexture(const std::string &path,
                                                 int colorSpace, int colorCode) {
   if (loadedTextures.count(path) > 0) {
