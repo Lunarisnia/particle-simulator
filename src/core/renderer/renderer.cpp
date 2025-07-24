@@ -48,6 +48,9 @@ void Core::Renderer::Init() {
   textureFaces.emplace(Core::TextureTarget::CUBE_MAP_NEGATIVE_Z,
                        "./assets/skybox/back.jpg");
   mesh->material->LoadTextureCubeMap(textureFaces, GL_RGB, GL_RGB);
+  // TODO: I kinda hate having to put the index here as a magic number out of my
+  // ass, do something about this
+  mesh->material->SetInt("cubeTexture", 0);
   DepthTest(true);
 }
 
@@ -95,6 +98,9 @@ void Core::Renderer::Render() {
 
     glDepthFunc(GL_LEQUAL);
     skybox->mesh->material->Use();
+    skybox->mesh->material->SetMat4("view", StaticCamera::GetViewMatrix());
+    skybox->mesh->material->SetMat4("projection",
+                                    StaticCamera::GetProjectionMatrix());
     skybox->mesh->BindVertexArray();
     glDrawElements(GL_TRIANGLES, skybox->mesh->GetIndiceLength(),
                    GL_UNSIGNED_INT, 0);

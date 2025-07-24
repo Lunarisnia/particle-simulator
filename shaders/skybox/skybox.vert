@@ -9,9 +9,12 @@ struct VertexAttribute {
 };
 out VertexAttribute vertexAttribute;
 
+uniform mat4 view;
+uniform mat4 projection;
+
 void main()
 {
-    vec3 pos = aPos * 2.0f;
-    vertexAttribute.textureCoord = pos;
-    gl_Position = vec4(pos.xy, 1.0f, 1.0f);
+    vertexAttribute.textureCoord = aPos * 2.0f;
+    vec4 pos = projection * mat4(mat3(view)) * vec4(aPos * 2.0f, 1.0f);
+    gl_Position = pos.xyww;
 }

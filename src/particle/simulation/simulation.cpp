@@ -128,14 +128,16 @@ void Particle::Simulation::Init() {
   std::shared_ptr<Core::Object> texturedCube =
       Primitive::CreateCube(vertexPathV2, "./shaders/diffuse/cubemap.frag");
   texturedCube->transform->position = glm::vec3(0.0f, 1.0f, -1.0f);
-
   texturedCube->name = "TexturedCube";
   texturedCube->mesh->material->LoadTextureCubeMap(textureFaces, GL_RGB,
                                                    GL_RGB);
-  /*texturedCube->mesh->material->SetInt("cubeTexture", 5);*/
-  /*texturedCube->mesh->material->SetInt("material.specular", 4);*/
-  /*texturedCube->mesh->material->SetInt("material.normal", 2);*/
   cubes.emplace_back(texturedCube);
+
+  std::shared_ptr<Core::Object> reflectiveBall = Primitive::CreateUVSphere(
+      vertexPathV2, "./shaders/diffuse/environment_reflection.frag", "Ball");
+  reflectiveBall->transform->position = glm::vec3(0.0f, 0.0f, 1.0f);
+  reflectiveBall->name = "ReflectiveBall";
+  cubes.emplace_back(reflectiveBall);
 }
 
 // TODO: Update TBN matrix every frame
