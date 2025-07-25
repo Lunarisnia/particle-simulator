@@ -1,5 +1,4 @@
 #include "core/renderbuffer/renderbuffer.hpp"
-#include <print>
 #include "glad/glad.h"
 
 Core::Renderbuffer::Renderbuffer() {}

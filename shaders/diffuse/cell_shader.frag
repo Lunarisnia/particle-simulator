@@ -1,5 +1,8 @@
 #version 330 core
-out vec4 FragColor;
+layout(location = 0) out vec4 FragColor;
+layout(location = 1) out vec4 ModelColor;
+layout(location = 2) out vec4 OutlineColor;
+
 struct VertexAttribute {
     vec3 fragPos;
     vec3 normal;
@@ -55,9 +58,21 @@ vec3 calculatePointLight(PointLight light, vec3 diffuseTexture, vec3 normal) {
     return color;
 }
 
+float near = 0.01f;
+float far = 2.0f;
+
+float LinearizeDepth(float depth)
+{
+    float z = depth * 2.0 - 1.0; // back to NDC
+    return (2.0 * near * far) / (far + near - z * (far - near));
+}
+
 void main()
 {
     vec4 texColor = texture(material.diffuse, vertexAttribute.textureCoord);
+
+    float depth = LinearizeDepth(gl_FragCoord.z) / far; // divide by far for demonstration
+    ModelColor = vec4(mix(vec3(1.0f), vec3(0.0f), depth), 1.0f);
 
     vec3 color = calculatePointLight(pointLight[0], texColor.rgb, normalize(vertexAttribute.normal));
     FragColor = vec4(color, 1.0f);

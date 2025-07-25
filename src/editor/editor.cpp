@@ -38,9 +38,9 @@ void Editor::Editor::Update() {
   ImGui::DragFloat3("Diffuse Light Color", &Particle::Simulation::lightColor.x,
                     0.05f);
   ImGui::DragFloat("Global Shader Float", &Particle::Simulation::globalFloat,
-                   0.05f);
+                   0.001f);
   ImGui::DragFloat("Global Shader Float2", &Particle::Simulation::globalFloat2,
-                   0.05f);
+                   0.001f);
   ImGui::End();
   Hierarchy::Tick();
   Inspector::Tick();

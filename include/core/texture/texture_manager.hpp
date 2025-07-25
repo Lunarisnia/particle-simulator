@@ -11,6 +11,7 @@ class TextureManager {
  public:
   static int ScreenTextureLocation();
   static int GetTextureLocation(const std::string &path);
+  static Texture CreateTexture(const std::string &name, int width, int height);
   static Texture LoadTexture(const std::string &path, int colorSpace,
                              int colorCode);
   static Texture LoadTextureCubeMap(

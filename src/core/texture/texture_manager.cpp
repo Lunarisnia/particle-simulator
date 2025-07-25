@@ -17,6 +17,18 @@ int Core::TextureManager::GetTextureLocation(const std::string &path) {
   return number - GL_TEXTURE0;
 }
 
+Core::Texture Core::TextureManager::CreateTexture(const std::string &name,
+                                                  int width, int height) {
+  if (loadedTextures.count(name) > 0) {
+    return loadedTextures.at(name);
+  }
+
+  Core::Texture texture{width, height, nextAvailableTextureId++};
+  loadedTextures.emplace(name, texture);
+
+  return texture;
+}
+
 Core::Texture Core::TextureManager::LoadTexture(const std::string &path,
                                                 int colorSpace, int colorCode) {
   if (loadedTextures.count(path) > 0) {
@@ -30,6 +42,7 @@ Core::Texture Core::TextureManager::LoadTexture(const std::string &path,
 
   return texture;
 }
+
 Core::Texture Core::TextureManager::LoadTextureCubeMap(
     std::map<Core::TextureTarget, std::string> textureFaces, int colorSpace,
     int colorCode) {

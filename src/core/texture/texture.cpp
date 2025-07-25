@@ -7,9 +7,8 @@
 
 Core::Texture::Texture() {}
 
-Core::Texture::Texture(int width, int height)
-    : textureLocation(TextureManager::ScreenTextureLocation()),
-      textureType(GL_TEXTURE_2D) {
+Core::Texture::Texture(int width, int height, int textureLocation)
+    : textureLocation(textureLocation), textureType(GL_TEXTURE_2D) {
   glGenTextures(1, &id);
   glBindTexture(textureType, id);
 

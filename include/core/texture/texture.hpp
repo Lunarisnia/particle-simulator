@@ -30,7 +30,7 @@ class Texture {
   Texture();
   Texture(const std::string &path, int textureLocation, int colorSpace,
           int colorCode);
-  Texture(int width, int height);
+  Texture(int width, int height, int textureLocation);
   Texture(std::map<TextureTarget, std::string> textureFaces,
           int textureLocation, int colorSpace, int colorCode);
   ~Texture();

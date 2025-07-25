@@ -7,6 +7,7 @@
 #include "core/input/input.hpp"
 #include "core/renderer/renderer.hpp"
 #include "core/texture/texture.hpp"
+#include "core/texture/texture_manager.hpp"
 #include "core/time/time.hpp"
 #include "core/window/window.hpp"
 #include "core/world/world.hpp"
@@ -28,10 +29,26 @@ Particle::App::App() {
 
 void Particle::App::initFramebuffer() {
   framebuffer = std::make_shared<Core::Framebuffer>();
-  framebuffer->AttachTexture(std::make_shared<Core::Texture>(
-      Core::Window::GetWidth(), Core::Window::GetHeight()));
+  framebuffer->AttachTexture(
+      std::make_shared<Core::Texture>(Core::TextureManager::CreateTexture(
+          "color", Core::Window::GetWidth(), Core::Window::GetHeight())),
+      GL_COLOR_ATTACHMENT0);
+  framebuffer->AttachTexture(
+      std::make_shared<Core::Texture>(Core::TextureManager::CreateTexture(
+          "depth", Core::Window::GetWidth(), Core::Window::GetHeight())),
+      GL_COLOR_ATTACHMENT1);
+  framebuffer->AttachTexture(
+      std::make_shared<Core::Texture>(Core::TextureManager::CreateTexture(
+          "outline", Core::Window::GetWidth(), Core::Window::GetHeight())),
+      GL_COLOR_ATTACHMENT2);
   framebuffer->AttachRenderbuffer(std::make_shared<Core::Renderbuffer>(
       Core::Window::GetWidth(), Core::Window::GetHeight()));
+
+  framebuffer->Bind();
+  unsigned int attachments[3] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,
+                                 GL_COLOR_ATTACHMENT2};
+  glDrawBuffers(3, attachments);
+  framebuffer->Unbind();
   if (!framebuffer->CheckStatus()) {
     throw std::runtime_error("framebuffer incomplete");
   }
@@ -71,9 +88,21 @@ void Particle::App::Run() {
 
       // TODO: find a way to just use the existing renderer here later
       renderPlane->mesh->material->Use();
-      renderPlane->mesh->material->SetInt("screenTexture", 0);
+      renderPlane->mesh->material->SetInt(
+          "screenTexture",
+          framebuffer->textureBuffers[0]->GetLocation() - GL_TEXTURE0);
+      renderPlane->mesh->material->SetInt(
+          "depthTexture",
+          framebuffer->textureBuffers[1]->GetLocation() - GL_TEXTURE0);
+      renderPlane->mesh->material->SetInt(
+          "outlineTexture",
+          framebuffer->textureBuffers[2]->GetLocation() - GL_TEXTURE0);
+      renderPlane->mesh->material->SetFloat("globalFloat",
+                                            Simulation::globalFloat);
+      renderPlane->mesh->material->SetFloat("globalFloat2",
+                                            Simulation::globalFloat2);
       renderPlane->mesh->BindVertexArray();
-      framebuffer->textureBuffer->Bind();
+      framebuffer->BindTextures();
       glDrawElements(GL_TRIANGLES, renderPlane->mesh->GetIndiceLength(),
                      GL_UNSIGNED_INT, 0);
       Editor::Editor::Render();

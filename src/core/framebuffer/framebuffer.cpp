@@ -9,20 +9,27 @@ Core::Framebuffer::Framebuffer() { glGenFramebuffers(1, &id); }
 void Core::Framebuffer::Bind() { glBindFramebuffer(GL_FRAMEBUFFER, id); }
 void Core::Framebuffer::Unbind() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 
-void Core::Framebuffer::AttachTexture(std::shared_ptr<Texture> texture) {
+void Core::Framebuffer::AttachTexture(std::shared_ptr<Texture> texture,
+                                      unsigned int attachment) {
   Bind();
-  textureBuffer = texture;
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+  glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D,
                          texture->GetID(), 0);
+  textureBuffers.emplace_back(texture);
   Unbind();
 }
 
+void Core::Framebuffer::BindTextures() {
+  for (std::shared_ptr<Core::Texture>& texture : textureBuffers) {
+    texture->Bind();
+  }
+}
+
 void Core::Framebuffer::AttachRenderbuffer(
-    std::shared_ptr<Core::Renderbuffer> renderBuf) {
+    std::shared_ptr<Core::Renderbuffer> renderbuffer) {
   Bind();
-  renderbuffer = renderBuf;
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
                             GL_RENDERBUFFER, renderbuffer->GetID());
+  renderbuffers.emplace_back(renderbuffer);
   Unbind();
 }
 
