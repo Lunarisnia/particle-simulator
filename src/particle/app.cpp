@@ -37,19 +37,26 @@ void Particle::App::initFramebuffer() {
       std::make_shared<Core::Texture>(Core::TextureManager::CreateTexture(
           "depth", Core::Window::GetWidth(), Core::Window::GetHeight())),
       GL_COLOR_ATTACHMENT1);
-  framebuffer->AttachTexture(
-      std::make_shared<Core::Texture>(Core::TextureManager::CreateTexture(
-          "outline", Core::Window::GetWidth(), Core::Window::GetHeight())),
-      GL_COLOR_ATTACHMENT2);
   framebuffer->AttachRenderbuffer(std::make_shared<Core::Renderbuffer>(
       Core::Window::GetWidth(), Core::Window::GetHeight()));
 
   framebuffer->Bind();
-  unsigned int attachments[3] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,
-                                 GL_COLOR_ATTACHMENT2};
-  glDrawBuffers(3, attachments);
+  unsigned int attachments[2] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
+  glDrawBuffers(2, attachments);
   framebuffer->Unbind();
   if (!framebuffer->CheckStatus()) {
+    throw std::runtime_error("framebuffer incomplete");
+  }
+
+  edgeDetectionFramebuffer = std::make_shared<Core::Framebuffer>();
+  edgeDetectionFramebuffer->AttachTexture(
+      std::make_shared<Core::Texture>(Core::TextureManager::CreateTexture(
+          "outline", Core::Window::GetWidth(), Core::Window::GetHeight())),
+      GL_COLOR_ATTACHMENT0);
+  edgeDetectionFramebuffer->AttachRenderbuffer(
+      std::make_shared<Core::Renderbuffer>(Core::Window::GetWidth(),
+                                           Core::Window::GetHeight()));
+  if (!edgeDetectionFramebuffer->CheckStatus()) {
     throw std::runtime_error("framebuffer incomplete");
   }
 }
@@ -58,6 +65,10 @@ void Particle::App::initRenderPlane() {
   renderPlane = Primitive::CreatePlane("./shaders/screen/screen.vert",
                                        "./shaders/screen/screen.frag");
   renderPlane->name = "RenderPlane";
+
+  edgeDetectionPlane = Primitive::CreatePlane(
+      "./shaders/screen/screen.vert", "./shaders/screen/edge_detection.frag");
+  edgeDetectionPlane->name = "Edge";
 }
 
 void Particle::App::Run() {
@@ -81,11 +92,27 @@ void Particle::App::Run() {
       Core::Renderer::Render();
 
       framebuffer->Unbind();
-      Core::Renderer::AdjustViewport(true);
+      // EDGE DETECTION PASS
+      edgeDetectionFramebuffer->Bind();
+      Core::Renderer::AdjustViewport(false);
       Core::Renderer::DepthTest(false);
       Core::Renderer::SetClearColor(0.3f, 0.3f, 0.3f, 1.0f);
       Core::Renderer::Clear(GL_COLOR_BUFFER_BIT);
 
+      edgeDetectionPlane->mesh->material->Use();
+      edgeDetectionPlane->mesh->material->SetInt(
+          "depthTexture",
+          framebuffer->textureBuffers[1]->GetLocation() - GL_TEXTURE0);
+      edgeDetectionPlane->mesh->BindVertexArray();
+      framebuffer->BindTextures();
+      glDrawElements(GL_TRIANGLES, edgeDetectionPlane->mesh->GetIndiceLength(),
+                     GL_UNSIGNED_INT, 0);
+      edgeDetectionFramebuffer->Unbind();
+
+      Core::Renderer::AdjustViewport(true);
+      Core::Renderer::DepthTest(false);
+      Core::Renderer::SetClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+      Core::Renderer::Clear(GL_COLOR_BUFFER_BIT);
       // TODO: find a way to just use the existing renderer here later
       renderPlane->mesh->material->Use();
       renderPlane->mesh->material->SetInt(
@@ -96,13 +123,15 @@ void Particle::App::Run() {
           framebuffer->textureBuffers[1]->GetLocation() - GL_TEXTURE0);
       renderPlane->mesh->material->SetInt(
           "outlineTexture",
-          framebuffer->textureBuffers[2]->GetLocation() - GL_TEXTURE0);
+          edgeDetectionFramebuffer->textureBuffers[0]->GetLocation() -
+              GL_TEXTURE0);
       renderPlane->mesh->material->SetFloat("globalFloat",
                                             Simulation::globalFloat);
       renderPlane->mesh->material->SetFloat("globalFloat2",
                                             Simulation::globalFloat2);
       renderPlane->mesh->BindVertexArray();
       framebuffer->BindTextures();
+      edgeDetectionFramebuffer->BindTextures();
       glDrawElements(GL_TRIANGLES, renderPlane->mesh->GetIndiceLength(),
                      GL_UNSIGNED_INT, 0);
       Editor::Editor::Render();

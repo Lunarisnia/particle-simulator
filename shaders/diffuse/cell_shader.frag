@@ -1,7 +1,6 @@
 #version 330 core
 layout(location = 0) out vec4 FragColor;
 layout(location = 1) out vec4 ModelColor;
-layout(location = 2) out vec4 OutlineColor;
 
 struct VertexAttribute {
     vec3 fragPos;
@@ -59,7 +58,7 @@ vec3 calculatePointLight(PointLight light, vec3 diffuseTexture, vec3 normal) {
 }
 
 float near = 0.01f;
-float far = 2.0f;
+float far = 1.5f;
 
 float LinearizeDepth(float depth)
 {

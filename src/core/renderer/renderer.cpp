@@ -81,7 +81,7 @@ void Core::Renderer::Render() {
       continue;
     }
     // FIXME: Do better than this
-    if (owner->name == "RenderPlane") {
+    if (owner->name == "RenderPlane" || owner->name == "Edge") {
       continue;
     }
 

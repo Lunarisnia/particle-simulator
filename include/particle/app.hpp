@@ -8,7 +8,9 @@ class App {
  private:
   Core::App core;
   std::shared_ptr<Core::Framebuffer> framebuffer;
+  std::shared_ptr<Core::Framebuffer> edgeDetectionFramebuffer;
   std::shared_ptr<Core::Object> renderPlane;
+  std::shared_ptr<Core::Object> edgeDetectionPlane;
 
  private:
   void initFramebuffer();
