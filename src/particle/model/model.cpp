@@ -65,7 +65,7 @@ void Particle::Model::processMesh(aiMesh* mesh, const aiScene* scene) {
   objects.emplace_back(object);
 
   Core::Shader shader{"./shaders/diffuse/diffuse_v2.vert",
-                      "./shaders/diffuse/demo.frag"};
+                      "./shaders/diffuse/cell_shader.frag"};
   std::shared_ptr<Core::Material> material =
       std::make_shared<Core::Material>(shader);
   std::shared_ptr<Core::Mesh> objectMesh =

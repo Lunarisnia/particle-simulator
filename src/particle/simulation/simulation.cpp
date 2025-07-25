@@ -28,7 +28,7 @@ glm::vec3 Particle::Simulation::lightColor = glm::vec3(1.0f);
 
 const std::string vertexPath = "./shaders/diffuse/diffuse.vert";
 const std::string diffuseFrag = "./shaders/diffuse/diffuse.frag";
-const std::string demoFrag = "./shaders/diffuse/demo.frag";
+const std::string cellShaderFrag = "./shaders/diffuse/cell_shader.frag";
 const std::string diffuseFrag2 = "./shaders/diffuse/multi_light_diffuse.frag";
 const std::string lightFrag = "./shaders/light/light.frag";
 const std::string blinPhongFrag = "./shaders/diffuse/blin_phong.frag";
