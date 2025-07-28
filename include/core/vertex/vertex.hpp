@@ -8,6 +8,7 @@ class VertexData {
   glm::vec2 textureCoord;
   glm::vec3 normal;
   glm::vec3 tangent;
+  glm::vec3 color;
 
  public:
   inline void SetPosition(glm::vec3 p) { position = p; }

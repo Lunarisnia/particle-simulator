@@ -68,6 +68,7 @@ add_executable(${PROJECT_NAME}
 	particle/simulation/simulation.cpp
 	particle/primitive/primitive.cpp
 	particle/model/model.cpp
+	particle/color_id/color_id.cpp
 
 	# Editor
 	editor/editor.cpp

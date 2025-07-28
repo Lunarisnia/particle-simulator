@@ -31,18 +31,27 @@ void Particle::App::initFramebuffer() {
   framebuffer = std::make_shared<Core::Framebuffer>();
   framebuffer->AttachTexture(
       std::make_shared<Core::Texture>(Core::TextureManager::CreateTexture(
-          "color", Core::Window::GetWidth(), Core::Window::GetHeight())),
+          "main", Core::Window::GetWidth(), Core::Window::GetHeight())),
       GL_COLOR_ATTACHMENT0);
   framebuffer->AttachTexture(
       std::make_shared<Core::Texture>(Core::TextureManager::CreateTexture(
           "depth", Core::Window::GetWidth(), Core::Window::GetHeight())),
       GL_COLOR_ATTACHMENT1);
+  framebuffer->AttachTexture(
+      std::make_shared<Core::Texture>(Core::TextureManager::CreateTexture(
+          "normal", Core::Window::GetWidth(), Core::Window::GetHeight())),
+      GL_COLOR_ATTACHMENT2);
+  framebuffer->AttachTexture(
+      std::make_shared<Core::Texture>(Core::TextureManager::CreateTexture(
+          "color", Core::Window::GetWidth(), Core::Window::GetHeight())),
+      GL_COLOR_ATTACHMENT3);
   framebuffer->AttachRenderbuffer(std::make_shared<Core::Renderbuffer>(
       Core::Window::GetWidth(), Core::Window::GetHeight()));
 
   framebuffer->Bind();
-  unsigned int attachments[2] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
-  glDrawBuffers(2, attachments);
+  unsigned int attachments[4] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,
+                                 GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
+  glDrawBuffers(4, attachments);
   framebuffer->Unbind();
   if (!framebuffer->CheckStatus()) {
     throw std::runtime_error("framebuffer incomplete");
@@ -101,8 +110,11 @@ void Particle::App::Run() {
 
       edgeDetectionPlane->mesh->material->Use();
       edgeDetectionPlane->mesh->material->SetInt(
-          "depthTexture",
-          framebuffer->textureBuffers[1]->GetLocation() - GL_TEXTURE0);
+          "colorTexture", Core::TextureManager::GetTextureLocation("color"));
+      edgeDetectionPlane->mesh->material->SetInt(
+          "normalTexture", Core::TextureManager::GetTextureLocation("normal"));
+      edgeDetectionPlane->mesh->material->SetInt(
+          "depthTexture", Core::TextureManager::GetTextureLocation("depth"));
       edgeDetectionPlane->mesh->BindVertexArray();
       framebuffer->BindTextures();
       glDrawElements(GL_TRIANGLES, edgeDetectionPlane->mesh->GetIndiceLength(),
@@ -118,9 +130,14 @@ void Particle::App::Run() {
       renderPlane->mesh->material->SetInt(
           "screenTexture",
           framebuffer->textureBuffers[0]->GetLocation() - GL_TEXTURE0);
+
       renderPlane->mesh->material->SetInt(
-          "depthTexture",
-          framebuffer->textureBuffers[1]->GetLocation() - GL_TEXTURE0);
+          "colorTexture", Core::TextureManager::GetTextureLocation("color"));
+      renderPlane->mesh->material->SetInt(
+          "normalTexture", Core::TextureManager::GetTextureLocation("normal"));
+      renderPlane->mesh->material->SetInt(
+          "depthTexture", Core::TextureManager::GetTextureLocation("depth"));
+
       renderPlane->mesh->material->SetInt(
           "outlineTexture",
           edgeDetectionFramebuffer->textureBuffers[0]->GetLocation() -

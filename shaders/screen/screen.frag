@@ -7,8 +7,11 @@ struct VertexAttribute {
 in VertexAttribute vertexAttribute;
 
 uniform sampler2D screenTexture;
-uniform sampler2D depthTexture;
 uniform sampler2D outlineTexture;
+
+uniform sampler2D depthTexture;
+uniform sampler2D colorTexture;
+uniform sampler2D normalTexture;
 
 uniform float globalFloat;
 uniform float globalFloat2;
@@ -47,6 +50,11 @@ void main()
 {
     vec4 screen = texture(screenTexture, vertexAttribute.textureCoord);
     vec4 outline = texture(outlineTexture, vertexAttribute.textureCoord);
+
+    vec4 depth = texture(depthTexture, vertexAttribute.textureCoord);
+    vec4 colorTex = texture(colorTexture, vertexAttribute.textureCoord);
+    vec4 normalTex = texture(normalTexture, vertexAttribute.textureCoord);
+
     float kernel[9] = float[](
             0.5f, 1.0f, 0.5f,
             1.0f, 2.0f, 1.0f,
@@ -54,6 +62,6 @@ void main()
         );
     vec3 blur = useKernel3x3(kernel, 1.0f / 1000.0f);
 
-    vec3 color = mix(screen.rgb, vec3(0.0f), blur);
+    vec3 color = mix(screen.rgb, vec3(0.0f), outline.rgb);
     FragColor = vec4(color, 1.0f);
 }

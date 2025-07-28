@@ -1,8 +1,10 @@
 #include "particle/simulation/simulation.hpp"
 #include <cstddef>
+#include <exception>
 #include <format>
 #include <map>
 #include <memory>
+#include <print>
 #include <random>
 #include <string>
 #include <vector>
@@ -35,19 +37,6 @@ const std::string blinPhongFrag = "./shaders/diffuse/blin_phong.frag";
 const std::string vertexPathV2 = "./shaders/diffuse/diffuse_v2.vert";
 
 void Particle::Simulation::Init() {
-  std::map<Core::TextureTarget, std::string> textureFaces;
-  textureFaces.emplace(Core::TextureTarget::CUBE_MAP_POSITIVE_X,
-                       "./assets/skybox/right.jpg");
-  textureFaces.emplace(Core::TextureTarget::CUBE_MAP_NEGATIVE_X,
-                       "./assets/skybox/left.jpg");
-  textureFaces.emplace(Core::TextureTarget::CUBE_MAP_POSITIVE_Y,
-                       "./assets/skybox/top.jpg");
-  textureFaces.emplace(Core::TextureTarget::CUBE_MAP_NEGATIVE_Y,
-                       "./assets/skybox/bottom.jpg");
-  textureFaces.emplace(Core::TextureTarget::CUBE_MAP_POSITIVE_Z,
-                       "./assets/skybox/front.jpg");
-  textureFaces.emplace(Core::TextureTarget::CUBE_MAP_NEGATIVE_Z,
-                       "./assets/skybox/back.jpg");
   Core::StaticCamera::transform->position.z = 4.0f;
 
   std::random_device dev;
@@ -123,7 +112,6 @@ void Particle::Simulation::Init() {
       Primitive::CreateCube(vertexPathV2, blinPhongFrag);
   cube->transform->position = glm::vec3(0.0f, -2.0f, -1.0f);
   cube->transform->scale = glm::vec3(10.0f, 1.0f, 10.0f);
-
   cube->name = "Floor";
   cube->mesh->material->LoadTexture(containerTexture, GL_SRGB_ALPHA, GL_RGBA);
   cube->mesh->material->LoadTexture(containerSpecular, GL_SRGB_ALPHA, GL_RGBA);
@@ -138,23 +126,14 @@ void Particle::Simulation::Init() {
       Core::TextureManager::GetTextureLocation(brickWallNormal));
   cubes.emplace_back(cube);
 
-  std::shared_ptr<Core::Object> texturedCube =
-      Primitive::CreateCube(vertexPathV2, "./shaders/diffuse/cubemap.frag");
-  texturedCube->transform->position = glm::vec3(-2.0f, 1.0f, -1.0f);
-  texturedCube->name = "TexturedCube";
-  texturedCube->mesh->material->LoadTextureCubeMap(textureFaces, GL_RGB,
-                                                   GL_RGB);
-  cubes.emplace_back(texturedCube);
-
-  std::shared_ptr<Core::Object> reflectiveBall = Primitive::CreateUVSphere(
-      vertexPathV2, "./shaders/diffuse/environment_reflection.frag", "Ball");
-  reflectiveBall->transform->position = glm::vec3(2.0f, 0.0f, 1.0f);
-  reflectiveBall->name = "ReflectiveBall";
-  cubes.emplace_back(reflectiveBall);
-
-  Particle::Model model;
-  model.LoadModel("./assets/honkai-star-rail-jingliu/source/JingiluV3.fbx");
-  model.StoreMeshes(cubes);
+  try {
+    Particle::Model model;
+    /*model.LoadModel("./assets/honkai-star-rail-jingliu/source/JingiluV3.fbx");*/
+    model.LoadModel("./assets/living-room/LivingRoom.obj");
+    model.StoreMeshes(cubes);
+  } catch (std::exception &error) {
+    std::println("{}", error.what());
+  }
 }
 
 // TODO: Update TBN matrix every frame

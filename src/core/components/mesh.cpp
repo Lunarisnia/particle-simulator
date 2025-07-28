@@ -36,6 +36,9 @@ void Core::Mesh::SetupMesh() {
   glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData),
                         (void *)offsetof(VertexData, tangent));
   glEnableVertexAttribArray(3);
+  glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData),
+                        (void *)offsetof(VertexData, color));
+  glEnableVertexAttribArray(4);
 
   glBindVertexArray(0);
 }

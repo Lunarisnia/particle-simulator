@@ -21,6 +21,7 @@
 #include "core/world/world.hpp"
 #include "glm/ext/vector_float2.hpp"
 #include "glm/ext/vector_float3.hpp"
+#include "particle/color_id/color_id.hpp"
 
 Particle::Model::Model() {}
 
@@ -49,7 +50,7 @@ void Particle::Model::LoadModel(const std::string& path) {
 
 void Particle::Model::processScene(aiNode* node, const aiScene* scene) {
   for (size_t i = 0; i < node->mNumMeshes; i++) {
-    processMesh(scene->mMeshes[node->mMeshes[i]], scene);
+    processMesh(scene->mMeshes[node->mMeshes[i]], scene, ColorID::Generate());
   }
 
   for (size_t i = 0; i < node->mNumChildren; i++) {
@@ -57,7 +58,8 @@ void Particle::Model::processScene(aiNode* node, const aiScene* scene) {
   }
 }
 
-void Particle::Model::processMesh(aiMesh* mesh, const aiScene* scene) {
+void Particle::Model::processMesh(aiMesh* mesh, const aiScene* scene,
+                                  glm::vec3 objectColor) {
   std::shared_ptr<Core::Object> object = std::make_shared<Core::Object>();
   // FIXME: Remove
   /*object->transform->position.z = -4.0f;*/
@@ -65,7 +67,7 @@ void Particle::Model::processMesh(aiMesh* mesh, const aiScene* scene) {
   objects.emplace_back(object);
 
   Core::Shader shader{"./shaders/diffuse/diffuse_v2.vert",
-                      "./shaders/diffuse/cell_shader.frag"};
+                      "./shaders/sketch/sketch.frag"};
   std::shared_ptr<Core::Material> material =
       std::make_shared<Core::Material>(shader);
   std::shared_ptr<Core::Mesh> objectMesh =
@@ -77,9 +79,10 @@ void Particle::Model::processMesh(aiMesh* mesh, const aiScene* scene) {
     aiVector3D norm = mesh->mNormals[i];
 
     Core::VertexData vertex;
+    vertex.color = objectColor;
     // TODO: Flipped the z and y coordinate because of jingliu model
-    vertex.SetPosition(glm::vec3(vert.x, vert.z, vert.y));
-    vertex.SetNormal(glm::vec3(norm.x, norm.z, norm.y));
+    vertex.SetPosition(glm::vec3(vert.x, vert.y, vert.z));
+    vertex.SetNormal(glm::vec3(norm.x, norm.y, norm.z));
     if (mesh->mTextureCoords[0]) {
       vertex.SetTextureCoordinate(glm::vec2(mesh->mTextureCoords[0][i].x,
                                             mesh->mTextureCoords[0][i].y));
@@ -101,11 +104,12 @@ void Particle::Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 
   if (mesh->mMaterialIndex >= 0) {
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-    loadTextures(material, aiTextureType_DIFFUSE, objectMesh,
-                 "material.diffuse");
-    loadTextures(material, aiTextureType_SPECULAR, objectMesh,
-                 "material.specular");
-    loadTextures(material, aiTextureType_HEIGHT, objectMesh, "material.normal");
+    /*loadTextures(material, aiTextureType_DIFFUSE, objectMesh,*/
+    /*"material.diffuse");*/
+    /*loadTextures(material, aiTextureType_SPECULAR, objectMesh,*/
+    /*"material.specular");*/
+    /*loadTextures(material, aiTextureType_HEIGHT, objectMesh, */
+    /*"material.normal");*/
   }
 
   objectMesh->SetupMesh();

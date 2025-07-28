@@ -7,11 +7,13 @@ struct VertexAttribute {
 in VertexAttribute vertexAttribute;
 
 uniform sampler2D depthTexture;
+uniform sampler2D colorTexture;
+uniform sampler2D normalTexture;
 
 uniform float globalFloat;
 uniform float globalFloat2;
 
-vec3 useKernel3x3(float kernel[9], float offset) {
+vec3 useKernel3x3(float kernel[9], float offset, sampler2D tex) {
     vec2 offsets[9] = vec2[](
             vec2(-offset, offset),
             vec2(0.0f, offset),
@@ -26,7 +28,7 @@ vec3 useKernel3x3(float kernel[9], float offset) {
 
     vec3 sampleTexture[9];
     for (int i = 0; i < 9; i++) {
-        sampleTexture[i] = texture(depthTexture, vertexAttribute.textureCoord + offsets[i]).rgb;
+        sampleTexture[i] = texture(tex, vertexAttribute.textureCoord + offsets[i]).rgb;
     }
     vec3 color = vec3(0.0f);
     for (int i = 0; i < 9; i++) {
@@ -53,9 +55,20 @@ void main()
             1, -8, 1,
             1, 1, 1
         );
-    vec3 edge = useKernel3x3(edgeDetectionKernel, 1.0f / 900.0f);
+    // vec3 depthEdge = useKernel3x3(edgeDetectionKernel, 1.0f / 900.0f, depthTexture);
+    // vec3 normalEdge = useKernel3x3(edgeDetectionKernel, 1.0f / 900.0f, normalTexture);
+    // vec3 colorEdge = useKernel3x3(edgeDetectionKernel, 1.0f / 900.0f, colorTexture);
 
-    vec3 outline = edge;
+    vec3 depthSobelX = useKernel3x3(sobelXKernel, 1.0f / 900.0f, depthTexture);
+    vec3 depthSobelY = useKernel3x3(sobelYKernel, 1.0f / 900.0f, depthTexture);
+
+    vec3 normalSobelX = useKernel3x3(sobelXKernel, 1.0f / 900.0f, normalTexture);
+    vec3 normalSobelY = useKernel3x3(sobelYKernel, 1.0f / 900.0f, normalTexture);
+
+    vec3 colorSobelX = useKernel3x3(sobelXKernel, 1.0f / 900.0f, colorTexture);
+    vec3 colorSobelY = useKernel3x3(sobelYKernel, 1.0f / 900.0f, colorTexture);
+
+    vec3 outline = vec3(length(depthSobelX) + length(depthSobelY));
     float f = dot(outline, vec3(1.0f)) / 3.0f;
 
     vec3 color = mix(vec3(0.0f), vec3(1.0f), step(0.5, f));
