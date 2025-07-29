@@ -23,13 +23,13 @@ struct PointLight {
 };
 
 uniform PointLight pointLight[2];
-// uniform float globalFloat;
+uniform float globalFloat;
 
 vec3 calculatePointLight(PointLight light, vec3 brightColor, vec3 shadowColor) {
     vec3 color = vec3(0.0f);
     vec3 lightDir = normalize(light.position - vertexAttribute.fragPos);
     float diff = max(0.0f, dot(lightDir, vertexAttribute.normal));
-    vec3 diffuse = mix(shadowColor, brightColor, step(0.5f, diff));
+    vec3 diffuse = mix(shadowColor, brightColor, step(globalFloat, diff));
 
     color += diffuse;
     return color;
