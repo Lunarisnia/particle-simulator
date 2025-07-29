@@ -52,9 +52,6 @@ void main()
     vec4 outline = texture(outlineTexture, vertexAttribute.textureCoord);
 
     vec4 depth = texture(depthTexture, vertexAttribute.textureCoord);
-    vec4 colorTex = texture(colorTexture, vertexAttribute.textureCoord);
-    vec4 normalTex = texture(normalTexture, vertexAttribute.textureCoord);
-
     float kernel[9] = float[](
             0.5f, 1.0f, 0.5f,
             1.0f, 2.0f, 1.0f,

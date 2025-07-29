@@ -55,18 +55,9 @@ void main()
             1, -8, 1,
             1, 1, 1
         );
-    // vec3 depthEdge = useKernel3x3(edgeDetectionKernel, 1.0f / 900.0f, depthTexture);
-    // vec3 normalEdge = useKernel3x3(edgeDetectionKernel, 1.0f / 900.0f, normalTexture);
-    // vec3 colorEdge = useKernel3x3(edgeDetectionKernel, 1.0f / 900.0f, colorTexture);
 
     vec3 depthSobelX = useKernel3x3(sobelXKernel, 1.0f / 900.0f, depthTexture);
     vec3 depthSobelY = useKernel3x3(sobelYKernel, 1.0f / 900.0f, depthTexture);
-
-    vec3 normalSobelX = useKernel3x3(sobelXKernel, 1.0f / 900.0f, normalTexture);
-    vec3 normalSobelY = useKernel3x3(sobelYKernel, 1.0f / 900.0f, normalTexture);
-
-    vec3 colorSobelX = useKernel3x3(sobelXKernel, 1.0f / 900.0f, colorTexture);
-    vec3 colorSobelY = useKernel3x3(sobelYKernel, 1.0f / 900.0f, colorTexture);
 
     vec3 outline = vec3(length(depthSobelX) + length(depthSobelY));
     float f = dot(outline, vec3(1.0f)) / 3.0f;
