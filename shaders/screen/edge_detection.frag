@@ -56,11 +56,19 @@ void main()
             1, 1, 1
         );
 
+    vec3 colorSobelX = useKernel3x3(sobelXKernel, 1.0f / 900.0f, colorTexture);
+    vec3 colorSobelY = useKernel3x3(sobelYKernel, 1.0f / 900.0f, colorTexture);
+
+    vec3 normalSobelX = useKernel3x3(sobelXKernel, 1.0f / 900.0f, normalTexture);
+    vec3 normalSobelY = useKernel3x3(sobelYKernel, 1.0f / 900.0f, normalTexture);
+
     vec3 depthSobelX = useKernel3x3(sobelXKernel, 1.0f / 900.0f, depthTexture);
     vec3 depthSobelY = useKernel3x3(sobelYKernel, 1.0f / 900.0f, depthTexture);
 
-    vec3 outline = vec3(length(depthSobelX) + length(depthSobelY));
+    vec3 outline = clamp(vec3(length(colorSobelX) + length(colorSobelY)), 0.0f, 1.0f);
     float f = dot(outline, vec3(1.0f)) / 3.0f;
+
+    vec4 tex = texture(depthTexture, vertexAttribute.textureCoord);
 
     vec3 color = mix(vec3(0.0f), vec3(1.0f), step(0.5, f));
     FragColor = vec4(color, 1.0f);

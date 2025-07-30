@@ -129,7 +129,7 @@ void Particle::Simulation::Init() {
   try {
     Particle::Model model;
     /*model.LoadModel("./assets/honkai-star-rail-jingliu/source/JingiluV3.fbx");*/
-    model.LoadModel("./assets/living-room/LivingRoom.obj");
+    model.LoadModel("./assets/bed-room/bed-room.obj");
     model.StoreMeshes(cubes);
   } catch (std::exception &error) {
     std::println("{}", error.what());

@@ -1,8 +1,8 @@
 #version 330 core
 layout(location = 0) out vec4 FragColor;
-layout(location = 1) out vec4 ModelColor;
+layout(location = 1) out vec4 DepthColor;
 layout(location = 2) out vec4 NormalColor;
-layout(location = 3) out vec4 DepthColor;
+layout(location = 3) out vec4 ModelColor;
 
 struct VertexAttribute {
     vec3 fragPos;
@@ -30,6 +30,7 @@ vec3 calculatePointLight(PointLight light, vec3 brightColor, vec3 shadowColor) {
     vec3 lightDir = normalize(light.position - vertexAttribute.fragPos);
     float diff = max(0.0f, dot(lightDir, vertexAttribute.normal));
     vec3 diffuse = mix(shadowColor, brightColor, step(globalFloat, diff));
+    // vec3 diffuse = brightColor * diff;
 
     color += diffuse;
     return color;
