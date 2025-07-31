@@ -54,6 +54,9 @@ add_executable(${PROJECT_NAME}
 	# Procedural
 	core/procedural/procedural.cpp
 
+	# Static Light
+	core/static_light/static_light.cpp
+
 
 	# Components
 	core/components/component.cpp

@@ -6,6 +6,7 @@ struct VertexAttribute {
     vec3 normal;
     vec2 textureCoord;
     vec3 tangent;
+    vec4 lightSpaceFragPos;
 
     mat3 TBN;
 };
@@ -31,6 +32,22 @@ struct Camera {
 };
 uniform Camera camera;
 
+uniform sampler2D shadowMap;
+
+float calculateShadow(vec4 fragPosLightSpace) {
+    // perform perspective divide
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    projCoords = projCoords * 0.5f + 0.5f;
+    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+    float closestDepth = texture(shadowMap, projCoords.xy).x;
+    // get depth of current fragment from light's perspective
+    float currentDepth = projCoords.z;
+    // check whether current frag pos is in shadow
+    float shadow = currentDepth > closestDepth ? 1.0 : 0.0;
+
+    return shadow;
+}
+
 vec3 calculatePointLight(PointLight light, vec3 diffuseTexture, vec3 specularTexture, vec3 normal) {
     // All calculation are done in tangent space
     vec3 color = vec3(0.0f);
@@ -46,7 +63,10 @@ vec3 calculatePointLight(PointLight light, vec3 diffuseTexture, vec3 specularTex
     float spec = pow(max(0.0f, dot(halfVector, normal)), 32.0f);
     vec3 specular = light.specular * spec * specularTexture;
 
-    color += diffuse + specular;
+    // vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;
+
+    float shadow = calculateShadow(vertexAttribute.lightSpaceFragPos);
+    color += (1.0f - shadow) * (diffuse + specular);
     return color;
 }
 

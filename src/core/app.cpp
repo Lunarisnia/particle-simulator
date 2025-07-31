@@ -5,6 +5,7 @@
 #include "core/time/time.hpp"
 #include "core/window/window.hpp"
 #include "core/world/world.hpp"
+#include "core/static_light/static_light.hpp"
 
 void Core::App::Init() {
   Window::Init();
@@ -12,6 +13,7 @@ void Core::App::Init() {
   Input::Init();
   World::Init();
   StaticCamera::Init();
+  StaticLight::Init();
 }
 
 // NOTE: why the hell does this exist???

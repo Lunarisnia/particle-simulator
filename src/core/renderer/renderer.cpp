@@ -8,6 +8,7 @@
 #include "core/procedural/procedural.hpp"
 #include "core/shader/shader.hpp"
 #include "core/static_camera/static_camera.hpp"
+#include "core/static_light/static_light.hpp"
 #include "core/window/window.hpp"
 
 std::vector<std::shared_ptr<Core::Mesh>> Core::Renderer::renderQueue;
@@ -62,13 +63,12 @@ void Core::Renderer::DepthTest(bool enable) {
   glDisable(GL_DEPTH_TEST);
 }
 
-void Core::Renderer::AdjustViewport(bool scaleUp) {
+void Core::Renderer::AdjustViewport(int width, int height, bool scaleUp) {
   int multiplier = 1;
   if (scaleUp) {
     multiplier = 2;
   }
-  glViewport(0, 0, Window::GetWidth() * multiplier,
-             Window::GetHeight() * multiplier);
+  glViewport(0, 0, width * multiplier, height * multiplier);
 }
 
 void Core::Renderer::Render() {
@@ -105,6 +105,35 @@ void Core::Renderer::Render() {
     glDrawElements(GL_TRIANGLES, skybox->mesh->GetIndiceLength(),
                    GL_UNSIGNED_INT, 0);
     glDepthFunc(GL_LESS);
+  }
+}
+
+void Core::Renderer::RenderShadowMap() {
+  Shader shadowMappingShader = Shader{"./shaders/shadow/simple_shadow.vert",
+                                      "./shaders/shadow/simple_shadow.frag"};
+  for (std::shared_ptr<Mesh> &mesh : renderQueue) {
+    if (!mesh->isActive) {
+      continue;
+    }
+    Object *owner = mesh->GetOwner();
+    if (!owner) {
+      continue;
+    }
+    // FIXME: Do better than this
+    if (owner->name == "RenderPlane" || owner->name == "Edge") {
+      continue;
+    }
+
+    /*mesh->material->Use();*/
+    shadowMappingShader.Use();
+    shadowMappingShader.SetMat4("model",
+                                owner->transform->GetTransformMatrix());
+    shadowMappingShader.SetMat4("lightSpaceMatrix",
+                                StaticLight::GetLightSpaceMatrix());
+    mesh->BindVertexArray();
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    glDrawElements(GL_TRIANGLES, mesh->GetIndiceLength(), GL_UNSIGNED_INT, 0);
   }
 }
 

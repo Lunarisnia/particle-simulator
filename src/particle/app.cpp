@@ -75,11 +75,23 @@ void Particle::App::initFramebuffer() {
   }
 
   // SHADOW MAP
-  /*shadowMapFramebuffer = std::make_shared<Core::Framebuffer>();*/
-  /*shadowMapFramebuffer->AttachTexture(*/
-  /*    std::make_shared<Core::Texture>(*/
-  /*        Core::TextureManager::CreateTexture("shadowMap", 1024, 1024)),*/
-  /*    GL_DEPTH_COMPONENT);*/
+  std::shared_ptr<Core::Texture> shadowTexture =
+      std::make_shared<Core::Texture>(Core::TextureManager::CreateTexture(
+          "shadowMap", 1024, 1024, GL_TEXTURE_2D, GL_DEPTH_COMPONENT,
+          GL_DEPTH_COMPONENT, GL_FLOAT, false));
+  shadowTexture->SetParameter(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  shadowTexture->SetParameter(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  shadowTexture->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+  shadowTexture->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+  shadowMapFramebuffer = std::make_shared<Core::Framebuffer>();
+  shadowMapFramebuffer->AttachTexture(shadowTexture, GL_DEPTH_ATTACHMENT);
+  shadowMapFramebuffer->Bind();
+  glDrawBuffer(GL_NONE);
+  glReadBuffer(GL_NONE);
+  if (!shadowMapFramebuffer->CheckStatus()) {
+    throw std::runtime_error("fb incomplete");
+  }
+  shadowMapFramebuffer->Unbind();
 }
 
 void Particle::App::initRenderPlane() {
@@ -95,7 +107,8 @@ void Particle::App::initRenderPlane() {
 void Particle::App::edgeDetectionPass() {
   // EDGE DETECTION PASS
   edgeDetectionFramebuffer->Bind();
-  Core::Renderer::AdjustViewport(false);
+  Core::Renderer::AdjustViewport(Core::Window::GetWidth(),
+                                 Core::Window::GetHeight(), false);
   Core::Renderer::DepthTest(false);
   Core::Renderer::SetClearColor(0.3f, 0.3f, 0.3f, 1.0f);
   Core::Renderer::Clear(GL_COLOR_BUFFER_BIT);
@@ -113,7 +126,8 @@ void Particle::App::edgeDetectionPass() {
                  GL_UNSIGNED_INT, 0);
   edgeDetectionFramebuffer->Unbind();
 
-  Core::Renderer::AdjustViewport(true);
+  Core::Renderer::AdjustViewport(Core::Window::GetWidth(),
+                                 Core::Window::GetHeight(), true);
   Core::Renderer::DepthTest(false);
   Core::Renderer::SetClearColor(0.3f, 0.3f, 0.3f, 1.0f);
   Core::Renderer::Clear(GL_COLOR_BUFFER_BIT);
@@ -155,8 +169,19 @@ void Particle::App::Run() {
       Editor::Editor::NewFrame();
       Editor::Editor::Update();
 
+      shadowMapFramebuffer->Bind();
+      Core::Renderer::AdjustViewport(1024, 1024, false);
+      Core::Renderer::DepthTest(true);
+      Core::Renderer::SetClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+      Core::Renderer::Clear(GL_DEPTH_BUFFER_BIT);
+
+      Core::Renderer::RenderShadowMap();
+
+      shadowMapFramebuffer->Unbind();
+
       framebuffer->Bind();
-      Core::Renderer::AdjustViewport(false);
+      Core::Renderer::AdjustViewport(Core::Window::GetWidth(),
+                                     Core::Window::GetHeight(), false);
       Core::Renderer::DepthTest(true);
       Core::Renderer::SetClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       Core::Renderer::Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -164,7 +189,9 @@ void Particle::App::Run() {
       Core::Renderer::Render();
 
       framebuffer->Unbind();
-      Core::Renderer::AdjustViewport(true);
+
+      Core::Renderer::AdjustViewport(Core::Window::GetWidth(),
+                                     Core::Window::GetHeight(), true);
       Core::Renderer::DepthTest(false);
       Core::Renderer::SetClearColor(0.3f, 0.3f, 0.3f, 1.0f);
       Core::Renderer::Clear(GL_COLOR_BUFFER_BIT);
@@ -179,6 +206,9 @@ void Particle::App::Run() {
           "normalTexture", Core::TextureManager::GetTextureLocation("normal"));
       renderPlane->mesh->material->SetInt(
           "depthTexture", Core::TextureManager::GetTextureLocation("depth"));
+      renderPlane->mesh->material->SetInt(
+          "shadowTexture",
+          Core::TextureManager::GetTextureLocation("shadowMap"));
 
       renderPlane->mesh->material->SetInt(
           "outlineTexture",
