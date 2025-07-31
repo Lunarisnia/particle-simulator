@@ -31,19 +31,23 @@ void Particle::App::initFramebuffer() {
   framebuffer = std::make_shared<Core::Framebuffer>();
   framebuffer->AttachTexture(
       std::make_shared<Core::Texture>(Core::TextureManager::CreateTexture(
-          "main", Core::Window::GetWidth(), Core::Window::GetHeight())),
+          "main", Core::Window::GetWidth(), Core::Window::GetHeight(),
+          GL_TEXTURE_2D, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, true)),
       GL_COLOR_ATTACHMENT0);
   framebuffer->AttachTexture(
       std::make_shared<Core::Texture>(Core::TextureManager::CreateTexture(
-          "depth", Core::Window::GetWidth(), Core::Window::GetHeight())),
+          "depth", Core::Window::GetWidth(), Core::Window::GetHeight(),
+          GL_TEXTURE_2D, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, true)),
       GL_COLOR_ATTACHMENT1);
   framebuffer->AttachTexture(
       std::make_shared<Core::Texture>(Core::TextureManager::CreateTexture(
-          "normal", Core::Window::GetWidth(), Core::Window::GetHeight())),
+          "normal", Core::Window::GetWidth(), Core::Window::GetHeight(),
+          GL_TEXTURE_2D, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, true)),
       GL_COLOR_ATTACHMENT2);
   framebuffer->AttachTexture(
       std::make_shared<Core::Texture>(Core::TextureManager::CreateTexture(
-          "color", Core::Window::GetWidth(), Core::Window::GetHeight())),
+          "color", Core::Window::GetWidth(), Core::Window::GetHeight(),
+          GL_TEXTURE_2D, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, true)),
       GL_COLOR_ATTACHMENT3);
   framebuffer->AttachRenderbuffer(std::make_shared<Core::Renderbuffer>(
       Core::Window::GetWidth(), Core::Window::GetHeight()));
@@ -60,7 +64,8 @@ void Particle::App::initFramebuffer() {
   edgeDetectionFramebuffer = std::make_shared<Core::Framebuffer>();
   edgeDetectionFramebuffer->AttachTexture(
       std::make_shared<Core::Texture>(Core::TextureManager::CreateTexture(
-          "outline", Core::Window::GetWidth(), Core::Window::GetHeight())),
+          "outline", Core::Window::GetWidth(), Core::Window::GetHeight(),
+          GL_TEXTURE_2D, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, true)),
       GL_COLOR_ATTACHMENT0);
   edgeDetectionFramebuffer->AttachRenderbuffer(
       std::make_shared<Core::Renderbuffer>(Core::Window::GetWidth(),
@@ -68,6 +73,13 @@ void Particle::App::initFramebuffer() {
   if (!edgeDetectionFramebuffer->CheckStatus()) {
     throw std::runtime_error("framebuffer incomplete");
   }
+
+  // SHADOW MAP
+  /*shadowMapFramebuffer = std::make_shared<Core::Framebuffer>();*/
+  /*shadowMapFramebuffer->AttachTexture(*/
+  /*    std::make_shared<Core::Texture>(*/
+  /*        Core::TextureManager::CreateTexture("shadowMap", 1024, 1024)),*/
+  /*    GL_DEPTH_COMPONENT);*/
 }
 
 void Particle::App::initRenderPlane() {
@@ -78,6 +90,57 @@ void Particle::App::initRenderPlane() {
   edgeDetectionPlane = Primitive::CreatePlane(
       "./shaders/screen/screen.vert", "./shaders/screen/edge_detection.frag");
   edgeDetectionPlane->name = "Edge";
+}
+
+void Particle::App::edgeDetectionPass() {
+  // EDGE DETECTION PASS
+  edgeDetectionFramebuffer->Bind();
+  Core::Renderer::AdjustViewport(false);
+  Core::Renderer::DepthTest(false);
+  Core::Renderer::SetClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+  Core::Renderer::Clear(GL_COLOR_BUFFER_BIT);
+
+  edgeDetectionPlane->mesh->material->Use();
+  edgeDetectionPlane->mesh->material->SetInt(
+      "colorTexture", Core::TextureManager::GetTextureLocation("color"));
+  edgeDetectionPlane->mesh->material->SetInt(
+      "normalTexture", Core::TextureManager::GetTextureLocation("normal"));
+  edgeDetectionPlane->mesh->material->SetInt(
+      "depthTexture", Core::TextureManager::GetTextureLocation("depth"));
+  edgeDetectionPlane->mesh->BindVertexArray();
+  framebuffer->BindTextures();
+  glDrawElements(GL_TRIANGLES, edgeDetectionPlane->mesh->GetIndiceLength(),
+                 GL_UNSIGNED_INT, 0);
+  edgeDetectionFramebuffer->Unbind();
+
+  Core::Renderer::AdjustViewport(true);
+  Core::Renderer::DepthTest(false);
+  Core::Renderer::SetClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+  Core::Renderer::Clear(GL_COLOR_BUFFER_BIT);
+  // TODO: find a way to just use the existing renderer here later
+  renderPlane->mesh->material->Use();
+  renderPlane->mesh->material->SetInt(
+      "screenTexture",
+      framebuffer->textureBuffers[0]->GetLocation() - GL_TEXTURE0);
+
+  renderPlane->mesh->material->SetInt(
+      "colorTexture", Core::TextureManager::GetTextureLocation("color"));
+  renderPlane->mesh->material->SetInt(
+      "normalTexture", Core::TextureManager::GetTextureLocation("normal"));
+  renderPlane->mesh->material->SetInt(
+      "depthTexture", Core::TextureManager::GetTextureLocation("depth"));
+
+  renderPlane->mesh->material->SetInt(
+      "outlineTexture",
+      edgeDetectionFramebuffer->textureBuffers[0]->GetLocation() - GL_TEXTURE0);
+  renderPlane->mesh->material->SetFloat("globalFloat", Simulation::globalFloat);
+  renderPlane->mesh->material->SetFloat("globalFloat2",
+                                        Simulation::globalFloat2);
+  renderPlane->mesh->BindVertexArray();
+  framebuffer->BindTextures();
+  edgeDetectionFramebuffer->BindTextures();
+  glDrawElements(GL_TRIANGLES, renderPlane->mesh->GetIndiceLength(),
+                 GL_UNSIGNED_INT, 0);
 }
 
 void Particle::App::Run() {
@@ -101,26 +164,6 @@ void Particle::App::Run() {
       Core::Renderer::Render();
 
       framebuffer->Unbind();
-      // EDGE DETECTION PASS
-      edgeDetectionFramebuffer->Bind();
-      Core::Renderer::AdjustViewport(false);
-      Core::Renderer::DepthTest(false);
-      Core::Renderer::SetClearColor(0.3f, 0.3f, 0.3f, 1.0f);
-      Core::Renderer::Clear(GL_COLOR_BUFFER_BIT);
-
-      edgeDetectionPlane->mesh->material->Use();
-      edgeDetectionPlane->mesh->material->SetInt(
-          "colorTexture", Core::TextureManager::GetTextureLocation("color"));
-      edgeDetectionPlane->mesh->material->SetInt(
-          "normalTexture", Core::TextureManager::GetTextureLocation("normal"));
-      edgeDetectionPlane->mesh->material->SetInt(
-          "depthTexture", Core::TextureManager::GetTextureLocation("depth"));
-      edgeDetectionPlane->mesh->BindVertexArray();
-      framebuffer->BindTextures();
-      glDrawElements(GL_TRIANGLES, edgeDetectionPlane->mesh->GetIndiceLength(),
-                     GL_UNSIGNED_INT, 0);
-      edgeDetectionFramebuffer->Unbind();
-
       Core::Renderer::AdjustViewport(true);
       Core::Renderer::DepthTest(false);
       Core::Renderer::SetClearColor(0.3f, 0.3f, 0.3f, 1.0f);
@@ -128,8 +171,7 @@ void Particle::App::Run() {
       // TODO: find a way to just use the existing renderer here later
       renderPlane->mesh->material->Use();
       renderPlane->mesh->material->SetInt(
-          "screenTexture",
-          framebuffer->textureBuffers[0]->GetLocation() - GL_TEXTURE0);
+          "screenTexture", Core::TextureManager::GetTextureLocation("main"));
 
       renderPlane->mesh->material->SetInt(
           "colorTexture", Core::TextureManager::GetTextureLocation("color"));
@@ -151,6 +193,7 @@ void Particle::App::Run() {
       edgeDetectionFramebuffer->BindTextures();
       glDrawElements(GL_TRIANGLES, renderPlane->mesh->GetIndiceLength(),
                      GL_UNSIGNED_INT, 0);
+
       Editor::Editor::Render();
 
       Core::Window::SwapBuffer();

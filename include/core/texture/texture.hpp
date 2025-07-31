@@ -24,13 +24,15 @@ class Texture {
  public:
   unsigned int GetID();
   int GetLocation();
+  void SetParameter(int key, int value);
   void Bind();
 
  public:
   Texture();
   Texture(const std::string &path, int textureLocation, int colorSpace,
           int colorCode);
-  Texture(int width, int height, int textureLocation);
+  Texture(int width, int height, int textureLocation, int textureType,
+          int colorSpace, int colorCode, int numberFormat, bool emptyParam);
   Texture(std::map<TextureTarget, std::string> textureFaces,
           int textureLocation, int colorSpace, int colorCode);
   ~Texture();

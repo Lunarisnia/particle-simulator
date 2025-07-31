@@ -17,13 +17,15 @@ int Core::TextureManager::GetTextureLocation(const std::string &path) {
   return number - GL_TEXTURE0;
 }
 
-Core::Texture Core::TextureManager::CreateTexture(const std::string &name,
-                                                  int width, int height) {
+Core::Texture Core::TextureManager::CreateTexture(
+    const std::string &name, int width, int height, int textureType,
+    int colorSpace, int colorCode, int numberFormat, bool emptyParam) {
   if (loadedTextures.count(name) > 0) {
     return loadedTextures.at(name);
   }
-
-  Core::Texture texture{width, height, nextAvailableTextureId++};
+  Core::Texture texture{width,        height,     nextAvailableTextureId++,
+                        textureType,  colorSpace, colorCode,
+                        numberFormat, emptyParam};
   loadedTextures.emplace(name, texture);
 
   return texture;

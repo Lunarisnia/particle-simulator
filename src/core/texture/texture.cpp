@@ -2,20 +2,23 @@
 #include <map>
 #include <stdexcept>
 #include <string>
-#include "core/texture/texture_manager.hpp"
 #include "stbi_image/stbi_image.h"
 
 Core::Texture::Texture() {}
 
-Core::Texture::Texture(int width, int height, int textureLocation)
-    : textureLocation(textureLocation), textureType(GL_TEXTURE_2D) {
+Core::Texture::Texture(int width, int height, int textureLocation,
+                       int textureType, int colorSpace, int colorCode,
+                       int numberFormat, bool emptyParam)
+    : textureLocation(textureLocation), textureType(textureType) {
   glGenTextures(1, &id);
   glBindTexture(textureType, id);
 
-  glTexParameteri(textureType, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(textureType, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexImage2D(textureType, 0, GL_RGB, width, height, 0, GL_RGB,
-               GL_UNSIGNED_BYTE, nullptr);
+  if (emptyParam) {
+    glTexParameteri(textureType, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(textureType, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  }
+  glTexImage2D(textureType, 0, colorSpace, width, height, 0, colorCode,
+               numberFormat, nullptr);
   glBindTexture(textureType, 0);
 }
 
@@ -65,6 +68,11 @@ Core::Texture::Texture(std::map<TextureTarget, std::string> textureFaces,
   glTexParameteri(textureType, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(textureType, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexParameteri(textureType, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+}
+
+void Core::Texture::SetParameter(int key, int value) {
+  Bind();
+  glTexParameteri(textureType, key, value);
 }
 
 void Core::Texture::Bind() {
