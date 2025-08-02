@@ -4,6 +4,41 @@
 #include <string>
 #include "stbi_image/stbi_image.h"
 
+int Core::Texture::nextAvailableTextureId = 0;
+std::map<std::string, Core::Texture> Core::Texture::loadedTextures;
+
+Core::Texture Core::Texture::CreateEmpty2DTexture(
+    const std::string &name, struct CreateEmpty2DTextureDetail textureDetail) {
+  Texture texture;
+  texture.init(nextAvailableTextureId);
+  nextAvailableTextureId++;
+  texture.setTextureType(textureDetail.textureType);
+  texture.Bind();
+  texture.generateTexture(textureDetail.textureType, textureDetail.colorSpace,
+                          textureDetail.width, textureDetail.height,
+                          textureDetail.colorCode, textureDetail.numberFormat);
+  texture.SetParameterInt(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  texture.SetParameterInt(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  /*texture.SetParameterInt(GL_TEXTURE_WRAP_S, GL_REPEAT);*/
+  /*texture.SetParameterInt(GL_TEXTURE_WRAP_T, GL_REPEAT);*/
+  texture.Unbind();
+  return texture;
+}
+
+void Core::Texture::init(int location) {
+  glGenTextures(1, &id);
+  textureLocation = location;
+}
+
+void Core::Texture::generateTexture(int textureType, int colorSpace, int width,
+                                    int height, int colorCode,
+                                    int numberFormat) {
+  glTexImage2D(textureType, 0, colorSpace, width, height, 0, colorCode,
+               numberFormat, nullptr);
+}
+
+void Core::Texture::setTextureType(int type) { textureType = type; }
+
 Core::Texture::Texture() {}
 
 Core::Texture::Texture(int width, int height, int textureLocation,
@@ -70,15 +105,21 @@ Core::Texture::Texture(std::map<TextureTarget, std::string> textureFaces,
   glTexParameteri(textureType, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 }
 
-void Core::Texture::SetParameter(int key, int value) {
+void Core::Texture::SetParameterInt(int key, int value) {
   Bind();
   glTexParameteri(textureType, key, value);
+}
+void Core::Texture::SetParameterFv(int key, float *fv) {
+  Bind();
+  glTexParameterfv(textureType, key, fv);
 }
 
 void Core::Texture::Bind() {
   glActiveTexture(textureLocation);
   glBindTexture(textureType, id);
 }
+
+void Core::Texture::Unbind() { glBindTexture(textureType, 0); }
 
 unsigned int Core::Texture::GetID() { return id; }
 int Core::Texture::GetLocation() { return textureLocation; }
