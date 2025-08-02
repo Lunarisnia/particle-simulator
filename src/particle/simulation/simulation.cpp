@@ -2,7 +2,6 @@
 #include <cstddef>
 #include <exception>
 #include <format>
-#include <map>
 #include <memory>
 #include <print>
 #include <random>
@@ -96,15 +95,12 @@ void Particle::Simulation::Init() {
   ball->name = "Ball";
   ball->mesh->material->LoadTexture(brickWallTexture, GL_SRGB, GL_RGB);
   ball->mesh->material->LoadTexture(brickWallNormal, GL_RGB, GL_RGB);
-  ball->mesh->material->SetInt(
-      "material.diffuse",
-      Core::TextureManager::GetTextureLocation(brickWallTexture));
-  ball->mesh->material->SetInt(
-      "material.specular",
-      Core::TextureManager::GetTextureLocation(brickWallTexture));
-  ball->mesh->material->SetInt(
-      "material.normal",
-      Core::TextureManager::GetTextureLocation(brickWallNormal));
+  ball->mesh->material->SetInt("material.diffuse",
+                               Core::Texture::GetTextureID(brickWallTexture));
+  ball->mesh->material->SetInt("material.specular",
+                               Core::Texture::GetTextureID(brickWallTexture));
+  ball->mesh->material->SetInt("material.normal",
+                               Core::Texture::GetTextureID(brickWallNormal));
   cubes.emplace_back(ball);
 
   const std::string containerTexture = "./assets/container2.png";
@@ -116,15 +112,12 @@ void Particle::Simulation::Init() {
   cube->name = "Floor";
   cube->mesh->material->LoadTexture(containerTexture, GL_SRGB_ALPHA, GL_RGBA);
   cube->mesh->material->LoadTexture(containerSpecular, GL_SRGB_ALPHA, GL_RGBA);
-  cube->mesh->material->SetInt(
-      "material.diffuse",
-      Core::TextureManager::GetTextureLocation(containerTexture));
-  cube->mesh->material->SetInt(
-      "material.specular",
-      Core::TextureManager::GetTextureLocation(containerSpecular));
-  cube->mesh->material->SetInt(
-      "material.normal",
-      Core::TextureManager::GetTextureLocation(brickWallNormal));
+  cube->mesh->material->SetInt("material.diffuse",
+                               Core::Texture::GetTextureID(containerTexture));
+  cube->mesh->material->SetInt("material.specular",
+                               Core::Texture::GetTextureID(containerSpecular));
+  cube->mesh->material->SetInt("material.normal",
+                               Core::Texture::GetTextureID(brickWallNormal));
   cubes.emplace_back(cube);
 
   try {
@@ -158,7 +151,7 @@ void Particle::Simulation::Update() {
     object->mesh->material->SetFloat("globalFloat2", globalFloat2);
     object->mesh->material->SetMat4("lightSpaceMatrix",
                                     Core::StaticLight::GetLightSpaceMatrix());
-    object->mesh->material->SetInt(
-        "shadowMap", Core::TextureManager::GetTextureLocation("shadowMap"));
+    object->mesh->material->SetInt("shadowMap",
+                                   Core::Texture::GetTextureID("shadowMap"));
   }
 }

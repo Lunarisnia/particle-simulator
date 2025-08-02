@@ -10,8 +10,7 @@ std::map<std::string, Core::Texture> Core::Texture::loadedTextures;
 Core::Texture Core::Texture::CreateEmpty2DTexture(
     const std::string &name, struct CreateEmpty2DTextureDetail textureDetail) {
   Texture texture;
-  texture.init(nextAvailableTextureId);
-  nextAvailableTextureId++;
+  texture.init();
   texture.setTextureType(textureDetail.textureType);
   texture.Bind();
   texture.generateTexture(textureDetail.textureType, textureDetail.colorSpace,
@@ -19,15 +18,60 @@ Core::Texture Core::Texture::CreateEmpty2DTexture(
                           textureDetail.colorCode, textureDetail.numberFormat);
   texture.SetParameterInt(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   texture.SetParameterInt(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  /*texture.SetParameterInt(GL_TEXTURE_WRAP_S, GL_REPEAT);*/
-  /*texture.SetParameterInt(GL_TEXTURE_WRAP_T, GL_REPEAT);*/
+  texture.SetParameterInt(GL_TEXTURE_WRAP_S, GL_REPEAT);
+  texture.SetParameterInt(GL_TEXTURE_WRAP_T, GL_REPEAT);
+  texture.Unbind();
+  loadedTextures.emplace(name, texture);
+  return texture;
+}
+
+Core::Texture Core::Texture::Create2DTextureFromImage(
+    const std::string &name,
+    struct Create2DTextureFromImageDetail textureDetail) {
+  Texture texture;
+  texture.init();
+  texture.setTextureType(GL_TEXTURE_2D);
+  texture.Bind();
+  // Load image
+  int width, height, numberOfChannel;
+  stbi_set_flip_vertically_on_load(true);
+  unsigned char *data = stbi_load(textureDetail.path.c_str(), &width, &height,
+                                  &numberOfChannel, 0);
+  if (data) {
+    glTexImage2D(GL_TEXTURE_2D, 0, textureDetail.colorSpace, width, height, 0,
+                 textureDetail.colorCode, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+  } else {
+    throw std::runtime_error("failed to load texture");
+  }
+  // Bind image
+  texture.Unbind();
+  loadedTextures.emplace(name, texture);
+  return texture;
+}
+
+Core::Texture Core::Texture::CreateCubeMapTextureFromImage(
+    const std::string &name,
+    CreateCubeMapTextureFromImageDetail textureDetail) {
+  Texture texture;
+  texture.init();
+  texture.Bind();
+
   texture.Unbind();
   return texture;
 }
 
-void Core::Texture::init(int location) {
+int Core::Texture::GetTextureID(const std::string &name) {
+  if (loadedTextures.count(name) < 1) {
+    return 0;
+  }
+  return loadedTextures.at(name).GetLocation() - GL_TEXTURE0;
+}
+
+void Core::Texture::init() {
   glGenTextures(1, &id);
-  textureLocation = location;
+  textureLocation = GL_TEXTURE0 + nextAvailableTextureId;
+  nextAvailableTextureId++;
 }
 
 void Core::Texture::generateTexture(int textureType, int colorSpace, int width,

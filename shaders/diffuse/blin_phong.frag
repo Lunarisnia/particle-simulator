@@ -34,16 +34,26 @@ uniform Camera camera;
 
 uniform sampler2D shadowMap;
 
-float calculateShadow(vec4 fragPosLightSpace) {
+float calculateShadow(vec4 fragPosLightSpace, vec3 lightDir, vec3 normal) {
     // perform perspective divide
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     projCoords = projCoords * 0.5f + 0.5f;
-    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
-    float closestDepth = texture(shadowMap, projCoords.xy).x;
     // get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
     // check whether current frag pos is in shadow
-    float shadow = currentDepth > closestDepth ? 1.0 : 0.0;
+    float bias = max(0.04f, 0.05 * (1.0f - dot(lightDir, normal)));
+    float shadow = 0.0f;
+    vec2 texelSize = 1.0f / textureSize(shadowMap, 0);
+    for (int i = -1; i <= 1; i++) {
+        for (int j = -1; j <= 1; j++) {
+            float closestDepth = texture(shadowMap, projCoords.xy + vec2(i, j) * texelSize).x;
+            shadow += currentDepth - bias > closestDepth ? 1.0 : 0.0;
+        }
+    }
+    shadow /= 9.0f;
+    if (projCoords.z > 1.0f) {
+        shadow = 0.0f;
+    }
 
     return shadow;
 }
@@ -65,8 +75,9 @@ vec3 calculatePointLight(PointLight light, vec3 diffuseTexture, vec3 specularTex
 
     // vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;
 
-    float shadow = calculateShadow(vertexAttribute.lightSpaceFragPos);
-    color += (1.0f - shadow) * (diffuse + specular);
+    float shadow = calculateShadow(vertexAttribute.lightSpaceFragPos, lightDir, normal);
+    // color += (1.0f - shadow) * (diffuse + specular);
+    color += mix(vec3(0.0f), diffuse + specular, 1.0f - shadow);
     return color;
 }
 

@@ -134,10 +134,13 @@ void Particle::Model::loadTextures(aiMaterial* material, aiTextureType type,
 
     const std::string path =
         std::format("{}/{}", directory.c_str(), name.c_str());
+    Core::Create2DTextureFromImageDetail detail;
+    detail.path = path;
+    detail.colorCode = colorCode;
+    detail.colorSpace = colorSpace;
     Core::Texture texture =
-        Core::TextureManager::LoadTexture(path, colorSpace, colorCode);
-    objectMesh->material->SetInt(
-        uniform, Core::TextureManager::GetTextureLocation(path));
+        Core::Texture::Create2DTextureFromImage(path, detail);
+    objectMesh->material->SetInt(uniform, Core::Texture::GetTextureID(path));
     objectMesh->material->AddTexture(texture);
   }
 }

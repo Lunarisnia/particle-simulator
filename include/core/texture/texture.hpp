@@ -3,6 +3,15 @@
 #include <map>
 #include <string>
 namespace Core {
+enum TextureTarget {
+  CUBE_MAP_POSITIVE_X = GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+  CUBE_MAP_NEGATIVE_X = GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+  CUBE_MAP_POSITIVE_Y = GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+  CUBE_MAP_NEGATIVE_Y = GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+  CUBE_MAP_POSITIVE_Z = GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+  CUBE_MAP_NEGATIVE_Z = GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
+};
+
 struct CreateEmpty2DTextureDetail {
   int textureType;
   int colorSpace;
@@ -11,13 +20,17 @@ struct CreateEmpty2DTextureDetail {
   int colorCode;
   int numberFormat;
 };
-enum TextureTarget {
-  CUBE_MAP_POSITIVE_X = GL_TEXTURE_CUBE_MAP_POSITIVE_X,
-  CUBE_MAP_NEGATIVE_X = GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
-  CUBE_MAP_POSITIVE_Y = GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-  CUBE_MAP_NEGATIVE_Y = GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
-  CUBE_MAP_POSITIVE_Z = GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
-  CUBE_MAP_NEGATIVE_Z = GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
+
+struct Create2DTextureFromImageDetail {
+  std::string path;
+  int colorSpace;
+  int colorCode;
+};
+
+struct CreateCubeMapTextureFromImageDetail {
+  std::map<TextureTarget, std::string> textureFaces;
+  int colorSpace;
+  int colorCode;
 };
 
 class Texture {
@@ -37,9 +50,15 @@ class Texture {
  public:
   static Texture CreateEmpty2DTexture(const std::string &name,
                                       CreateEmpty2DTextureDetail textureDetail);
+  static Texture Create2DTextureFromImage(
+      const std::string &name, Create2DTextureFromImageDetail textureDetail);
+  static Texture CreateCubeMapTextureFromImage(
+      const std::string &name,
+      CreateCubeMapTextureFromImageDetail textureDetail);
+  static int GetTextureID(const std::string &name);
 
  private:
-  void init(int location);
+  void init();
   void setTextureType(int textureType);
   void generateTexture(int textureType, int colorSpace, int width, int height,
                        int colorCode, int numberFormat);

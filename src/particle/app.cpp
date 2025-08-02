@@ -28,29 +28,32 @@ Particle::App::App() {
 }
 
 void Particle::App::initFramebuffer() {
+  Core::CreateEmpty2DTextureDetail detail;
+  detail.width = Core::Window::GetWidth();
+  detail.height = Core::Window::GetHeight();
+  detail.textureType = GL_TEXTURE_2D;
+  detail.colorSpace = GL_RGB;
+  detail.colorCode = GL_RGB;
+  detail.numberFormat = GL_UNSIGNED_BYTE;
   framebuffer = std::make_shared<Core::Framebuffer>();
   framebuffer->AttachTexture(
-      std::make_shared<Core::Texture>(Core::TextureManager::CreateTexture(
-          "main", Core::Window::GetWidth(), Core::Window::GetHeight(),
-          GL_TEXTURE_2D, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, true)),
+      std::make_shared<Core::Texture>(
+          Core::Texture::CreateEmpty2DTexture("main", detail)),
       GL_COLOR_ATTACHMENT0);
   framebuffer->AttachTexture(
-      std::make_shared<Core::Texture>(Core::TextureManager::CreateTexture(
-          "depth", Core::Window::GetWidth(), Core::Window::GetHeight(),
-          GL_TEXTURE_2D, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, true)),
+      std::make_shared<Core::Texture>(
+          Core::Texture::CreateEmpty2DTexture("depth", detail)),
       GL_COLOR_ATTACHMENT1);
   framebuffer->AttachTexture(
-      std::make_shared<Core::Texture>(Core::TextureManager::CreateTexture(
-          "normal", Core::Window::GetWidth(), Core::Window::GetHeight(),
-          GL_TEXTURE_2D, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, true)),
+      std::make_shared<Core::Texture>(
+          Core::Texture::CreateEmpty2DTexture("normal", detail)),
       GL_COLOR_ATTACHMENT2);
   framebuffer->AttachTexture(
-      std::make_shared<Core::Texture>(Core::TextureManager::CreateTexture(
-          "color", Core::Window::GetWidth(), Core::Window::GetHeight(),
-          GL_TEXTURE_2D, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, true)),
+      std::make_shared<Core::Texture>(
+          Core::Texture::CreateEmpty2DTexture("color", detail)),
       GL_COLOR_ATTACHMENT3);
-  framebuffer->AttachRenderbuffer(std::make_shared<Core::Renderbuffer>(
-      Core::Window::GetWidth(), Core::Window::GetHeight()));
+  framebuffer->AttachRenderbuffer(
+      std::make_shared<Core::Renderbuffer>(detail.width, detail.height));
 
   framebuffer->Bind();
   unsigned int attachments[4] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,
@@ -63,26 +66,30 @@ void Particle::App::initFramebuffer() {
 
   edgeDetectionFramebuffer = std::make_shared<Core::Framebuffer>();
   edgeDetectionFramebuffer->AttachTexture(
-      std::make_shared<Core::Texture>(Core::TextureManager::CreateTexture(
-          "outline", Core::Window::GetWidth(), Core::Window::GetHeight(),
-          GL_TEXTURE_2D, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, true)),
+      std::make_shared<Core::Texture>(
+          Core::Texture::CreateEmpty2DTexture("outline", detail)),
       GL_COLOR_ATTACHMENT0);
   edgeDetectionFramebuffer->AttachRenderbuffer(
-      std::make_shared<Core::Renderbuffer>(Core::Window::GetWidth(),
-                                           Core::Window::GetHeight()));
+      std::make_shared<Core::Renderbuffer>(detail.width, detail.height));
   if (!edgeDetectionFramebuffer->CheckStatus()) {
     throw std::runtime_error("framebuffer incomplete");
   }
 
   // SHADOW MAP
+  Core::CreateEmpty2DTextureDetail shadowDetail;
+  shadowDetail.width = 1024;
+  shadowDetail.height = 1024;
+  shadowDetail.textureType = GL_TEXTURE_2D;
+  shadowDetail.colorSpace = GL_DEPTH_COMPONENT;
+  shadowDetail.colorCode = GL_DEPTH_COMPONENT;
+  shadowDetail.numberFormat = GL_FLOAT;
   std::shared_ptr<Core::Texture> shadowTexture =
-      std::make_shared<Core::Texture>(Core::TextureManager::CreateTexture(
-          "shadowMap", 1024, 1024, GL_TEXTURE_2D, GL_DEPTH_COMPONENT,
-          GL_DEPTH_COMPONENT, GL_FLOAT, false));
-  shadowTexture->SetParameter(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  shadowTexture->SetParameter(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  shadowTexture->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
-  shadowTexture->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+      std::make_shared<Core::Texture>(
+          Core::Texture::CreateEmpty2DTexture("shadowMap", shadowDetail));
+  shadowTexture->SetParameterInt(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  shadowTexture->SetParameterInt(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  shadowTexture->SetParameterInt(GL_TEXTURE_WRAP_S, GL_REPEAT);
+  shadowTexture->SetParameterInt(GL_TEXTURE_WRAP_T, GL_REPEAT);
   shadowMapFramebuffer = std::make_shared<Core::Framebuffer>();
   shadowMapFramebuffer->AttachTexture(shadowTexture, GL_DEPTH_ATTACHMENT);
   shadowMapFramebuffer->Bind();
@@ -115,11 +122,11 @@ void Particle::App::edgeDetectionPass() {
 
   edgeDetectionPlane->mesh->material->Use();
   edgeDetectionPlane->mesh->material->SetInt(
-      "colorTexture", Core::TextureManager::GetTextureLocation("color"));
+      "colorTexture", Core::Texture::GetTextureID("color"));
   edgeDetectionPlane->mesh->material->SetInt(
-      "normalTexture", Core::TextureManager::GetTextureLocation("normal"));
+      "normalTexture", Core::Texture::GetTextureID("normal"));
   edgeDetectionPlane->mesh->material->SetInt(
-      "depthTexture", Core::TextureManager::GetTextureLocation("depth"));
+      "depthTexture", Core::Texture::GetTextureID("depth"));
   edgeDetectionPlane->mesh->BindVertexArray();
   framebuffer->BindTextures();
   glDrawElements(GL_TRIANGLES, edgeDetectionPlane->mesh->GetIndiceLength(),
@@ -137,12 +144,12 @@ void Particle::App::edgeDetectionPass() {
       "screenTexture",
       framebuffer->textureBuffers[0]->GetLocation() - GL_TEXTURE0);
 
-  renderPlane->mesh->material->SetInt(
-      "colorTexture", Core::TextureManager::GetTextureLocation("color"));
-  renderPlane->mesh->material->SetInt(
-      "normalTexture", Core::TextureManager::GetTextureLocation("normal"));
-  renderPlane->mesh->material->SetInt(
-      "depthTexture", Core::TextureManager::GetTextureLocation("depth"));
+  renderPlane->mesh->material->SetInt("colorTexture",
+                                      Core::Texture::GetTextureID("color"));
+  renderPlane->mesh->material->SetInt("normalTexture",
+                                      Core::Texture::GetTextureID("normal"));
+  renderPlane->mesh->material->SetInt("depthTexture",
+                                      Core::Texture::GetTextureID("depth"));
 
   renderPlane->mesh->material->SetInt(
       "outlineTexture",
@@ -197,23 +204,19 @@ void Particle::App::Run() {
       Core::Renderer::Clear(GL_COLOR_BUFFER_BIT);
       // TODO: find a way to just use the existing renderer here later
       renderPlane->mesh->material->Use();
+      renderPlane->mesh->material->SetInt("screenTexture",
+                                          Core::Texture::GetTextureID("main"));
+      renderPlane->mesh->material->SetInt("colorTexture",
+                                          Core::Texture::GetTextureID("color"));
       renderPlane->mesh->material->SetInt(
-          "screenTexture", Core::TextureManager::GetTextureLocation("main"));
+          "normalTexture", Core::Texture::GetTextureID("normal"));
+      renderPlane->mesh->material->SetInt("depthTexture",
+                                          Core::Texture::GetTextureID("depth"));
+      renderPlane->mesh->material->SetInt(
+          "shadowTexture", Core::Texture::GetTextureID("shadowMap"));
 
       renderPlane->mesh->material->SetInt(
-          "colorTexture", Core::TextureManager::GetTextureLocation("color"));
-      renderPlane->mesh->material->SetInt(
-          "normalTexture", Core::TextureManager::GetTextureLocation("normal"));
-      renderPlane->mesh->material->SetInt(
-          "depthTexture", Core::TextureManager::GetTextureLocation("depth"));
-      renderPlane->mesh->material->SetInt(
-          "shadowTexture",
-          Core::TextureManager::GetTextureLocation("shadowMap"));
-
-      renderPlane->mesh->material->SetInt(
-          "outlineTexture",
-          edgeDetectionFramebuffer->textureBuffers[0]->GetLocation() -
-              GL_TEXTURE0);
+          "outlineTexture", Core::Texture::GetTextureID("outline"));
       renderPlane->mesh->material->SetFloat("globalFloat",
                                             Simulation::globalFloat);
       renderPlane->mesh->material->SetFloat("globalFloat2",

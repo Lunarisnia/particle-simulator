@@ -9,6 +9,7 @@
 #include "core/shader/shader.hpp"
 #include "core/static_camera/static_camera.hpp"
 #include "core/static_light/static_light.hpp"
+#include "core/texture/texture.hpp"
 #include "core/window/window.hpp"
 
 std::vector<std::shared_ptr<Core::Mesh>> Core::Renderer::renderQueue;
@@ -111,6 +112,7 @@ void Core::Renderer::Render() {
 void Core::Renderer::RenderShadowMap() {
   Shader shadowMappingShader = Shader{"./shaders/shadow/simple_shadow.vert",
                                       "./shaders/shadow/simple_shadow.frag"};
+  glCullFace(GL_FRONT);
   for (std::shared_ptr<Mesh> &mesh : renderQueue) {
     if (!mesh->isActive) {
       continue;
@@ -135,6 +137,7 @@ void Core::Renderer::RenderShadowMap() {
 
     glDrawElements(GL_TRIANGLES, mesh->GetIndiceLength(), GL_UNSIGNED_INT, 0);
   }
+  glCullFace(GL_BACK);
 }
 
 void Core::Renderer::SetClearColor(float r, float g, float b, float a) {
