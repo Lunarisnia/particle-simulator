@@ -1,6 +1,5 @@
 #include "core/material/material.hpp"
 #include <string>
-#include "core/texture/texture_manager.hpp"
 #include "glad/glad.h"
 #include "core/shader/shader.hpp"
 #include "core/texture/texture.hpp"
@@ -41,10 +40,15 @@ void Core::Material::LoadTexture(const std::string &path, int colorSpace,
 }
 
 void Core::Material::LoadTextureCubeMap(
+    const std::string &name,
     std::map<Core::TextureTarget, std::string> textureFaces, int colorSpace,
     int colorCode) {
-  textures.emplace_back(Core::TextureManager::LoadTextureCubeMap(
-      textureFaces, colorSpace, colorCode));
+  CreateCubeMapTextureFromImageDetail detail;
+  detail.textureFaces = textureFaces;
+  detail.colorCode = colorCode;
+  detail.colorSpace = colorSpace;
+  textures.emplace_back(
+      Core::Texture::CreateCubeMapTextureFromImage(name, detail));
 }
 
 void Core::Material::AddTexture(Texture texture) {

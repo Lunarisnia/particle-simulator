@@ -1,7 +1,6 @@
 #include "particle/model/model.hpp"
 #include <cstddef>
 #include "core/texture/texture.hpp"
-#include "core/texture/texture_manager.hpp"
 #include "glad/glad.h"
 #include <format>
 #include <memory>

@@ -49,10 +49,8 @@ void Core::Renderer::Init() {
                        "./assets/skybox/front.jpg");
   textureFaces.emplace(Core::TextureTarget::CUBE_MAP_NEGATIVE_Z,
                        "./assets/skybox/back.jpg");
-  mesh->material->LoadTextureCubeMap(textureFaces, GL_RGB, GL_RGB);
-  // TODO: I kinda hate having to put the index here as a magic number out of my
-  // ass, do something about this
-  mesh->material->SetInt("cubeTexture", 0);
+  mesh->material->LoadTextureCubeMap("skyBox", textureFaces, GL_RGB, GL_RGB);
+  mesh->material->SetInt("cubeTexture", Core::Texture::GetTextureID("skyBox"));
   DepthTest(true);
 }
 

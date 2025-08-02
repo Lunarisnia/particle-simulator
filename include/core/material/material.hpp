@@ -21,6 +21,7 @@ class Material {
 
   void LoadTexture(const std::string &path, int colorSpace, int colorCode);
   void LoadTextureCubeMap(
+      const std::string &name,
       std::map<Core::TextureTarget, std::string> textureFaces, int colorSpace,
       int colorCode);
 

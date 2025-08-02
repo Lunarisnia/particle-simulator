@@ -14,7 +14,6 @@
 #include "core/static_camera/static_camera.hpp"
 #include "core/static_light/static_light.hpp"
 #include "core/texture/texture.hpp"
-#include "core/texture/texture_manager.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/trigonometric.hpp"
 #include "particle/model/model.hpp"

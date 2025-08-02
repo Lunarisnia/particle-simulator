@@ -7,7 +7,6 @@
 #include "core/input/input.hpp"
 #include "core/renderer/renderer.hpp"
 #include "core/texture/texture.hpp"
-#include "core/texture/texture_manager.hpp"
 #include "core/time/time.hpp"
 #include "core/window/window.hpp"
 #include "core/world/world.hpp"
