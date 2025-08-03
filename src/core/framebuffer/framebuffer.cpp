@@ -10,10 +10,14 @@ void Core::Framebuffer::Bind() { glBindFramebuffer(GL_FRAMEBUFFER, id); }
 void Core::Framebuffer::Unbind() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 
 void Core::Framebuffer::AttachTexture(std::shared_ptr<Texture> texture,
-                                      unsigned int attachment) {
+                                      unsigned int attachment, bool isCubeMap) {
   Bind();
-  glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D,
-                         texture->GetID(), 0);
+  if (isCubeMap) {
+    glFramebufferTexture(GL_FRAMEBUFFER, attachment, texture->GetID(), 0);
+  } else {
+    glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D,
+                           texture->GetID(), 0);
+  }
   textureBuffers.emplace_back(texture);
   Unbind();
 }

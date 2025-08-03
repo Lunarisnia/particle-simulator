@@ -1,4 +1,5 @@
 #include "particle/app.hpp"
+#include <cups/raster.h>
 #include <exception>
 #include <memory>
 #include <stdexcept>
@@ -98,6 +99,24 @@ void Particle::App::initFramebuffer() {
     throw std::runtime_error("fb incomplete");
   }
   shadowMapFramebuffer->Unbind();
+
+  // Cubemap ShadowMap
+  Core::CreateEmptyCubeMapTextureDetail cubeShadowDetail;
+  cubeShadowDetail.width = 1024;
+  cubeShadowDetail.height = 1024;
+  std::shared_ptr<Core::Texture> cubeMapShadowTexture =
+      std::make_shared<Core::Texture>(Core::Texture::CreateEmptyCubeMapTexture(
+          "cubeMapShadowMap", cubeShadowDetail));
+  cubeMapShadowMapFramebuffer = std::make_shared<Core::Framebuffer>();
+  cubeMapShadowMapFramebuffer->AttachTexture(cubeMapShadowTexture,
+                                             GL_DEPTH_ATTACHMENT, true);
+  cubeMapShadowMapFramebuffer->Bind();
+  glDrawBuffer(GL_NONE);
+  glReadBuffer(GL_NONE);
+  if (!cubeMapShadowMapFramebuffer->CheckStatus()) {
+    throw std::runtime_error("fb incomplete");
+  }
+  cubeMapShadowMapFramebuffer->Unbind();
 }
 
 void Particle::App::initRenderPlane() {

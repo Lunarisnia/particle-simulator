@@ -14,7 +14,7 @@ class Framebuffer {
 
  public:
   void AttachTexture(std::shared_ptr<Core::Texture> texture,
-                     unsigned int attachment);
+                     unsigned int attachment, bool isCubeMap = false);
   void AttachRenderbuffer(std::shared_ptr<Core::Renderbuffer> renderbuffer);
   void Bind();
   void BindTextures();
