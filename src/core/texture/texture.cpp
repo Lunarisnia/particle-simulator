@@ -7,6 +7,28 @@
 int Core::Texture::nextAvailableTextureId = 0;
 std::map<std::string, Core::Texture> Core::Texture::loadedTextures;
 
+Core::Texture Core::Texture::CreateEmptyCubeMapTexture(
+    const std::string &name,
+    struct CreateEmptyCubeMapTextureDetail textureDetail) {
+  Texture texture;
+  texture.init();
+  texture.setTextureType(GL_TEXTURE_CUBE_MAP);
+  texture.Bind();
+  for (size_t i = 0; i < 6; i++) {
+    texture.generateTexture(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                            GL_DEPTH_COMPONENT, textureDetail.width,
+                            textureDetail.height, GL_DEPTH_COMPONENT, GL_FLOAT);
+  }
+  texture.SetParameterInt(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  texture.SetParameterInt(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  texture.SetParameterInt(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  texture.SetParameterInt(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  texture.SetParameterInt(GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+  texture.Unbind();
+  return texture;
+}
+
 Core::Texture Core::Texture::CreateEmpty2DTexture(
     const std::string &name, struct CreateEmpty2DTextureDetail textureDetail) {
   Texture texture;
@@ -32,7 +54,6 @@ Core::Texture Core::Texture::Create2DTextureFromImage(
   texture.init();
   texture.setTextureType(GL_TEXTURE_2D);
   texture.Bind();
-  // Load image
   int width, height, numberOfChannel;
   stbi_set_flip_vertically_on_load(true);
   unsigned char *data = stbi_load(textureDetail.path.c_str(), &width, &height,
@@ -44,7 +65,6 @@ Core::Texture Core::Texture::Create2DTextureFromImage(
   } else {
     throw std::runtime_error("failed to load texture");
   }
-  // Bind image
   texture.Unbind();
   loadedTextures.emplace(name, texture);
   return texture;

@@ -33,6 +33,11 @@ struct CreateCubeMapTextureFromImageDetail {
   int colorCode;
 };
 
+struct CreateEmptyCubeMapTextureDetail {
+  int width;
+  int height;
+};
+
 class Texture {
  private:
   static int nextAvailableTextureId;
@@ -55,6 +60,8 @@ class Texture {
   static Texture CreateCubeMapTextureFromImage(
       const std::string &name,
       CreateCubeMapTextureFromImageDetail textureDetail);
+  static Texture CreateEmptyCubeMapTexture(
+      const std::string &name, CreateEmptyCubeMapTextureDetail textureDetail);
   static int GetTextureID(const std::string &name);
 
  private:
