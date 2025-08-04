@@ -15,6 +15,7 @@ class Renderer {
   static void SetClearColor(float r, float g, float b, float a);
   static void Render();
   static void RenderShadowMap();
+  static void RenderShadowCubeMap();
   static void Clear(int bit);
   static void AdjustViewport(int width, int height, bool scaleUp);
   static void DepthTest(bool enable);

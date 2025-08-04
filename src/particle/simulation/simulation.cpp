@@ -41,7 +41,7 @@ void Particle::Simulation::Init() {
   std::random_device dev;
   std::mt19937 rng(dev());
   std::uniform_real_distribution<float> dist(-3.5f, 3.5f);
-  for (size_t i = 0; i < 2; i++) {
+  for (size_t i = 0; i < 1; i++) {
     std::shared_ptr<Core::Object> light =
         Primitive::CreateCube(vertexPath, lightFrag);
     std::shared_ptr<Core::PointLight> pointLight =

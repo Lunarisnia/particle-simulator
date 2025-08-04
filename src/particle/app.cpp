@@ -193,6 +193,15 @@ void Particle::App::Run() {
 
       Editor::Editor::NewFrame();
       Editor::Editor::Update();
+      cubeMapShadowMapFramebuffer->Bind();
+      Core::Renderer::AdjustViewport(1024, 1024, false);
+      Core::Renderer::DepthTest(true);
+      Core::Renderer::SetClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+      Core::Renderer::Clear(GL_DEPTH_BUFFER_BIT);
+
+      Core::Renderer::RenderShadowCubeMap();
+
+      cubeMapShadowMapFramebuffer->Unbind();
 
       shadowMapFramebuffer->Bind();
       Core::Renderer::AdjustViewport(1024, 1024, false);

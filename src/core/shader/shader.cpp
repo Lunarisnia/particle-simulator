@@ -3,6 +3,7 @@
 #include "glm/ext/vector_float3.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include <fstream>
+#include <print>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -50,10 +51,26 @@ Core::Shader Core::Shader::CreateShaderWithGeometry(
 
   unsigned int vertexShader =
       shader.createShader(vertexCode.c_str(), GL_VERTEX_SHADER);
+  glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+  if (!success) {
+    glGetShaderInfoLog(shader.id, 512, NULL, infoLog);
+    throw std::runtime_error(infoLog);
+  }
   unsigned int geometryShader =
-      shader.createShader(fragmentCode.c_str(), GL_GEOMETRY_SHADER);
+      shader.createShader(geometryCode.c_str(), GL_GEOMETRY_SHADER);
+  glGetShaderiv(geometryShader, GL_COMPILE_STATUS, &success);
+  if (!success) {
+    glGetShaderInfoLog(shader.id, 512, NULL, infoLog);
+    throw std::runtime_error(infoLog);
+  }
   unsigned int fragmentShader =
       shader.createShader(fragmentCode.c_str(), GL_FRAGMENT_SHADER);
+  glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+  if (!success) {
+    glGetShaderInfoLog(shader.id, 512, NULL, infoLog);
+    std::println("{}", infoLog);
+    throw std::runtime_error(infoLog);
+  }
 
   shader.id = glCreateProgram();
   glAttachShader(shader.id, vertexShader);

@@ -1,8 +1,10 @@
 #include "core/renderer/renderer.hpp"
+#include <format>
 #include <memory>
 #include <stdexcept>
 #include <vector>
 #include "core/components/mesh.hpp"
+#include "core/components/point_light.hpp"
 #include "core/material/material.hpp"
 #include "core/object/object.hpp"
 #include "core/procedural/procedural.hpp"
@@ -11,6 +13,7 @@
 #include "core/static_light/static_light.hpp"
 #include "core/texture/texture.hpp"
 #include "core/window/window.hpp"
+#include "glm/ext/matrix_float4x4.hpp"
 
 std::vector<std::shared_ptr<Core::Mesh>> Core::Renderer::renderQueue;
 std::shared_ptr<Core::Object> Core::Renderer::skybox;
@@ -105,6 +108,50 @@ void Core::Renderer::Render() {
                    GL_UNSIGNED_INT, 0);
     glDepthFunc(GL_LESS);
   }
+}
+void Core::Renderer::RenderShadowCubeMap() {
+  Shader shadowMappingShader = Shader::CreateShaderWithGeometry(
+      "./shaders/shadow/shadow_cube_map.vert",
+      "./shaders/shadow/shadow_cube_map_geometry.glsl",
+      "./shaders/shadow/shadow_cube_map.frag");
+  glCullFace(GL_FRONT);
+  for (std::shared_ptr<Mesh> &mesh : renderQueue) {
+    if (!mesh->isActive) {
+      continue;
+    }
+    Object *owner = mesh->GetOwner();
+    if (!owner) {
+      continue;
+    }
+    // FIXME: Do better than this
+    if (owner->name == "RenderPlane" || owner->name == "Edge") {
+      continue;
+    }
+
+    /*mesh->material->Use();*/
+    shadowMappingShader.Use();
+    shadowMappingShader.SetMat4("model",
+                                owner->transform->GetTransformMatrix());
+    /*shadowMappingShader.SetMat4("lightSpaceMatrix",*/
+    /*                            StaticLight::GetLightSpaceMatrix());*/
+    if (owner->GetComponent<Core::PointLight>() != nullptr) {
+      std::shared_ptr<Core::PointLight> pointLight =
+          owner->GetComponent<Core::PointLight>();
+      std::vector<glm::mat4> shadowMapMatrices =
+          pointLight->GetCubeMapLightMatrix();
+      shadowMappingShader.SetFloat("farPlane", 0.25f);
+      shadowMappingShader.SetVec3("lightPos", owner->transform->position);
+      for (size_t i = 0; i < 6; i++) {
+        shadowMappingShader.SetMat4(std::format("shadowMatrices[{}]", i),
+                                    shadowMapMatrices[i]);
+      }
+    }
+    mesh->BindVertexArray();
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    glDrawElements(GL_TRIANGLES, mesh->GetIndiceLength(), GL_UNSIGNED_INT, 0);
+  }
+  glCullFace(GL_BACK);
 }
 
 void Core::Renderer::RenderShadowMap() {
