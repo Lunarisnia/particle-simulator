@@ -7,6 +7,72 @@
 #include <stdexcept>
 #include <string>
 
+Core::Shader Core::Shader::CreateShader(const std::string &vertPath,
+                                        const std::string &fragPath) {
+  Shader shader;
+  int success;
+  char infoLog[512];
+
+  std::string vertexCode = shader.loadFile(vertPath);
+  std::string fragmentCode = shader.loadFile(fragPath);
+
+  unsigned int vertexShader =
+      shader.createShader(vertexCode.c_str(), GL_VERTEX_SHADER);
+  unsigned int fragmentShader =
+      shader.createShader(fragmentCode.c_str(), GL_FRAGMENT_SHADER);
+
+  shader.id = glCreateProgram();
+  glAttachShader(shader.id, vertexShader);
+  glAttachShader(shader.id, fragmentShader);
+  glLinkProgram(shader.id);
+
+  glGetProgramiv(shader.id, GL_LINK_STATUS, &success);
+  if (!success) {
+    glGetProgramInfoLog(shader.id, 512, NULL, infoLog);
+    throw std::runtime_error(infoLog);
+  }
+
+  glDeleteProgram(vertexShader);
+  glDeleteProgram(fragmentShader);
+  return shader;
+}
+
+Core::Shader Core::Shader::CreateShaderWithGeometry(
+    const std::string &vertPath, const std::string &geometryPath,
+    const std::string &fragPath) {
+  Shader shader;
+  int success;
+  char infoLog[512];
+
+  std::string vertexCode = shader.loadFile(vertPath);
+  std::string fragmentCode = shader.loadFile(fragPath);
+  std::string geometryCode = shader.loadFile(geometryPath);
+
+  unsigned int vertexShader =
+      shader.createShader(vertexCode.c_str(), GL_VERTEX_SHADER);
+  unsigned int geometryShader =
+      shader.createShader(fragmentCode.c_str(), GL_GEOMETRY_SHADER);
+  unsigned int fragmentShader =
+      shader.createShader(fragmentCode.c_str(), GL_FRAGMENT_SHADER);
+
+  shader.id = glCreateProgram();
+  glAttachShader(shader.id, vertexShader);
+  glAttachShader(shader.id, geometryShader);
+  glAttachShader(shader.id, fragmentShader);
+  glLinkProgram(shader.id);
+
+  glGetProgramiv(shader.id, GL_LINK_STATUS, &success);
+  if (!success) {
+    glGetProgramInfoLog(shader.id, 512, NULL, infoLog);
+    throw std::runtime_error(infoLog);
+  }
+
+  glDeleteProgram(vertexShader);
+  glDeleteProgram(geometryShader);
+  glDeleteProgram(fragmentShader);
+  return shader;
+}
+
 Core::Shader::Shader() {}
 
 Core::Shader::Shader(const std::string &vertexPath,

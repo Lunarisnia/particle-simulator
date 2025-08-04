@@ -11,6 +11,13 @@ class Shader {
   unsigned int id;
 
  public:
+  static Shader CreateShader(const std::string &vertPath,
+                             const std::string &fragPath);
+  static Shader CreateShaderWithGeometry(const std::string &vertPath,
+                                         const std::string &geometryPath,
+                                         const std::string &fragPath);
+
+ public:
   void Use();
   void SetMat4(const std::string &uniform, glm::mat4 mat4);
   void SetVec3(const std::string &uniform, glm::vec3 vec3);
