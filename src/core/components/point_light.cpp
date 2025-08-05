@@ -24,6 +24,8 @@ void Core::PointLight::SetMeshUniform(const std::string &uniform,
   Core::Object *lightOwner = owner;
   object->mesh->material->SetVec3(std::format("{}.position", uniform),
                                   lightOwner->transform->GetWorldPosition());
+  object->mesh->material->SetFloat(std::format("{}.farPlane", uniform),
+                                   farPlane);
   object->mesh->material->SetVec3(std::format("{}.ambient", uniform), ambient);
   object->mesh->material->SetVec3(std::format("{}.diffuse", uniform), diffuse);
   object->mesh->material->SetVec3(std::format("{}.specular", uniform),
@@ -43,9 +45,8 @@ glm::mat4 Core::PointLight::getViewMatrix(glm::vec3 direction, glm::vec3 up) {
 }
 
 glm::mat4 Core::PointLight::getProjectionMatrix() {
-  glm::mat4 projection = glm::perspective(
-      glm::radians(90.0f),
-      (float)Window::GetWidth() / (float)Window::GetHeight(), 1.00f, 25.0f);
+  glm::mat4 projection =
+      glm::perspective(glm::radians(90.0f), 1024.0f / 1024.0f, 1.00f, farPlane);
 
   return projection;
 }

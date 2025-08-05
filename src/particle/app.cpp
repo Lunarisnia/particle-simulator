@@ -106,7 +106,7 @@ void Particle::App::initFramebuffer() {
   cubeShadowDetail.height = 1024;
   std::shared_ptr<Core::Texture> cubeMapShadowTexture =
       std::make_shared<Core::Texture>(Core::Texture::CreateEmptyCubeMapTexture(
-          "cubeMapShadowMap", cubeShadowDetail));
+          "shadowCubeMap", cubeShadowDetail));
   cubeMapShadowMapFramebuffer = std::make_shared<Core::Framebuffer>();
   cubeMapShadowMapFramebuffer->AttachTexture(cubeMapShadowTexture,
                                              GL_DEPTH_ATTACHMENT, true);
@@ -203,16 +203,6 @@ void Particle::App::Run() {
 
       cubeMapShadowMapFramebuffer->Unbind();
 
-      shadowMapFramebuffer->Bind();
-      Core::Renderer::AdjustViewport(1024, 1024, false);
-      Core::Renderer::DepthTest(true);
-      Core::Renderer::SetClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-      Core::Renderer::Clear(GL_DEPTH_BUFFER_BIT);
-
-      Core::Renderer::RenderShadowMap();
-
-      shadowMapFramebuffer->Unbind();
-
       framebuffer->Bind();
       Core::Renderer::AdjustViewport(Core::Window::GetWidth(),
                                      Core::Window::GetHeight(), false);
@@ -220,6 +210,7 @@ void Particle::App::Run() {
       Core::Renderer::SetClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       Core::Renderer::Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+      cubeMapShadowMapFramebuffer->BindTextures();
       Core::Renderer::Render();
 
       framebuffer->Unbind();
@@ -240,7 +231,7 @@ void Particle::App::Run() {
       renderPlane->mesh->material->SetInt("depthTexture",
                                           Core::Texture::GetTextureID("depth"));
       renderPlane->mesh->material->SetInt(
-          "shadowTexture", Core::Texture::GetTextureID("shadowMap"));
+          "shadowTexture", Core::Texture::GetTextureID("shadowCubeMap"));
 
       renderPlane->mesh->material->SetInt(
           "outlineTexture", Core::Texture::GetTextureID("outline"));
@@ -251,6 +242,7 @@ void Particle::App::Run() {
       renderPlane->mesh->BindVertexArray();
       framebuffer->BindTextures();
       edgeDetectionFramebuffer->BindTextures();
+      cubeMapShadowMapFramebuffer->BindTextures();
       glDrawElements(GL_TRIANGLES, renderPlane->mesh->GetIndiceLength(),
                      GL_UNSIGNED_INT, 0);
 

@@ -53,21 +53,21 @@ Core::Shader Core::Shader::CreateShaderWithGeometry(
       shader.createShader(vertexCode.c_str(), GL_VERTEX_SHADER);
   glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
   if (!success) {
-    glGetShaderInfoLog(shader.id, 512, NULL, infoLog);
+    glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
     throw std::runtime_error(infoLog);
   }
   unsigned int geometryShader =
       shader.createShader(geometryCode.c_str(), GL_GEOMETRY_SHADER);
   glGetShaderiv(geometryShader, GL_COMPILE_STATUS, &success);
   if (!success) {
-    glGetShaderInfoLog(shader.id, 512, NULL, infoLog);
+    glGetShaderInfoLog(geometryShader, 512, NULL, infoLog);
     throw std::runtime_error(infoLog);
   }
   unsigned int fragmentShader =
       shader.createShader(fragmentCode.c_str(), GL_FRAGMENT_SHADER);
   glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
   if (!success) {
-    glGetShaderInfoLog(shader.id, 512, NULL, infoLog);
+    glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
     std::println("{}", infoLog);
     throw std::runtime_error(infoLog);
   }
@@ -102,8 +102,20 @@ Core::Shader::Shader(const std::string &vertexPath,
 
   unsigned int vertexShader =
       createShader(vertexCode.c_str(), GL_VERTEX_SHADER);
+  glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+  if (!success) {
+    glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+    std::println("{}", infoLog);
+    throw std::runtime_error(infoLog);
+  }
   unsigned int fragmentShader =
       createShader(fragmentCode.c_str(), GL_FRAGMENT_SHADER);
+  glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+  if (!success) {
+    glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+    std::println("{}", infoLog);
+    throw std::runtime_error(infoLog);
+  }
 
   id = glCreateProgram();
   glAttachShader(id, vertexShader);

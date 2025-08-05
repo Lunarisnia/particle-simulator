@@ -13,7 +13,7 @@ uniform sampler2D depthTexture;
 uniform sampler2D colorTexture;
 uniform sampler2D normalTexture;
 
-uniform sampler2D shadowTexture;
+uniform samplerCube shadowTexture;
 
 uniform float globalFloat;
 uniform float globalFloat2;
@@ -51,7 +51,7 @@ vec3 useKernel3x3(float kernel[9], float offset) {
 void main()
 {
     vec4 screen = texture(screenTexture, vertexAttribute.textureCoord);
-    vec4 shadowTex = texture(shadowTexture, vertexAttribute.textureCoord);
+    // vec4 shadowTex = texture(shadowTexture, vertexAttribute.textureCoord);
     // vec4 outline = texture(outlineTexture, vertexAttribute.textureCoord);
     //
     // vec4 depth = texture(depthTexture, vertexAttribute.textureCoord);

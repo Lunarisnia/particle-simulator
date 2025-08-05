@@ -3,12 +3,14 @@
 #include <vector>
 #include "core/components/mesh.hpp"
 #include "core/object/object.hpp"
+#include "core/shader/shader.hpp"
 #include "glad/glad.h"
 namespace Core {
 class Renderer {
  private:
   static std::vector<std::shared_ptr<Mesh>> renderQueue;
   static std::shared_ptr<Core::Object> skybox;
+  static Shader shadowMappingShader;
 
  public:
   static void Init();

@@ -12,7 +12,6 @@
 #include "core/components/spot_light.hpp"
 #include "core/object/object.hpp"
 #include "core/static_camera/static_camera.hpp"
-#include "core/static_light/static_light.hpp"
 #include "core/texture/texture.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/trigonometric.hpp"
@@ -148,9 +147,9 @@ void Particle::Simulation::Update() {
         "camera.position", Core::StaticCamera::transform->GetWorldPosition());
     object->mesh->material->SetFloat("globalFloat", globalFloat);
     object->mesh->material->SetFloat("globalFloat2", globalFloat2);
-    object->mesh->material->SetMat4("lightSpaceMatrix",
-                                    Core::StaticLight::GetLightSpaceMatrix());
-    object->mesh->material->SetInt("shadowMap",
-                                   Core::Texture::GetTextureID("shadowMap"));
+    /*object->mesh->material->SetMat4("lightSpaceMatrix",*/
+    /*                                Core::StaticLight::GetLightSpaceMatrix());*/
+    object->mesh->material->SetInt(
+        "shadowCubeMap", Core::Texture::GetTextureID("shadowCubeMap"));
   }
 }

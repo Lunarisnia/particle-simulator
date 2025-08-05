@@ -17,6 +17,7 @@
 
 std::vector<std::shared_ptr<Core::Mesh>> Core::Renderer::renderQueue;
 std::shared_ptr<Core::Object> Core::Renderer::skybox;
+Core::Shader Core::Renderer::shadowMappingShader;
 
 void Core::Renderer::Init() {
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -54,6 +55,10 @@ void Core::Renderer::Init() {
                        "./assets/skybox/back.jpg");
   mesh->material->LoadTextureCubeMap("skyBox", textureFaces, GL_RGB, GL_RGB);
   mesh->material->SetInt("cubeTexture", Core::Texture::GetTextureID("skyBox"));
+  shadowMappingShader = Shader::CreateShaderWithGeometry(
+      "./shaders/shadow/shadow_cube_map.vert",
+      "./shaders/shadow/shadow_cube_map_geometry.glsl",
+      "./shaders/shadow/shadow_cube_map.frag");
   DepthTest(true);
 }
 
@@ -110,10 +115,6 @@ void Core::Renderer::Render() {
   }
 }
 void Core::Renderer::RenderShadowCubeMap() {
-  Shader shadowMappingShader = Shader::CreateShaderWithGeometry(
-      "./shaders/shadow/shadow_cube_map.vert",
-      "./shaders/shadow/shadow_cube_map_geometry.glsl",
-      "./shaders/shadow/shadow_cube_map.frag");
   glCullFace(GL_FRONT);
   for (std::shared_ptr<Mesh> &mesh : renderQueue) {
     if (!mesh->isActive) {
@@ -128,18 +129,17 @@ void Core::Renderer::RenderShadowCubeMap() {
       continue;
     }
 
+    // TODO: Try continuing after the hooking of the cubemap shader part
     /*mesh->material->Use();*/
     shadowMappingShader.Use();
     shadowMappingShader.SetMat4("model",
                                 owner->transform->GetTransformMatrix());
-    /*shadowMappingShader.SetMat4("lightSpaceMatrix",*/
-    /*                            StaticLight::GetLightSpaceMatrix());*/
     if (owner->GetComponent<Core::PointLight>() != nullptr) {
       std::shared_ptr<Core::PointLight> pointLight =
           owner->GetComponent<Core::PointLight>();
       std::vector<glm::mat4> shadowMapMatrices =
           pointLight->GetCubeMapLightMatrix();
-      shadowMappingShader.SetFloat("farPlane", 0.25f);
+      shadowMappingShader.SetFloat("farPlane", 25.0f);
       shadowMappingShader.SetVec3("lightPos", owner->transform->position);
       for (size_t i = 0; i < 6; i++) {
         shadowMappingShader.SetMat4(std::format("shadowMatrices[{}]", i),

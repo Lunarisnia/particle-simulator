@@ -12,6 +12,7 @@ class PointLight : public Component {
   glm::vec3 diffuse;
   glm::vec3 specular;
 
+  float farPlane = 25.0f;
   float constant;
   float linear;
   float quadratic;

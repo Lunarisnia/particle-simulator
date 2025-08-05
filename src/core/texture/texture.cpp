@@ -26,6 +26,7 @@ Core::Texture Core::Texture::CreateEmptyCubeMapTexture(
   texture.SetParameterInt(GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
   texture.Unbind();
+  loadedTextures.emplace(name, texture);
   return texture;
 }
 
