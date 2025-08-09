@@ -18,6 +18,7 @@
 std::vector<std::shared_ptr<Core::Mesh>> Core::Renderer::renderQueue;
 std::shared_ptr<Core::Object> Core::Renderer::skybox;
 Core::Shader Core::Renderer::shadowMappingShader;
+bool Core::Renderer::enableSkybox = true;
 
 void Core::Renderer::Init() {
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -103,14 +104,16 @@ void Core::Renderer::Render() {
 
     glDrawElements(GL_TRIANGLES, mesh->GetIndiceLength(), GL_UNSIGNED_INT, 0);
 
-    glDepthFunc(GL_LEQUAL);
-    skybox->mesh->material->Use();
-    skybox->mesh->material->SetMat4("view", StaticCamera::GetViewMatrix());
-    skybox->mesh->material->SetMat4("projection",
-                                    StaticCamera::GetProjectionMatrix());
-    skybox->mesh->BindVertexArray();
-    glDrawElements(GL_TRIANGLES, skybox->mesh->GetIndiceLength(),
-                   GL_UNSIGNED_INT, 0);
+    if (enableSkybox) {
+      glDepthFunc(GL_LEQUAL);
+      skybox->mesh->material->Use();
+      skybox->mesh->material->SetMat4("view", StaticCamera::GetViewMatrix());
+      skybox->mesh->material->SetMat4("projection",
+                                      StaticCamera::GetProjectionMatrix());
+      skybox->mesh->BindVertexArray();
+      glDrawElements(GL_TRIANGLES, skybox->mesh->GetIndiceLength(),
+                     GL_UNSIGNED_INT, 0);
+    }
     glDepthFunc(GL_LESS);
   }
 }

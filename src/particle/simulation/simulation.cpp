@@ -7,10 +7,13 @@
 #include <random>
 #include <string>
 #include <vector>
+#include "GLFW/glfw3.h"
 #include "core/components/component.hpp"
 #include "core/components/point_light.hpp"
 #include "core/components/spot_light.hpp"
+#include "core/input/input.hpp"
 #include "core/object/object.hpp"
+#include "core/renderer/renderer.hpp"
 #include "core/static_camera/static_camera.hpp"
 #include "core/texture/texture.hpp"
 #include "glm/ext/vector_float3.hpp"
@@ -151,5 +154,13 @@ void Particle::Simulation::Update() {
     /*                                Core::StaticLight::GetLightSpaceMatrix());*/
     object->mesh->material->SetInt(
         "shadowCubeMap", Core::Texture::GetTextureID("shadowCubeMap"));
+  }
+
+  if (Core::Input::GetKey(GLFW_KEY_LEFT_SHIFT) &&
+      Core::Input::GetKey(GLFW_KEY_S)) {
+    Core::Renderer::enableSkybox = false;
+  }
+  if (Core::Input::GetKey(GLFW_KEY_S)) {
+    Core::Renderer::enableSkybox = true;
   }
 }

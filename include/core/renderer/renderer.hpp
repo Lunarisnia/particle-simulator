@@ -13,6 +13,9 @@ class Renderer {
   static Shader shadowMappingShader;
 
  public:
+  static bool enableSkybox;
+
+ public:
   static void Init();
   static void SetClearColor(float r, float g, float b, float a);
   static void Render();
