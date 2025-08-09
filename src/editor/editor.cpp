@@ -1,3 +1,4 @@
+#include "core/input/input.hpp"
 #include "particle/simulation/simulation.hpp"
 #include "editor/editor.hpp"
 #include "backends/imgui_impl_glfw.h"
@@ -41,6 +42,9 @@ void Editor::Editor::Update() {
                    0.001f);
   ImGui::DragFloat("Global Shader Float2", &Particle::Simulation::globalFloat2,
                    0.001f);
+  ImGui::Text("Mouse Coord: (X:%f, Y:%f)",
+              (Core::Input::mouse.ToNDCPosition().x + 1.0f) / 2.0f,
+              (Core::Input::mouse.ToNDCPosition().y + 1.0f) / 2.0f);
   ImGui::End();
   Hierarchy::Tick();
   Inspector::Tick();

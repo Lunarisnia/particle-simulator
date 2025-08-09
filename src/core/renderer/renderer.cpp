@@ -12,6 +12,7 @@
 #include "core/static_camera/static_camera.hpp"
 #include "core/static_light/static_light.hpp"
 #include "core/texture/texture.hpp"
+#include "core/time/time.hpp"
 #include "core/window/window.hpp"
 #include "glm/ext/matrix_float4x4.hpp"
 
@@ -97,6 +98,7 @@ void Core::Renderer::Render() {
     mesh->material->SetMat4("model", owner->transform->GetTransformMatrix());
     mesh->material->SetMat4("view", StaticCamera::GetViewMatrix());
     mesh->material->SetMat4("projection", StaticCamera::GetProjectionMatrix());
+    mesh->material->SetFloat("currentTime", Time::timeSinceStartup);
     mesh->BindVertexArray();
 
     glDrawElements(GL_TRIANGLES, mesh->GetIndiceLength(), GL_UNSIGNED_INT, 0);
