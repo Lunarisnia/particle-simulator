@@ -145,15 +145,14 @@ void Particle::Simulation::Update() {
           spotLightCubes[i]->GetComponent<Core::SpotLight>();
       spotLight->SetMeshUniform(std::format("spotLight[{}]", i), object);
     }
-
-    object->mesh->material->SetVec3(
-        "camera.position", Core::StaticCamera::transform->GetWorldPosition());
-    object->mesh->material->SetFloat("globalFloat", globalFloat);
-    object->mesh->material->SetFloat("globalFloat2", globalFloat2);
-    /*object->mesh->material->SetMat4("lightSpaceMatrix",*/
-    /*                                Core::StaticLight::GetLightSpaceMatrix());*/
-    object->mesh->material->SetInt(
-        "shadowCubeMap", Core::Texture::GetTextureID("shadowCubeMap"));
+    if (object->isActive) {
+      object->mesh->material->SetVec3(
+          "camera.position", Core::StaticCamera::transform->GetWorldPosition());
+      object->mesh->material->SetFloat("globalFloat", globalFloat);
+      object->mesh->material->SetFloat("globalFloat2", globalFloat2);
+      object->mesh->material->SetInt(
+          "shadowCubeMap", Core::Texture::GetTextureID("shadowCubeMap"));
+    }
   }
 
   if (Core::Input::GetKey(GLFW_KEY_LEFT_SHIFT) &&

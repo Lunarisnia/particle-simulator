@@ -81,11 +81,11 @@ void Core::Renderer::AdjustViewport(int width, int height, bool scaleUp) {
 
 void Core::Renderer::Render() {
   for (std::shared_ptr<Mesh> &mesh : renderQueue) {
-    if (!mesh->isActive) {
-      continue;
-    }
     Object *owner = mesh->GetOwner();
     if (!owner) {
+      continue;
+    }
+    if (!mesh->isActive || !owner->isActive) {
       continue;
     }
     // FIXME: Do better than this
@@ -98,9 +98,6 @@ void Core::Renderer::Render() {
     mesh->material->SetMat4("view", StaticCamera::GetViewMatrix());
     mesh->material->SetMat4("projection", StaticCamera::GetProjectionMatrix());
     mesh->BindVertexArray();
-    // TODO: add toggle for wireframe rendering somewhere
-    /*glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);*/
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     glDrawElements(GL_TRIANGLES, mesh->GetIndiceLength(), GL_UNSIGNED_INT, 0);
 
@@ -117,14 +114,15 @@ void Core::Renderer::Render() {
     glDepthFunc(GL_LESS);
   }
 }
+
 void Core::Renderer::RenderShadowCubeMap() {
   glCullFace(GL_FRONT);
   for (std::shared_ptr<Mesh> &mesh : renderQueue) {
-    if (!mesh->isActive) {
-      continue;
-    }
     Object *owner = mesh->GetOwner();
     if (!owner) {
+      continue;
+    }
+    if (!mesh->isActive || !owner->isActive) {
       continue;
     }
     // FIXME: Do better than this
@@ -162,11 +160,11 @@ void Core::Renderer::RenderShadowMap() {
                                       "./shaders/shadow/simple_shadow.frag"};
   glCullFace(GL_FRONT);
   for (std::shared_ptr<Mesh> &mesh : renderQueue) {
-    if (!mesh->isActive) {
-      continue;
-    }
     Object *owner = mesh->GetOwner();
     if (!owner) {
+      continue;
+    }
+    if (!mesh->isActive || !owner->isActive) {
       continue;
     }
     // FIXME: Do better than this

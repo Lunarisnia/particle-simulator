@@ -9,6 +9,7 @@ namespace Core {
 class Object {
  public:
   std::string name;
+  bool isActive = true;
   std::shared_ptr<Transform> transform;
   std::shared_ptr<Mesh> mesh;
 
