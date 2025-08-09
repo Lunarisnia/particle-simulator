@@ -104,28 +104,11 @@ void Particle::Simulation::Init() {
                                Core::Texture::GetTextureID(brickWallNormal));
   cubes.emplace_back(ball);
 
-  const std::string containerTexture = "./assets/container2.png";
-  const std::string containerSpecular = "./assets/container2_specular.png";
-  std::shared_ptr<Core::Object> cube =
-      Primitive::CreateCube(vertexPathV2, blinPhongFrag);
-  cube->transform->position = glm::vec3(0.0f, -2.0f, -1.0f);
-  cube->transform->scale = glm::vec3(10.0f, 1.0f, 10.0f);
-  cube->name = "Floor";
-  cube->mesh->material->LoadTexture(containerTexture, GL_SRGB_ALPHA, GL_RGBA);
-  cube->mesh->material->LoadTexture(containerSpecular, GL_SRGB_ALPHA, GL_RGBA);
-  cube->mesh->material->SetInt("material.diffuse",
-                               Core::Texture::GetTextureID(containerTexture));
-  cube->mesh->material->SetInt("material.specular",
-                               Core::Texture::GetTextureID(containerSpecular));
-  cube->mesh->material->SetInt("material.normal",
-                               Core::Texture::GetTextureID(brickWallNormal));
-  cubes.emplace_back(cube);
-
   try {
     Particle::Model model;
     /*model.LoadModel("./assets/honkai-star-rail-jingliu/source/JingiluV3.fbx");*/
-    model.LoadModel("./assets/bed-room/bed-room.obj");
-    model.StoreMeshes(cubes);
+    /*model.LoadModel("./assets/bed-room/bed-room.obj");*/
+    /*model.StoreMeshes(cubes);*/
   } catch (std::exception &error) {
     std::println("{}", error.what());
   }

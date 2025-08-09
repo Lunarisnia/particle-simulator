@@ -8,6 +8,7 @@ void Editor::Inspector::Tick() {
     ImGui::DragFloat3("Transform",
                       &Core::World::selectedObject->transform->position.x,
                       0.05f);
+    ImGui::Checkbox("Is Active", &Core::World::selectedObject->isActive);
   } else {
     ImGui::Text("Selected: NONE");
   }
