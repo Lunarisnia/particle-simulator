@@ -4,6 +4,7 @@
 #include "core/shader/shader.hpp"
 #include "core/texture/texture.hpp"
 #include "glm/ext/matrix_float4x4.hpp"
+#include "glm/ext/vector_float2.hpp"
 
 Core::Material::Material(Core::Shader shader) : shader(shader) {}
 
@@ -28,6 +29,10 @@ void Core::Material::SetInt(const std::string &uniform, int i) {
 
 void Core::Material::SetFloat(const std::string &uniform, float f) {
   shader.SetFloat(uniform, f);
+}
+
+void Core::Material::SetVec2(const std::string &uniform, glm::vec2 vec2) {
+  shader.SetVec2(uniform, vec2);
 }
 
 void Core::Material::LoadTexture(const std::string &path, int colorSpace,

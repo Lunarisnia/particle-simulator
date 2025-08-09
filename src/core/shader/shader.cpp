@@ -158,6 +158,12 @@ void Core::Shader::SetFloat(const std::string &uniform, float f) {
   glUniform1f(uniformId, f);
 }
 
+void Core::Shader::SetVec2(const std::string &uniform, glm::vec2 vec2) {
+  Use();
+  int uniformId = glGetUniformLocation(id, uniform.c_str());
+  glUniform2fv(uniformId, 1, glm::value_ptr(vec2));
+}
+
 unsigned int Core::Shader::createShader(const char *source, int shaderType) {
   unsigned int shader = glCreateShader(shaderType);
   glShaderSource(shader, 1, &source, NULL);

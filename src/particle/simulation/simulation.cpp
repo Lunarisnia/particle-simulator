@@ -90,18 +90,18 @@ void Particle::Simulation::Init() {
 
   const std::string brickWallTexture = "./assets/brickwall.jpg";
   const std::string brickWallNormal = "./assets/brickwall_normal.jpg";
-  std::shared_ptr<Core::Object> ball =
-      Primitive::CreateUVSphere(vertexPathV2, blinPhongFrag, "Hello", 256, 256);
-  ball->transform->position = glm::vec3(-2.0f, 0.0f, 0.0f);
+  std::shared_ptr<Core::Object> ball = Primitive::CreateUVSphere(
+      vertexPathV2, "./shaders/video-demo/diffuse.frag", "Hello", 256, 256);
+  /*ball->transform->position = glm::vec3(-2.0f, 0.0f, 0.0f);*/
   ball->name = "Ball";
-  ball->mesh->material->LoadTexture(brickWallTexture, GL_SRGB, GL_RGB);
-  ball->mesh->material->LoadTexture(brickWallNormal, GL_RGB, GL_RGB);
-  ball->mesh->material->SetInt("material.diffuse",
-                               Core::Texture::GetTextureID(brickWallTexture));
-  ball->mesh->material->SetInt("material.specular",
-                               Core::Texture::GetTextureID(brickWallTexture));
-  ball->mesh->material->SetInt("material.normal",
-                               Core::Texture::GetTextureID(brickWallNormal));
+  /*ball->mesh->material->LoadTexture(brickWallTexture, GL_SRGB, GL_RGB);*/
+  /*ball->mesh->material->LoadTexture(brickWallNormal, GL_RGB, GL_RGB);*/
+  /*ball->mesh->material->SetInt("material.diffuse",*/
+  /*                             Core::Texture::GetTextureID(brickWallTexture));*/
+  /*ball->mesh->material->SetInt("material.specular",*/
+  /*                             Core::Texture::GetTextureID(brickWallTexture));*/
+  /*ball->mesh->material->SetInt("material.normal",*/
+  /*                             Core::Texture::GetTextureID(brickWallNormal));*/
   cubes.emplace_back(ball);
 
   try {
@@ -135,6 +135,8 @@ void Particle::Simulation::Update() {
       object->mesh->material->SetFloat("globalFloat2", globalFloat2);
       object->mesh->material->SetInt(
           "shadowCubeMap", Core::Texture::GetTextureID("shadowCubeMap"));
+      object->mesh->material->SetVec2("mousePosition",
+                                      Core::Input::mouse.ToNDCPosition());
     }
   }
 

@@ -4,6 +4,7 @@
 namespace Core {
 class Mouse {
  public:
+  glm::vec2 position;
   int x, y;
 
  public:

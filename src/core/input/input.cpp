@@ -3,6 +3,7 @@
 #include "GLFW/glfw3.h"
 #include "core/input/mouse.hpp"
 #include "core/window/window.hpp"
+#include "glm/ext/vector_float2.hpp"
 
 Core::Mouse Core::Input::mouse(0, 0);
 
@@ -37,6 +38,7 @@ void Core::Input::PollMouse() {
 
   mouse.x = xPos;
   mouse.y = yPos;
+  mouse.position = glm::vec2(xPos, yPos);
 }
 
 void Core::Input::Cleanup() {}
