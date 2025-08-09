@@ -52,16 +52,16 @@ void main()
 {
     vec4 screen = texture(screenTexture, vertexAttribute.textureCoord);
     // vec4 shadowTex = texture(shadowTexture, vertexAttribute.textureCoord);
-    // vec4 outline = texture(outlineTexture, vertexAttribute.textureCoord);
-    //
-    // vec4 depth = texture(depthTexture, vertexAttribute.textureCoord);
-    // float kernel[9] = float[](
-    //         0.5f, 1.0f, 0.5f,
-    //         1.0f, 2.0f, 1.0f,
-    //         0.5f, 1.0f, 0.5f
-    //     );
-    // vec3 blur = useKernel3x3(kernel, 1.0f / 1000.0f);
+    vec4 outline = texture(outlineTexture, vertexAttribute.textureCoord);
 
-    // vec3 color = mix(screen.rgb, vec3(0.0f), outline.rgb);
-    FragColor = vec4(screen.rgb, 1.0f);
+    vec4 depth = texture(depthTexture, vertexAttribute.textureCoord);
+    float kernel[9] = float[](
+            0.5f, 1.0f, 0.5f,
+            1.0f, 2.0f, 1.0f,
+            0.5f, 1.0f, 0.5f
+        );
+    vec3 blur = useKernel3x3(kernel, 1.0f / 1000.0f);
+
+    vec3 color = mix(screen.rgb, vec3(0.0f), outline.rgb);
+    FragColor = vec4(color, 1.0f);
 }

@@ -65,7 +65,8 @@ void main()
     vec3 depthSobelX = useKernel3x3(sobelXKernel, 1.0f / 900.0f, depthTexture);
     vec3 depthSobelY = useKernel3x3(sobelYKernel, 1.0f / 900.0f, depthTexture);
 
-    vec3 outline = clamp(vec3(length(colorSobelX) + length(colorSobelY)), 0.0f, 1.0f);
+    // vec3 outline = clamp(vec3(length(normalSobelX) + length(normalSobelY)) + vec3(length(colorSobelX) + length(colorSobelY)), 0.0f, 1.0f);
+    vec3 outline = clamp(vec3(length(normalSobelX + colorSobelX) + length(normalSobelY + colorSobelY)), 0.0f, 1.0f);
     float f = dot(outline, vec3(1.0f)) / 3.0f;
 
     vec4 tex = texture(depthTexture, vertexAttribute.textureCoord);

@@ -17,6 +17,7 @@ in vec3 objectColor;
 
 struct PointLight {
     vec3 position;
+    float farPlane;
 
     vec3 diffuse;
     vec3 specular;
@@ -24,15 +25,31 @@ struct PointLight {
 
 uniform PointLight pointLight[2];
 uniform float globalFloat;
+uniform samplerCube shadowCubeMap;
+
+float calculateShadow(vec3 fragPos, vec3 lightPos, vec3 lightDir, float farPlane, vec3 normal) {
+    vec3 fragToLight = fragPos - lightPos;
+    float closestDepth = texture(shadowCubeMap, fragToLight).x;
+    closestDepth *= farPlane;
+    float currentDepth = length(fragToLight);
+    // check whether current frag pos is in shadow
+    float bias = max(0.04f, 0.05 * (1.0f - dot(lightDir, normal)));
+    // float bias = 0.05f;
+    float shadow = currentDepth - bias > closestDepth ? 1.0f : 0.0f;
+    return shadow;
+}
 
 vec3 calculatePointLight(PointLight light, vec3 brightColor, vec3 shadowColor) {
     vec3 color = vec3(0.0f);
     vec3 lightDir = normalize(light.position - vertexAttribute.fragPos);
     float diff = max(0.0f, dot(lightDir, vertexAttribute.normal));
-    vec3 diffuse = mix(shadowColor, brightColor, step(globalFloat, diff));
+    vec3 diffuse = mix(shadowColor, brightColor, step(0.510f, diff));
     // vec3 diffuse = brightColor * diff;
 
-    color += diffuse;
+    float bias = 0.05f;
+    float shadow = calculateShadow(vertexAttribute.fragPos, light.position, lightDir, light.farPlane, vertexAttribute.normal);
+    color += mix(vec3(0.0f), diffuse, 1.0f - shadow);
+    // color += diffuse;
     return color;
 }
 

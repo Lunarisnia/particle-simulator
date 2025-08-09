@@ -215,6 +215,26 @@ void Particle::App::Run() {
 
       framebuffer->Unbind();
 
+      edgeDetectionFramebuffer->Bind();
+      Core::Renderer::AdjustViewport(Core::Window::GetWidth(),
+                                     Core::Window::GetHeight(), false);
+      Core::Renderer::DepthTest(false);
+      Core::Renderer::SetClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+      Core::Renderer::Clear(GL_COLOR_BUFFER_BIT);
+
+      edgeDetectionPlane->mesh->material->Use();
+      edgeDetectionPlane->mesh->material->SetInt(
+          "colorTexture", Core::Texture::GetTextureID("color"));
+      edgeDetectionPlane->mesh->material->SetInt(
+          "normalTexture", Core::Texture::GetTextureID("normal"));
+      edgeDetectionPlane->mesh->material->SetInt(
+          "depthTexture", Core::Texture::GetTextureID("depth"));
+      edgeDetectionPlane->mesh->BindVertexArray();
+      framebuffer->BindTextures();
+      glDrawElements(GL_TRIANGLES, edgeDetectionPlane->mesh->GetIndiceLength(),
+                     GL_UNSIGNED_INT, 0);
+      edgeDetectionFramebuffer->Unbind();
+
       Core::Renderer::AdjustViewport(Core::Window::GetWidth(),
                                      Core::Window::GetHeight(), true);
       Core::Renderer::DepthTest(false);
