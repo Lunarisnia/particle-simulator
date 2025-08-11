@@ -13,13 +13,13 @@
 #include "core/components/spot_light.hpp"
 #include "core/input/input.hpp"
 #include "core/object/object.hpp"
+#include "core/primitive/primitive.hpp"
 #include "core/renderer/renderer.hpp"
 #include "core/static_camera/static_camera.hpp"
 #include "core/texture/texture.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/trigonometric.hpp"
 #include "particle/model/model.hpp"
-#include "particle/primitive/primitive.hpp"
 
 float Particle::Simulation::globalFloat = 0.0f;
 float Particle::Simulation::globalFloat2 = 0.0f;
@@ -45,7 +45,7 @@ void Particle::Simulation::Init() {
   std::uniform_real_distribution<float> dist(-3.5f, 3.5f);
   for (size_t i = 0; i < 1; i++) {
     std::shared_ptr<Core::Object> light =
-        Primitive::CreateCube(vertexPath, lightFrag);
+        Core::Primitive::CreateCube(vertexPath, lightFrag);
     std::shared_ptr<Core::PointLight> pointLight =
         light->AddComponent<Core::PointLight>();
     pointLight->ambient = glm::vec3(0.5f);
@@ -66,7 +66,7 @@ void Particle::Simulation::Init() {
   }
   for (size_t i = 0; i < 0; i++) {
     std::shared_ptr<Core::Object> light =
-        Primitive::CreateCube(vertexPath, lightFrag);
+        Core::Primitive::CreateCube(vertexPath, lightFrag);
     std::shared_ptr<Core::SpotLight> spotLight =
         light->AddComponent<Core::SpotLight>();
     spotLight->direction = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -90,7 +90,7 @@ void Particle::Simulation::Init() {
 
   const std::string brickWallTexture = "./assets/brickwall.jpg";
   const std::string brickWallNormal = "./assets/brickwall_normal.jpg";
-  std::shared_ptr<Core::Object> ball = Primitive::CreateUVSphere(
+  std::shared_ptr<Core::Object> ball = Core::Primitive::CreateUVSphere(
       vertexPathV2, "./shaders/video-demo/diffuse.frag", "Hello", 256, 256);
   /*ball->transform->position = glm::vec3(-2.0f, 0.0f, 0.0f);*/
   ball->name = "Ball";

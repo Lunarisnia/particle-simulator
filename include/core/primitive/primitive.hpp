@@ -2,7 +2,7 @@
 #include <memory>
 #include <string>
 #include "core/object/object.hpp"
-namespace Particle {
+namespace Core {
 class Primitive {
  public:
   static std::shared_ptr<Core::Object> CreatePlane(const std::string& vertPath,
@@ -14,4 +14,4 @@ class Primitive {
       const std::string& name, int sectorCount = 36, int stackCount = 18,
       float radius = 0.5f);
 };
-}  // namespace Particle
+}  // namespace Core

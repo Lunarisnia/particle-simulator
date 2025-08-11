@@ -7,6 +7,7 @@
 #include "core/components/point_light.hpp"
 #include "core/material/material.hpp"
 #include "core/object/object.hpp"
+#include "core/primitive/primitive.hpp"
 #include "core/procedural/procedural.hpp"
 #include "core/shader/shader.hpp"
 #include "core/static_camera/static_camera.hpp"
@@ -20,6 +21,7 @@ std::vector<std::shared_ptr<Core::Mesh>> Core::Renderer::renderQueue;
 std::shared_ptr<Core::Object> Core::Renderer::skybox;
 Core::Shader Core::Renderer::shadowMappingShader;
 bool Core::Renderer::enableSkybox = true;
+std::shared_ptr<Core::Object> Core::Renderer::viewport;
 
 void Core::Renderer::Init() {
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -62,6 +64,10 @@ void Core::Renderer::Init() {
       "./shaders/shadow/shadow_cube_map_geometry.glsl",
       "./shaders/shadow/shadow_cube_map.frag");
   DepthTest(true);
+
+  viewport = Core::Primitive::CreatePlane("./shaders/screen/screen.vert",
+                                          "./shaders/screen/screen.frag");
+  viewport->name = "RenderPlane";
 }
 
 void Core::Renderer::DepthTest(bool enable) {
@@ -115,6 +121,25 @@ void Core::Renderer::Render() {
     }
     glDepthFunc(GL_LESS);
   }
+}
+
+void Core::Renderer::RenderViewport() {
+  viewport->mesh->material->Use();
+  viewport->mesh->material->SetInt("screenTexture",
+                                   Core::Texture::GetTextureID("main"));
+  viewport->mesh->material->SetInt("colorTexture",
+                                   Core::Texture::GetTextureID("color"));
+  viewport->mesh->material->SetInt("normalTexture",
+                                   Core::Texture::GetTextureID("normal"));
+  viewport->mesh->material->SetInt("depthTexture",
+                                   Core::Texture::GetTextureID("depth"));
+  viewport->mesh->material->SetInt(
+      "shadowTexture", Core::Texture::GetTextureID("shadowCubeMap"));
+
+  viewport->mesh->material->SetInt("outlineTexture",
+                                   Core::Texture::GetTextureID("outline"));
+  glDrawElements(GL_TRIANGLES, viewport->mesh->GetIndiceLength(),
+                 GL_UNSIGNED_INT, 0);
 }
 
 void Core::Renderer::RenderShadowCubeMap() {

@@ -52,6 +52,7 @@ add_executable(${PROJECT_NAME}
 
 	# Procedural
 	core/procedural/procedural.cpp
+	core/primitive/primitive.cpp
 
 	# Static Light
 	core/static_light/static_light.cpp
@@ -68,7 +69,6 @@ add_executable(${PROJECT_NAME}
 	# Particle
 	particle/app.cpp
 	particle/simulation/simulation.cpp
-	particle/primitive/primitive.cpp
 	particle/model/model.cpp
 	particle/color_id/color_id.cpp
 

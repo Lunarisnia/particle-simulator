@@ -14,6 +14,7 @@ class Renderer {
 
  public:
   static bool enableSkybox;
+  static std::shared_ptr<Core::Object> viewport;
 
  public:
   static void Init();
@@ -21,6 +22,7 @@ class Renderer {
   static void Render();
   static void RenderShadowMap();
   static void RenderShadowCubeMap();
+  static void RenderViewport();
   static void Clear(int bit);
   static void AdjustViewport(int width, int height, bool scaleUp);
   static void DepthTest(bool enable);

@@ -1,4 +1,4 @@
-#include "particle/primitive/primitive.hpp"
+#include "core/primitive/primitive.hpp"
 #include <cstddef>
 #include <memory>
 #include <string>
@@ -7,7 +7,7 @@
 #include "core/shader/shader.hpp"
 #include "core/world/world.hpp"
 
-std::shared_ptr<Core::Object> Particle::Primitive::CreatePlane(
+std::shared_ptr<Core::Object> Core::Primitive::CreatePlane(
     const std::string& vertPath, const std::string& fragPath) {
   std::shared_ptr<Core::Object> obj = std::make_shared<Core::Object>();
   Core::Shader shader{vertPath, fragPath};
@@ -20,7 +20,7 @@ std::shared_ptr<Core::Object> Particle::Primitive::CreatePlane(
   return obj;
 }
 
-std::shared_ptr<Core::Object> Particle::Primitive::CreateCube(
+std::shared_ptr<Core::Object> Core::Primitive::CreateCube(
     const std::string& vertPath, const std::string& fragPath) {
   std::shared_ptr<Core::Object> obj = std::make_shared<Core::Object>();
   Core::Shader shader{vertPath, fragPath};
@@ -33,7 +33,7 @@ std::shared_ptr<Core::Object> Particle::Primitive::CreateCube(
   return obj;
 }
 
-std::shared_ptr<Core::Object> Particle::Primitive::CreateUVSphere(
+std::shared_ptr<Core::Object> Core::Primitive::CreateUVSphere(
     const std::string& vertPath, const std::string& fragPath,
     const std::string& name, int sectorCount, int stackCount, float radius) {
   std::shared_ptr<Core::Object> obj = std::make_shared<Core::Object>();

@@ -6,13 +6,13 @@
 #include "core/app.hpp"
 #include "core/framebuffer/framebuffer.hpp"
 #include "core/input/input.hpp"
+#include "core/primitive/primitive.hpp"
 #include "core/renderer/renderer.hpp"
 #include "core/texture/texture.hpp"
 #include "core/time/time.hpp"
 #include "core/window/window.hpp"
 #include "core/world/world.hpp"
 #include "editor/editor.hpp"
-#include "particle/primitive/primitive.hpp"
 #include "particle/simulation/simulation.hpp"
 Particle::App::App() {
   core = Core::App();
@@ -120,11 +120,11 @@ void Particle::App::initFramebuffer() {
 }
 
 void Particle::App::initRenderPlane() {
-  renderPlane = Primitive::CreatePlane("./shaders/screen/screen.vert",
-                                       "./shaders/screen/screen.frag");
+  renderPlane = Core::Primitive::CreatePlane("./shaders/screen/screen.vert",
+                                             "./shaders/screen/screen.frag");
   renderPlane->name = "RenderPlane";
 
-  edgeDetectionPlane = Primitive::CreatePlane(
+  edgeDetectionPlane = Core::Primitive::CreatePlane(
       "./shaders/screen/screen.vert", "./shaders/screen/edge_detection.frag");
   edgeDetectionPlane->name = "Edge";
 }
@@ -240,31 +240,18 @@ void Particle::App::Run() {
       Core::Renderer::DepthTest(false);
       Core::Renderer::SetClearColor(0.3f, 0.3f, 0.3f, 1.0f);
       Core::Renderer::Clear(GL_COLOR_BUFFER_BIT);
-      // TODO: find a way to just use the existing renderer here later
-      renderPlane->mesh->material->Use();
-      renderPlane->mesh->material->SetInt("screenTexture",
-                                          Core::Texture::GetTextureID("main"));
-      renderPlane->mesh->material->SetInt("colorTexture",
-                                          Core::Texture::GetTextureID("color"));
-      renderPlane->mesh->material->SetInt(
-          "normalTexture", Core::Texture::GetTextureID("normal"));
-      renderPlane->mesh->material->SetInt("depthTexture",
-                                          Core::Texture::GetTextureID("depth"));
-      renderPlane->mesh->material->SetInt(
-          "shadowTexture", Core::Texture::GetTextureID("shadowCubeMap"));
 
-      renderPlane->mesh->material->SetInt(
-          "outlineTexture", Core::Texture::GetTextureID("outline"));
-      renderPlane->mesh->material->SetFloat("globalFloat",
-                                            Simulation::globalFloat);
-      renderPlane->mesh->material->SetFloat("globalFloat2",
-                                            Simulation::globalFloat2);
+      // TODO: Abstract better than this
+      Core::Renderer::viewport->mesh->material->Use();
+      Core::Renderer::viewport->mesh->material->SetFloat(
+          "globalFloat", Simulation::globalFloat);
+      Core::Renderer::viewport->mesh->material->SetFloat(
+          "globalFloat2", Simulation::globalFloat2);
       renderPlane->mesh->BindVertexArray();
       framebuffer->BindTextures();
       edgeDetectionFramebuffer->BindTextures();
       cubeMapShadowMapFramebuffer->BindTextures();
-      glDrawElements(GL_TRIANGLES, renderPlane->mesh->GetIndiceLength(),
-                     GL_UNSIGNED_INT, 0);
+      Core::Renderer::RenderViewport();
 
       Editor::Editor::Render();
 
