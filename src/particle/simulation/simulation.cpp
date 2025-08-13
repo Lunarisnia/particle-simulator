@@ -93,7 +93,7 @@ void Particle::Simulation::Init() {
   Core::Shader ballShader = Core::Shader::CreateShader(
       vertexPathV2, "./shaders/video-demo/diffuse.frag");
   std::shared_ptr<Core::Object> ball =
-      Core::Primitive::CreateUVSphere(ballShader, "Hello", 16, 8);
+      Core::Primitive::CreateUVSphere(ballShader, "Hello", 32, 16);
   ball->isActive = true;
   ball->name = "Ball";
   cubes.emplace_back(ball);

@@ -45,11 +45,12 @@ void main() {
     vec2 nmc = mousePosition + 1.0f / 2.0f;
     vec2 uv = gl_FragCoord.xy / vec2(1280.0f, 768.0f);
 
-    if (nmc.x > uv.x) {
-        // Demo for diffuse light
-        FragColor = vec4(calculateDirectionalLight(vec3(0.5f, 0.5f, 1.0f), vertexAttribute), 1.0f);
-        // FragColor = vec4(vec3(0.0f, 1.0f, 0.0f), 1.0f);
-    } else {
-        FragColor = vec4(vec3(1.0f), 1.0f);
-    }
+    FragColor = vec4(calculateDirectionalLight(vec3(cos(currentTime), sin(currentTime), 1.0f), vertexAttribute), 1.0f);
+    // if (nmc.x > uv.x) {
+    //     // Demo for diffuse light
+    //     FragColor = vec4(calculateDirectionalLight(vec3(0.5f, 0.5f, 1.0f), vertexAttribute), 1.0f);
+    //     // FragColor = vec4(vec3(0.0f, 1.0f, 0.0f), 1.0f);
+    // } else {
+    //     FragColor = vec4(vec3(1.0f), 1.0f);
+    // }
 }
