@@ -35,9 +35,9 @@ void Particle::Model::LoadModel(const std::string& path) {
   Assimp::Importer importer;
 
   // TODO: Flip UV disabled because of jingliu model
-  const aiScene* scene =
-      importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenNormals |
-                                  aiProcess_CalcTangentSpace);
+  const aiScene* scene = importer.ReadFile(
+      path, aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_FlipUVs |
+                aiProcess_CalcTangentSpace);
   if (!scene || !scene->mRootNode ||
       scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) {
     throw std::runtime_error(importer.GetErrorString());
@@ -67,6 +67,8 @@ void Particle::Model::processMesh(aiMesh* mesh, const aiScene* scene,
 
   Core::Shader shader{"./shaders/diffuse/diffuse_v2.vert",
                       "./shaders/sketch/sketch.frag"};
+  /*Core::Shader shader{"./shaders/diffuse/diffuse_v2.vert",*/
+  /*                    "./shaders/video-demo/diffuse.frag"};*/
   std::shared_ptr<Core::Material> material =
       std::make_shared<Core::Material>(shader);
   std::shared_ptr<Core::Mesh> objectMesh =

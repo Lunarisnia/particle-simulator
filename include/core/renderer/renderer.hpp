@@ -11,9 +11,11 @@ class Renderer {
   static std::vector<std::shared_ptr<Mesh>> renderQueue;
   static std::shared_ptr<Core::Object> skybox;
   static Shader shadowMappingShader;
+  static Shader visualizeNormalShader;
 
  public:
   static bool enableSkybox;
+  static bool drawNormal;
   static std::shared_ptr<Core::Object> viewport;
 
  public:

@@ -8,9 +8,8 @@
 #include "core/world/world.hpp"
 
 std::shared_ptr<Core::Object> Core::Primitive::CreatePlane(
-    const std::string& vertPath, const std::string& fragPath) {
+    Core::Shader shader) {
   std::shared_ptr<Core::Object> obj = std::make_shared<Core::Object>();
-  Core::Shader shader{vertPath, fragPath};
   std::shared_ptr<Core::Material> material =
       std::make_shared<Core::Material>(shader);
   std::shared_ptr<Core::Mesh> mesh = obj->AddComponent<Core::Mesh>(material);
@@ -34,10 +33,9 @@ std::shared_ptr<Core::Object> Core::Primitive::CreateCube(
 }
 
 std::shared_ptr<Core::Object> Core::Primitive::CreateUVSphere(
-    const std::string& vertPath, const std::string& fragPath,
-    const std::string& name, int sectorCount, int stackCount, float radius) {
+    Core::Shader shader, const std::string& name, int sectorCount,
+    int stackCount, float radius) {
   std::shared_ptr<Core::Object> obj = std::make_shared<Core::Object>();
-  Core::Shader shader{vertPath, fragPath};
   std::shared_ptr<Core::Material> material =
       std::make_shared<Core::Material>(shader);
   std::shared_ptr<Core::Mesh> mesh = obj->AddComponent<Core::Mesh>(material);

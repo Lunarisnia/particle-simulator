@@ -8,6 +8,7 @@
 #include "core/input/input.hpp"
 #include "core/primitive/primitive.hpp"
 #include "core/renderer/renderer.hpp"
+#include "core/shader/shader.hpp"
 #include "core/texture/texture.hpp"
 #include "core/time/time.hpp"
 #include "core/window/window.hpp"
@@ -120,12 +121,9 @@ void Particle::App::initFramebuffer() {
 }
 
 void Particle::App::initRenderPlane() {
-  renderPlane = Core::Primitive::CreatePlane("./shaders/screen/screen.vert",
-                                             "./shaders/screen/screen.frag");
-  renderPlane->name = "RenderPlane";
-
-  edgeDetectionPlane = Core::Primitive::CreatePlane(
-      "./shaders/screen/screen.vert", "./shaders/screen/edge_detection.frag");
+  Core::Shader edgeDetectionShader{"./shaders/screen/screen.vert",
+                                   "./shaders/screen/edge_detection.frag"};
+  edgeDetectionPlane = Core::Primitive::CreatePlane(edgeDetectionShader);
   edgeDetectionPlane->name = "Edge";
 }
 
@@ -247,7 +245,7 @@ void Particle::App::Run() {
           "globalFloat", Simulation::globalFloat);
       Core::Renderer::viewport->mesh->material->SetFloat(
           "globalFloat2", Simulation::globalFloat2);
-      renderPlane->mesh->BindVertexArray();
+      Core::Renderer::viewport->mesh->BindVertexArray();
       framebuffer->BindTextures();
       edgeDetectionFramebuffer->BindTextures();
       cubeMapShadowMapFramebuffer->BindTextures();

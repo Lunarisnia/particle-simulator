@@ -20,7 +20,9 @@
 std::vector<std::shared_ptr<Core::Mesh>> Core::Renderer::renderQueue;
 std::shared_ptr<Core::Object> Core::Renderer::skybox;
 Core::Shader Core::Renderer::shadowMappingShader;
+Core::Shader Core::Renderer::visualizeNormalShader;
 bool Core::Renderer::enableSkybox = true;
+bool Core::Renderer::drawNormal = false;
 std::shared_ptr<Core::Object> Core::Renderer::viewport;
 
 void Core::Renderer::Init() {
@@ -65,9 +67,14 @@ void Core::Renderer::Init() {
       "./shaders/shadow/shadow_cube_map.frag");
   DepthTest(true);
 
-  viewport = Core::Primitive::CreatePlane("./shaders/screen/screen.vert",
-                                          "./shaders/screen/screen.frag");
+  Core::Shader viewportShader{"./shaders/screen/screen.vert",
+                              "./shaders/screen/screen.frag"};
+  viewport = Core::Primitive::CreatePlane(viewportShader);
   viewport->name = "RenderPlane";
+
+  visualizeNormalShader = Shader::CreateShaderWithGeometry(
+      "./shaders/normal-viz/normal.vert", "./shaders/normal-viz/normal.glsl",
+      "./shaders/normal-viz/normal.frag");
 }
 
 void Core::Renderer::DepthTest(bool enable) {
@@ -108,6 +115,18 @@ void Core::Renderer::Render() {
     mesh->BindVertexArray();
 
     glDrawElements(GL_TRIANGLES, mesh->GetIndiceLength(), GL_UNSIGNED_INT, 0);
+
+    if (drawNormal) {
+      visualizeNormalShader.Use();
+      visualizeNormalShader.SetMat4("model",
+                                    owner->transform->GetTransformMatrix());
+      visualizeNormalShader.SetMat4("view", StaticCamera::GetViewMatrix());
+      visualizeNormalShader.SetMat4("projection",
+                                    StaticCamera::GetProjectionMatrix());
+      visualizeNormalShader.SetFloat("currentTime", Time::timeSinceStartup);
+      mesh->BindVertexArray();
+      glDrawElements(GL_TRIANGLES, mesh->GetIndiceLength(), GL_UNSIGNED_INT, 0);
+    }
 
     if (enableSkybox) {
       glDepthFunc(GL_LEQUAL);

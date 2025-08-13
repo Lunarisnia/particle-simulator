@@ -90,19 +90,24 @@ void Particle::Simulation::Init() {
 
   const std::string brickWallTexture = "./assets/brickwall.jpg";
   const std::string brickWallNormal = "./assets/brickwall_normal.jpg";
-  std::shared_ptr<Core::Object> ball = Core::Primitive::CreateUVSphere(
-      vertexPathV2, "./shaders/video-demo/diffuse.frag", "Hello", 256, 256);
-  /*ball->transform->position = glm::vec3(-2.0f, 0.0f, 0.0f);*/
+  Core::Shader ballShader = Core::Shader::CreateShader(
+      vertexPathV2, "./shaders/video-demo/diffuse.frag");
+  std::shared_ptr<Core::Object> ball =
+      Core::Primitive::CreateUVSphere(ballShader, "Hello", 16, 8);
+  ball->isActive = true;
   ball->name = "Ball";
-  /*ball->mesh->material->LoadTexture(brickWallTexture, GL_SRGB, GL_RGB);*/
-  /*ball->mesh->material->LoadTexture(brickWallNormal, GL_RGB, GL_RGB);*/
-  /*ball->mesh->material->SetInt("material.diffuse",*/
-  /*                             Core::Texture::GetTextureID(brickWallTexture));*/
-  /*ball->mesh->material->SetInt("material.specular",*/
-  /*                             Core::Texture::GetTextureID(brickWallTexture));*/
-  /*ball->mesh->material->SetInt("material.normal",*/
-  /*                             Core::Texture::GetTextureID(brickWallNormal));*/
   cubes.emplace_back(ball);
+
+  Core::Shader geoShader = Core::Shader::CreateShaderWithGeometry(
+      vertexPathV2, "./shaders/geometry-learning/geom.glsl",
+      "./shaders/geometry-learning/geom.frag");
+  /*Core::Shader geoShader = Core::Shader::CreateShader(*/
+  /*    vertexPathV2, "./shaders/geometry-learning/geom.frag");*/
+  std::shared_ptr<Core::Object> geometryTest =
+      Core::Primitive::CreatePlane(geoShader);
+  geometryTest->name = "GeometryTest";
+  geometryTest->isActive = false;
+  cubes.emplace_back(geometryTest);
 
   try {
     Particle::Model model;
@@ -146,5 +151,12 @@ void Particle::Simulation::Update() {
   }
   if (Core::Input::GetKey(GLFW_KEY_S)) {
     Core::Renderer::enableSkybox = true;
+  }
+  if (Core::Input::GetKey(GLFW_KEY_LEFT_SHIFT) &&
+      Core::Input::GetKey(GLFW_KEY_N)) {
+    Core::Renderer::drawNormal = false;
+  }
+  if (Core::Input::GetKey(GLFW_KEY_N)) {
+    Core::Renderer::drawNormal = true;
   }
 }
