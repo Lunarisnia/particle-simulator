@@ -94,7 +94,7 @@ void Particle::Simulation::Init() {
       vertexPathV2, "./shaders/video-demo/diffuse.frag");
   std::shared_ptr<Core::Object> ball =
       Core::Primitive::CreateUVSphere(ballShader, "Hello", 32, 16);
-  ball->isActive = true;
+  ball->isActive = false;
   ball->name = "Ball";
   cubes.emplace_back(ball);
 
@@ -112,8 +112,8 @@ void Particle::Simulation::Init() {
   try {
     Particle::Model model;
     /*model.LoadModel("./assets/honkai-star-rail-jingliu/source/JingiluV3.fbx");*/
-    /*model.LoadModel("./assets/bed-room/bed-room.obj");*/
-    /*model.StoreMeshes(cubes);*/
+    model.LoadModel("./assets/bed-room/bed-room.obj");
+    model.StoreMeshes(cubes);
   } catch (std::exception &error) {
     std::println("{}", error.what());
   }

@@ -60,6 +60,6 @@ void main() {
         // Demo for diffuse light
         FragColor = vec4(calculateDirectionalLightCell(vec3(0.5f, 0.5f, 1.0f), vertexAttribute), 1.0f);
     } else {
-        FragColor = vec4(calculateDirectionalLight(vec3(0.5f, 0.5f, 1.0f), vertexAttribute), 1.0f);
+        FragColor = vec4(1.0f);
     }
 }
