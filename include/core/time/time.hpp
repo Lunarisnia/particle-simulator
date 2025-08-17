@@ -4,6 +4,7 @@ class Time {
  public:
   static float timeSinceStartup;
   static float deltaTime;
+  static int frameSinceStartup;
 
  public:
   static void Tick();

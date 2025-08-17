@@ -3,10 +3,12 @@
 
 float Core::Time::timeSinceStartup = 0.0f;
 float Core::Time::deltaTime = 0.0f;
+int Core::Time::frameSinceStartup = 0;
 
 void Core::Time::Tick() {
   const float currentTime = (float)glfwGetTime();
 
   deltaTime = currentTime - timeSinceStartup;
   timeSinceStartup = currentTime;
+  frameSinceStartup++;
 }
