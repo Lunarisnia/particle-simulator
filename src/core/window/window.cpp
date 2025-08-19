@@ -11,8 +11,20 @@ void Core::Window::Init() {
   createWindow();
 }
 
-int Core::Window::GetHeight() { return height; }
-int Core::Window::GetWidth() { return width; }
+int Core::Window::GetHeight() {
+#if defined(WIN32)
+  return height;
+#else
+  return height * 2.0f;
+#endif
+}
+int Core::Window::GetWidth() {
+#if defined(WIN32)
+  return width;
+#else
+  return width * 2.0f;
+#endif
+}
 
 bool Core::Window::ShouldClose() {
   if (window == nullptr) {
