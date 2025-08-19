@@ -16,6 +16,7 @@
 #include "core/time/time.hpp"
 #include "core/window/window.hpp"
 #include "glm/ext/matrix_float4x4.hpp"
+#include "glm/ext/vector_float2.hpp"
 
 std::vector<std::shared_ptr<Core::Mesh>> Core::Renderer::renderQueue;
 std::shared_ptr<Core::Object> Core::Renderer::skybox;
@@ -68,7 +69,7 @@ void Core::Renderer::Init() {
   DepthTest(true);
 
   Core::Shader viewportShader{"./shaders/screen/screen.vert",
-                              "./shaders/screen/screen.frag"};
+                              "./shaders/screen/noise-viz.frag"};
   viewport = Core::Primitive::CreatePlane(viewportShader);
   viewport->name = "RenderPlane";
 
@@ -112,6 +113,8 @@ void Core::Renderer::Render() {
     mesh->material->SetMat4("view", StaticCamera::GetViewMatrix());
     mesh->material->SetMat4("projection", StaticCamera::GetProjectionMatrix());
     mesh->material->SetFloat("currentTime", Time::timeSinceStartup);
+    mesh->material->SetVec2("resolution", glm::vec2(Core::Window::GetWidth(),
+                                                    Core::Window::GetHeight()));
     mesh->BindVertexArray();
 
     glDrawElements(GL_TRIANGLES, mesh->GetIndiceLength(), GL_UNSIGNED_INT, 0);
@@ -152,6 +155,10 @@ void Core::Renderer::RenderViewport() {
                                    Core::Texture::GetTextureID("normal"));
   viewport->mesh->material->SetInt("depthTexture",
                                    Core::Texture::GetTextureID("depth"));
+  viewport->mesh->material->SetInt("currentFrame", Time::frameSinceStartup);
+  viewport->mesh->material->SetVec2(
+      "resolution",
+      glm::vec2(Core::Window::GetWidth(), Core::Window::GetHeight()));
   viewport->mesh->material->SetInt(
       "shadowTexture", Core::Texture::GetTextureID("shadowCubeMap"));
 
