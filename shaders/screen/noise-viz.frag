@@ -83,19 +83,15 @@ vec3 valueNoise() {
     return vec3(color.x);
 }
 
-vec3 perlinNoise() {
-    vec2 uv = gl_FragCoord.xy / resolution;
-    uv *= 20.0f;
-
-    vec3 i = floor(vec3(uv, 0.0f));
-    vec3 f = fract(vec3(uv, 0.0f));
+float perlinNoise(vec3 uv) {
+    vec3 i = floor(uv);
+    vec3 f = fract(uv);
 
     // Fade curve (smooth interpolation)
     // vec3 u = f * f * (3.0 - 2.0 * f);
     vec3 u = smoothstep(0.0f, 1.0f, f);
 
     // --- Corners on z = 0 plane ---
-    // TODO: need better hash than integer hash
     float dot000 = dot(hash33(uvec3(i + vec3(0.0, 0.0, 0.0))), f - vec3(0.0, 0.0, 0.0));
     float dot100 = dot(hash33(uvec3(i + vec3(1.0, 0.0, 0.0))), f - vec3(1.0, 0.0, 0.0));
     float dot010 = dot(hash33(uvec3(i + vec3(0.0, 1.0, 0.0))), f - vec3(0.0, 1.0, 0.0));
@@ -116,8 +112,9 @@ vec3 perlinNoise() {
     float mixY1 = mix(mixX01, mixX11, u.y);
 
     // --- Final interpolation along z ---
-    return vec3(mix(mixY0, mixY1, u.z));
+    return mix(mixY0, mixY1, u.z);
 }
+// TODO: Move this to geometry shader
 
 void main()
 {
@@ -127,6 +124,7 @@ void main()
 
     uvec3 p = uvec3(gl_FragCoord.xy, currentFrame);
 
-    vec3 color = perlinNoise();
+    vec2 uv = gl_FragCoord.xy / resolution;
+    vec3 color = vec3(perlinNoise(vec3(uv * 20.0f, currentFrame * 0.0025)));
     FragColor = vec4(color, 1.0f);
 }
