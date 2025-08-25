@@ -14,8 +14,8 @@ class Window {
   static void SwapBuffer();
   static void Cleanup();
   static GLFWwindow *GetWindow();
-  static int GetWidth();
-  static int GetHeight();
+  static int GetWidth(bool retina = false);
+  static int GetHeight(bool retina = false);
 
  private:
   static void initGLFW();

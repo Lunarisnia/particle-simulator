@@ -15,6 +15,8 @@ uniform sampler2D normalTexture;
 
 uniform samplerCube shadowTexture;
 
+uniform int currentFrame;
+uniform vec2 resolution;
 uniform float globalFloat;
 uniform float globalFloat2;
 

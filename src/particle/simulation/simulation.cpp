@@ -90,16 +90,19 @@ void Particle::Simulation::Init() {
 
   const std::string brickWallTexture = "./assets/brickwall.jpg";
   const std::string brickWallNormal = "./assets/brickwall_normal.jpg";
-  Core::Shader ballShader = Core::Shader::CreateShader(
-      vertexPathV2, "./shaders/video-demo/diffuse.frag");
+  /*Core::Shader ballShader = Core::Shader::CreateShader(*/
+  /*    vertexPathV2, "./shaders/video-demo/diffuse.frag");*/
+  Core::Shader ballShader = Core::Shader::CreateShaderWithGeometry(
+      vertexPathV2, "./shaders/wobbly/wobbly.glsl",
+      "./shaders/geometry-learning/geom.frag");
   std::shared_ptr<Core::Object> ball =
       Core::Primitive::CreateUVSphere(ballShader, "Hello", 32, 16);
-  ball->isActive = false;
+  ball->isActive = true;
   ball->name = "Ball";
   cubes.emplace_back(ball);
 
   Core::Shader geoShader = Core::Shader::CreateShaderWithGeometry(
-      vertexPathV2, "./shaders/geometry-learning/geom.glsl",
+      vertexPathV2, "./shaders/wobbly/wobbly.glsl",
       "./shaders/geometry-learning/geom.frag");
   /*Core::Shader geoShader = Core::Shader::CreateShader(*/
   /*    vertexPathV2, "./shaders/geometry-learning/geom.frag");*/
@@ -112,8 +115,8 @@ void Particle::Simulation::Init() {
   try {
     Particle::Model model;
     /*model.LoadModel("./assets/honkai-star-rail-jingliu/source/JingiluV3.fbx");*/
-    model.LoadModel("./assets/bed-room/bed-room.obj");
-    model.StoreMeshes(cubes);
+    /*model.LoadModel("./assets/bed-room/bed-room.obj");*/
+    /*model.StoreMeshes(cubes);*/
   } catch (std::exception &error) {
     std::println("{}", error.what());
   }

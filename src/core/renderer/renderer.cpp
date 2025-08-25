@@ -34,7 +34,7 @@ void Core::Renderer::Init() {
 #if defined(WIN32)
   glViewport(0, 0, Window::GetWidth(), Window::GetHeight());
 #else
-  glViewport(0, 0, Window::GetWidth() * 2, Window::GetHeight() * 2);
+  glViewport(0, 0, Window::GetWidth(true), Window::GetHeight(true));
 #endif
 
   skybox = std::make_shared<Core::Object>();
@@ -69,7 +69,7 @@ void Core::Renderer::Init() {
   DepthTest(true);
 
   Core::Shader viewportShader{"./shaders/screen/screen.vert",
-                              "./shaders/screen/noise-viz.frag"};
+                              "./shaders/screen/screen.frag"};
   viewport = Core::Primitive::CreatePlane(viewportShader);
   viewport->name = "RenderPlane";
 
@@ -113,8 +113,9 @@ void Core::Renderer::Render() {
     mesh->material->SetMat4("view", StaticCamera::GetViewMatrix());
     mesh->material->SetMat4("projection", StaticCamera::GetProjectionMatrix());
     mesh->material->SetFloat("currentTime", Time::timeSinceStartup);
-    mesh->material->SetVec2("resolution", glm::vec2(Core::Window::GetWidth(),
-                                                    Core::Window::GetHeight()));
+    mesh->material->SetVec2(
+        "resolution",
+        glm::vec2(Core::Window::GetWidth(true), Core::Window::GetHeight(true)));
     mesh->BindVertexArray();
 
     glDrawElements(GL_TRIANGLES, mesh->GetIndiceLength(), GL_UNSIGNED_INT, 0);
@@ -158,7 +159,7 @@ void Core::Renderer::RenderViewport() {
   viewport->mesh->material->SetInt("currentFrame", Time::frameSinceStartup);
   viewport->mesh->material->SetVec2(
       "resolution",
-      glm::vec2(Core::Window::GetWidth(), Core::Window::GetHeight()));
+      glm::vec2(Core::Window::GetWidth(true), Core::Window::GetHeight(true)));
   viewport->mesh->material->SetInt(
       "shadowTexture", Core::Texture::GetTextureID("shadowCubeMap"));
 

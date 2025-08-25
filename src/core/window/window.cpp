@@ -11,19 +11,17 @@ void Core::Window::Init() {
   createWindow();
 }
 
-int Core::Window::GetHeight() {
-#if defined(WIN32)
+int Core::Window::GetHeight(bool retina) {
+  if (retina) {
+    return height * 2.0f;
+  }
   return height;
-#else
-  return height * 2.0f;
-#endif
 }
-int Core::Window::GetWidth() {
-#if defined(WIN32)
+int Core::Window::GetWidth(bool retina) {
+  if (retina) {
+    return width * 2.0f;
+  }
   return width;
-#else
-  return width * 2.0f;
-#endif
 }
 
 bool Core::Window::ShouldClose() {
