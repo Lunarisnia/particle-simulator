@@ -93,10 +93,10 @@ void Particle::Simulation::Init() {
   /*Core::Shader ballShader = Core::Shader::CreateShader(*/
   /*    vertexPathV2, "./shaders/video-demo/diffuse.frag");*/
   Core::Shader ballShader = Core::Shader::CreateShaderWithGeometry(
-      vertexPathV2, "./shaders/wobbly/wobbly.glsl",
+      "./shaders/wobbly/wobbly.vert", "./shaders/wobbly/wobbly.glsl",
       "./shaders/geometry-learning/geom.frag");
   std::shared_ptr<Core::Object> ball =
-      Core::Primitive::CreateUVSphere(ballShader, "Hello", 32, 16);
+      Core::Primitive::CreateUVSphere(ballShader, "Hello", 268, 268);
   ball->isActive = true;
   ball->name = "Ball";
   cubes.emplace_back(ball);

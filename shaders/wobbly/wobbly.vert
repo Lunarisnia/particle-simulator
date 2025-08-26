@@ -1,0 +1,42 @@
+#version 330 core
+layout(location = 0) in vec3 aPos;
+layout(location = 1) in vec2 aTexCoord;
+layout(location = 2) in vec3 aNormal;
+layout(location = 3) in vec3 aTangent;
+layout(location = 4) in vec3 aColor;
+
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+uniform mat4 lightSpaceMatrix;
+uniform float currentTime;
+
+struct VertexAttribute {
+    vec3 fragPos;
+    vec3 normal;
+    vec2 textureCoord;
+    vec3 tangent;
+
+    mat3 TBN;
+};
+out VertexAttribute vertexAttribute;
+out vec3 objectColor;
+
+void main()
+{
+    objectColor = aColor;
+    vertexAttribute.textureCoord = aTexCoord;
+    vertexAttribute.normal = normalize(mat3(transpose(inverse(model))) * aNormal);
+    // vertexAttribute.normal = aNormal;
+    vertexAttribute.fragPos = vec3(model * vec4(aPos, 1.0f));
+    vertexAttribute.tangent = aTangent;
+
+    vec3 N = normalize(vec3(model * vec4(aNormal, 0.0f)));
+    vec3 T = normalize(vec3(model * vec4(aTangent, 0.0f)));
+    vec3 B = cross(N, T);
+    vertexAttribute.TBN = transpose(mat3(T, B, N));
+
+    vec3 displaced = aPos + aNormal;
+    displaced.x = (aPos + aNormal).x + sin((aPos + aNormal).y * 10.0f + currentTime) * 0.1f;
+    gl_Position = projection * view * model * vec4(displaced, 1.0);
+}

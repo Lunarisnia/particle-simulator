@@ -97,7 +97,6 @@ vec4 generateTerrain(vec4 position, float noise) {
 
 void main() {
     vec3 normal = GetNormal();
-    vec2 uv = gl_FragCoord / resolution;
     gl_Position = gl_in[0].gl_Position;
     gs_vertexAttribute = vertexAttribute[0];
     EmitVertex();
