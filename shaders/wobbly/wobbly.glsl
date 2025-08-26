@@ -3,6 +3,7 @@ layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
 
 uniform float currentTime;
+uniform vec2 resolution;
 
 struct VertexAttribute {
     vec3 fragPos;
@@ -70,20 +71,40 @@ vec4 explode(vec4 position, vec3 normal) {
 
 vec4 wobble(vec4 position, vec3 normal, float time) {
     vec4 pos = position;
-    pos.x = position.x + cos(position.y * 10.0f + time) * sin(position.y * 10.0f + time) * 0.1f;
+    pos.x = position.x + sin(position.y * 10.0f + time) * 0.1f;
+    return pos;
+}
+
+float fbm(vec3 position, int n) {
+    float persistence = 0.5f;
+    float amplitude = 0.5f;
+    float total = 0.0f;
+    for (int i = 0; i < n; i++) {
+        float noiseValue = perlinNoise(position);
+        total += noiseValue * 0.5f;
+        amplitude *= persistence;
+    }
+
+    return total;
+}
+
+vec4 generateTerrain(vec4 position, float noise) {
+    vec4 pos = position;
+    pos.x = position.x + sin(position.y * noise);
+
     return pos;
 }
 
 void main() {
     vec3 normal = GetNormal();
-    // gl_Position = gl_in[0].gl_Position;
-    gl_Position = wobble(gl_in[0].gl_Position, vertexAttribute[0].normal, currentTime);
+    vec2 uv = gl_FragCoord / resolution;
+    gl_Position = gl_in[0].gl_Position;
     gs_vertexAttribute = vertexAttribute[0];
     EmitVertex();
-    gl_Position = wobble(gl_in[1].gl_Position, vertexAttribute[1].normal, currentTime);
+    gl_Position = gl_in[1].gl_Position;
     gs_vertexAttribute = vertexAttribute[1];
     EmitVertex();
-    gl_Position = wobble(gl_in[2].gl_Position, vertexAttribute[2].normal, currentTime);
+    gl_Position = gl_in[2].gl_Position;
     gs_vertexAttribute = vertexAttribute[2];
     EmitVertex();
     EndPrimitive();
