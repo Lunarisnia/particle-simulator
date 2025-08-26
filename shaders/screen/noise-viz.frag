@@ -2,6 +2,7 @@
 out vec4 FragColor;
 
 struct VertexAttribute {
+    vec3 fragPos;
     vec2 textureCoord;
 };
 in VertexAttribute vertexAttribute;
@@ -19,6 +20,8 @@ uniform float globalFloat;
 uniform float globalFloat2;
 uniform int currentFrame;
 uniform vec2 resolution;
+
+#define PI 3.141592653589793238462
 
 vec3 blackAndWhite(vec3 color) {
     color = vec3((color.r + color.g + color.b) / 3.0f);
@@ -48,6 +51,80 @@ vec3 useKernel3x3(float kernel[9], float offset) {
     }
 
     return color;
+}
+// UE4's PseudoRandom function
+// https://github.com/EpicGames/UnrealEngine/blob/release/Engine/Shaders/Private/Random.ush
+float pseudo(vec2 v) {
+    v = fract(v / 128.) * 128. + vec2(-64.340622, -72.465622);
+    return fract(dot(v.xyx * v.xyy, vec3(20.390625, 60.703125, 2.4281209)));
+}
+
+// Takes our xz positions and turns them into a random number between 0 and 1 using the above pseudo random function
+float HashPosition(vec2 pos) {
+    float _Seed = 0.12312348f;
+    return pseudo(pos * vec2(_Seed, _Seed + 4));
+}
+
+// Generates a random gradient vector for the perlin noise lattice points, watch my perlin noise video for a more in depth explanation
+vec2 RandVector(float seed) {
+    float _GradientRotation = 0.0f;
+    float theta = seed * 360 * 2 - 360;
+    theta += _GradientRotation;
+    theta = theta * PI / 180.0;
+    return normalize(vec2(cos(theta), sin(theta)));
+}
+
+// Normal smoothstep is cubic -- to avoid discontinuities in the gradient, we use a quintic interpolation instead as explained in my perlin noise video
+vec2 quinticInterpolation(vec2 t) {
+    return t * t * t * (t * (t * vec2(6) - vec2(15)) + vec2(10));
+}
+
+// Derivative of above function
+vec2 quinticDerivative(vec2 t) {
+    return vec2(30) * t * t * (t * (t - vec2(2)) + vec2(1));
+}
+
+// it's perlin noise that returns the noise in the x component and the derivatives in the yz components as explained in my perlin noise video
+vec3 perlin_noise2D(vec2 pos) {
+    vec2 latticeMin = floor(pos);
+    vec2 latticeMax = ceil(pos);
+
+    vec2 remainder = fract(pos);
+
+    // Lattice Corners
+    vec2 c00 = latticeMin;
+    vec2 c10 = vec2(latticeMax.x, latticeMin.y);
+    vec2 c01 = vec2(latticeMin.x, latticeMax.y);
+    vec2 c11 = latticeMax;
+
+    // Gradient Vectors assigned to each corner
+    vec2 g00 = RandVector(HashPosition(c00));
+    vec2 g10 = RandVector(HashPosition(c10));
+    vec2 g01 = RandVector(HashPosition(c01));
+    vec2 g11 = RandVector(HashPosition(c11));
+
+    // Directions to position from lattice corners
+    vec2 p0 = remainder;
+    vec2 p1 = p0 - vec2(1.0);
+
+    vec2 p00 = p0;
+    vec2 p10 = vec2(p1.x, p0.y);
+    vec2 p01 = vec2(p0.x, p1.y);
+    vec2 p11 = p1;
+
+    vec2 u = quinticInterpolation(remainder);
+    vec2 du = quinticDerivative(remainder);
+
+    float a = dot(g00, p00);
+    float b = dot(g10, p10);
+    float c = dot(g01, p01);
+    float d = dot(g11, p11);
+
+    // Expanded interpolation freaks of nature from https://iquilezles.org/articles/gradientnoise/
+    float noise = a + u.x * (b - a) + u.y * (c - a) + u.x * u.y * (a - b - c + d);
+
+    vec2 gradient = g00 + u.x * (g10 - g00) + u.y * (g01 - g00) + u.x * u.y * (g00 - g10 - g01 + g11) + du * (u.yx * (a - b - c + d) + vec2(b, c) - a);
+    return vec3(noise, gradient);
 }
 
 const uint k = 1103515245U;
@@ -124,7 +201,10 @@ void main()
 
     uvec3 p = uvec3(gl_FragCoord.xy, currentFrame);
 
+    // Initial noise sample position offset and scaled by uniform variables
     vec2 uv = gl_FragCoord.xy / resolution;
-    vec3 color = vec3(perlinNoise(vec3(uv * 20.0f, currentFrame * 0.0025)));
+    vec3 noise_pos = vertexAttribute.fragPos / 0.05f;
+
+    vec3 color = vec3(perlin_noise2D(noise_pos.xy).x);
     FragColor = vec4(color, 1.0f);
 }
