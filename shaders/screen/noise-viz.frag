@@ -191,7 +191,25 @@ float perlinNoise(vec3 uv) {
     // --- Final interpolation along z ---
     return mix(mixY0, mixY1, u.z);
 }
-// TODO: Move this to geometry shader
+
+float fbm(vec3 position, int n, float persistence, float lacunarity) {
+    float frequency = 1.0f;
+    float amplitude = 0.5f;
+    float total = 0.0f;
+    float normalization = 0.0f;
+    for (int i = 0; i < n; i++) {
+        float noiseValue = perlin_noise2D(position.xy * frequency).x;
+        total += noiseValue * 0.5f;
+        normalization += amplitude;
+
+        amplitude *= persistence;
+        frequency *= lacunarity;
+    }
+
+    total /= normalization;
+
+    return total;
+}
 
 void main()
 {
@@ -203,8 +221,8 @@ void main()
 
     // Initial noise sample position offset and scaled by uniform variables
     vec2 uv = gl_FragCoord.xy / resolution;
-    vec3 noise_pos = vertexAttribute.fragPos / 0.05f;
+    vec3 noise_pos = vertexAttribute.fragPos / 0.5f;
 
-    vec3 color = vec3(perlin_noise2D(noise_pos.xy).x);
+    vec3 color = vec3(fbm(noise_pos, 6, 0.5f, 2.0f));
     FragColor = vec4(color, 1.0f);
 }
