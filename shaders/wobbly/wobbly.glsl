@@ -70,7 +70,7 @@ vec4 explode(vec4 position, vec3 normal) {
 
 vec4 wobble(vec4 position, vec3 normal, float time) {
     vec4 pos = position;
-    pos.x = position.x + sin(position.y * 10.0f + time) * 0.1f;
+    pos.x = position.x + cos(position.y * 10.0f + time) * sin(position.y * 10.0f + time) * 0.1f;
     return pos;
 }
 
