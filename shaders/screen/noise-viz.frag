@@ -199,7 +199,7 @@ float fbm(vec3 position, int n, float persistence, float lacunarity) {
     float normalization = 0.0f;
     for (int i = 0; i < n; i++) {
         float noiseValue = perlin_noise2D(position.xy * frequency).x;
-        total += noiseValue * 0.5f;
+        total += noiseValue * amplitude;
         normalization += amplitude;
 
         amplitude *= persistence;
@@ -221,7 +221,7 @@ void main()
 
     // Initial noise sample position offset and scaled by uniform variables
     vec2 uv = gl_FragCoord.xy / resolution;
-    vec3 noise_pos = vertexAttribute.fragPos / 0.5f;
+    vec3 noise_pos = vertexAttribute.fragPos / 0.05f;
 
     vec3 color = vec3(fbm(noise_pos, 6, 0.5f, 2.0f));
     FragColor = vec4(color, 1.0f);

@@ -92,25 +92,13 @@ void Particle::Simulation::Init() {
   const std::string brickWallNormal = "./assets/brickwall_normal.jpg";
   /*Core::Shader ballShader = Core::Shader::CreateShader(*/
   /*    vertexPathV2, "./shaders/video-demo/diffuse.frag");*/
-  Core::Shader ballShader = Core::Shader::CreateShaderWithGeometry(
-      "./shaders/wobbly/wobbly.vert", "./shaders/wobbly/wobbly.glsl",
-      "./shaders/geometry-learning/geom.frag");
+  Core::Shader ballShader = Core::Shader::CreateShader(
+      "./shaders/wobbly/wobbly.vert", "./shaders/geometry-learning/geom.frag");
   std::shared_ptr<Core::Object> ball =
-      Core::Primitive::CreateUVSphere(ballShader, "Hello", 268, 268);
+      Core::Primitive::CreateUVSphere(ballShader, "Hello", 512, 512);
   ball->isActive = true;
   ball->name = "Ball";
   cubes.emplace_back(ball);
-
-  Core::Shader geoShader = Core::Shader::CreateShaderWithGeometry(
-      vertexPathV2, "./shaders/wobbly/wobbly.glsl",
-      "./shaders/geometry-learning/geom.frag");
-  /*Core::Shader geoShader = Core::Shader::CreateShader(*/
-  /*    vertexPathV2, "./shaders/geometry-learning/geom.frag");*/
-  std::shared_ptr<Core::Object> geometryTest =
-      Core::Primitive::CreatePlane(geoShader);
-  geometryTest->name = "GeometryTest";
-  geometryTest->isActive = false;
-  cubes.emplace_back(geometryTest);
 
   try {
     Particle::Model model;

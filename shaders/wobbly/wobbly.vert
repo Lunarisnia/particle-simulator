@@ -16,6 +16,7 @@ struct VertexAttribute {
     vec3 normal;
     vec2 textureCoord;
     vec3 tangent;
+    vec3 rawPos;
 
     mat3 TBN;
 };
@@ -97,15 +98,13 @@ void main()
     // vertexAttribute.normal = aNormal;
     vertexAttribute.fragPos = vec3(model * vec4(aPos, 1.0f));
     vertexAttribute.tangent = aTangent;
+    vertexAttribute.rawPos = aPos;
 
     vec3 N = normalize(vec3(model * vec4(aNormal, 0.0f)));
     vec3 T = normalize(vec3(model * vec4(aTangent, 0.0f)));
     vec3 B = cross(N, T);
     vertexAttribute.TBN = transpose(mat3(T, B, N));
 
-    // vec3 displaced = aPos + aNormal;
-    // displaced.x = (aPos + aNormal).x + sin((aPos + aNormal).y * 10.0f + currentTime) * 0.1f;
-    // vec3 displaced = generateTerrain(aPos, fbm(aPos, 3));
-    vec3 displaced = generateTerrain(aPos, aNormal, fbm(aPos, 16, 0.5f, 2.0f));
+    vec3 displaced = generateTerrain(vertexAttribute.fragPos, vertexAttribute.normal, fbm(vertexAttribute.fragPos, 8, 0.5f, 2.0f));
     gl_Position = projection * view * model * vec4(displaced, 1.0);
 }

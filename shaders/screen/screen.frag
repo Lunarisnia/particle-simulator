@@ -2,6 +2,7 @@
 out vec4 FragColor;
 
 struct VertexAttribute {
+    vec3 fragPos;
     vec2 textureCoord;
 };
 in VertexAttribute vertexAttribute;

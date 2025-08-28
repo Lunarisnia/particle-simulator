@@ -30,6 +30,7 @@ Core::Shader Core::Shader::CreateShader(const std::string &vertPath,
   glGetProgramiv(shader.id, GL_LINK_STATUS, &success);
   if (!success) {
     glGetProgramInfoLog(shader.id, 512, NULL, infoLog);
+    std::println("{}", infoLog);
     throw std::runtime_error(infoLog);
   }
 
@@ -54,6 +55,7 @@ Core::Shader Core::Shader::CreateShaderWithGeometry(
   glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+    std::println("Vertex: {}", infoLog);
     throw std::runtime_error(infoLog);
   }
   unsigned int geometryShader =
@@ -61,6 +63,7 @@ Core::Shader Core::Shader::CreateShaderWithGeometry(
   glGetShaderiv(geometryShader, GL_COMPILE_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(geometryShader, 512, NULL, infoLog);
+    std::println("Geometry: {}", infoLog);
     throw std::runtime_error(infoLog);
   }
   unsigned int fragmentShader =
@@ -68,7 +71,7 @@ Core::Shader Core::Shader::CreateShaderWithGeometry(
   glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-    std::println("{}", infoLog);
+    std::println("Fragment: {}", infoLog);
     throw std::runtime_error(infoLog);
   }
 
@@ -81,6 +84,7 @@ Core::Shader Core::Shader::CreateShaderWithGeometry(
   glGetProgramiv(shader.id, GL_LINK_STATUS, &success);
   if (!success) {
     glGetProgramInfoLog(shader.id, 512, NULL, infoLog);
+    std::println("{}", infoLog);
     throw std::runtime_error(infoLog);
   }
 
@@ -105,7 +109,7 @@ Core::Shader::Shader(const std::string &vertexPath,
   glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-    std::println("{}", infoLog);
+    std::println("Vertex: {}", infoLog);
     throw std::runtime_error(infoLog);
   }
   unsigned int fragmentShader =
@@ -113,7 +117,7 @@ Core::Shader::Shader(const std::string &vertexPath,
   glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-    std::println("{}", infoLog);
+    std::println("Fragment: {}", infoLog);
     throw std::runtime_error(infoLog);
   }
 
@@ -125,6 +129,7 @@ Core::Shader::Shader(const std::string &vertexPath,
   glGetProgramiv(id, GL_LINK_STATUS, &success);
   if (!success) {
     glGetProgramInfoLog(id, 512, NULL, infoLog);
+    std::println("{}", infoLog);
     throw std::runtime_error(infoLog);
   }
 
