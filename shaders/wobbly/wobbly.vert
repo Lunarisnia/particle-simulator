@@ -23,46 +23,54 @@ struct VertexAttribute {
 out VertexAttribute vertexAttribute;
 out vec3 objectColor;
 
-const uint k = 1103515245U;
-vec3 hash33(uvec3 x)
-{
-    x = ((x >> 8U) ^ x.yzx) * k;
-    x = ((x >> 8U) ^ x.yzx) * k;
-    x = ((x >> 8U) ^ x.yzx) * k;
+// Source: https://www.shadertoy.com/view/4dffRH
+vec3 hash(vec3 p) // this hash is not production ready, please
+{ // replace this by something better
+    p = vec3(dot(p, vec3(127.1, 311.7, 74.7)),
+            dot(p, vec3(269.5, 183.3, 246.1)),
+            dot(p, vec3(113.5, 271.9, 124.6)));
 
-    return vec3(x) * (1.0 / float(0xffffffffU));
+    return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
 }
 
-float perlinNoise(vec3 uv) {
-    vec3 i = floor(uv);
-    vec3 f = fract(uv);
+float perlinNoise(in vec3 x)
+{
+    // grid
+    vec3 p = floor(x);
+    vec3 w = fract(x);
 
-    // Fade curve (smooth interpolation)
-    // vec3 u = f * f * (3.0 - 2.0 * f);
-    vec3 u = smoothstep(0.0f, 1.0f, f);
+    // quintic interpolant
+    vec3 u = w * w * w * (w * (w * 6.0 - 15.0) + 10.0);
 
-    // --- Corners on z = 0 plane ---
-    float dot000 = dot(hash33(uvec3(i + vec3(0.0, 0.0, 0.0))), f - vec3(0.0, 0.0, 0.0));
-    float dot100 = dot(hash33(uvec3(i + vec3(1.0, 0.0, 0.0))), f - vec3(1.0, 0.0, 0.0));
-    float dot010 = dot(hash33(uvec3(i + vec3(0.0, 1.0, 0.0))), f - vec3(0.0, 1.0, 0.0));
-    float dot110 = dot(hash33(uvec3(i + vec3(1.0, 1.0, 0.0))), f - vec3(1.0, 1.0, 0.0));
+    // gradients
+    vec3 ga = hash(p + vec3(0.0, 0.0, 0.0));
+    vec3 gb = hash(p + vec3(1.0, 0.0, 0.0));
+    vec3 gc = hash(p + vec3(0.0, 1.0, 0.0));
+    vec3 gd = hash(p + vec3(1.0, 1.0, 0.0));
+    vec3 ge = hash(p + vec3(0.0, 0.0, 1.0));
+    vec3 gf = hash(p + vec3(1.0, 0.0, 1.0));
+    vec3 gg = hash(p + vec3(0.0, 1.0, 1.0));
+    vec3 gh = hash(p + vec3(1.0, 1.0, 1.0));
 
-    float mixX00 = mix(dot000, dot100, u.x);
-    float mixX10 = mix(dot010, dot110, u.x);
-    float mixY0 = mix(mixX00, mixX10, u.y);
+    // projections
+    float va = dot(ga, w - vec3(0.0, 0.0, 0.0));
+    float vb = dot(gb, w - vec3(1.0, 0.0, 0.0));
+    float vc = dot(gc, w - vec3(0.0, 1.0, 0.0));
+    float vd = dot(gd, w - vec3(1.0, 1.0, 0.0));
+    float ve = dot(ge, w - vec3(0.0, 0.0, 1.0));
+    float vf = dot(gf, w - vec3(1.0, 0.0, 1.0));
+    float vg = dot(gg, w - vec3(0.0, 1.0, 1.0));
+    float vh = dot(gh, w - vec3(1.0, 1.0, 1.0));
 
-    // --- Corners on z = 1 plane ---
-    float dot001 = dot(hash33(uvec3(i + vec3(0.0, 0.0, 1.0))), f - vec3(0.0, 0.0, 1.0));
-    float dot101 = dot(hash33(uvec3(i + vec3(1.0, 0.0, 1.0))), f - vec3(1.0, 0.0, 1.0));
-    float dot011 = dot(hash33(uvec3(i + vec3(0.0, 1.0, 1.0))), f - vec3(0.0, 1.0, 1.0));
-    float dot111 = dot(hash33(uvec3(i + vec3(1.0, 1.0, 1.0))), f - vec3(1.0, 1.0, 1.0));
-
-    float mixX01 = mix(dot001, dot101, u.x);
-    float mixX11 = mix(dot011, dot111, u.x);
-    float mixY1 = mix(mixX01, mixX11, u.y);
-
-    // --- Final interpolation along z ---
-    return mix(mixY0, mixY1, u.z);
+    // interpolation
+    return va +
+        u.x * (vb - va) +
+        u.y * (vc - va) +
+        u.z * (ve - va) +
+        u.x * u.y * (va - vb - vc + vd) +
+        u.y * u.z * (va - vc - ve + vg) +
+        u.z * u.x * (va - vb - ve + vf) +
+        u.x * u.y * u.z * (-va + vb + vc - vd + ve - vf - vg + vh);
 }
 
 float fbm(vec3 position, int n, float persistence, float lacunarity) {
@@ -105,6 +113,6 @@ void main()
     vec3 B = cross(N, T);
     vertexAttribute.TBN = transpose(mat3(T, B, N));
 
-    vec3 displaced = generateTerrain(vertexAttribute.fragPos, vertexAttribute.normal, fbm(vertexAttribute.fragPos, 8, 0.5f, 2.0f));
+    vec3 displaced = generateTerrain(vertexAttribute.fragPos, vertexAttribute.normal, fbm(vertexAttribute.fragPos, 16, 0.5f, 2.0f));
     gl_Position = projection * view * model * vec4(displaced, 1.0);
 }
