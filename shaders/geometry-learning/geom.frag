@@ -20,6 +20,8 @@ struct Camera {
 uniform Camera camera;
 
 uniform vec2 mousePosition;
+uniform float globalFloat;
+uniform float globalFloat2;
 
 const uint k = 1103515245U;
 vec3 hash33(uvec3 x)
@@ -31,37 +33,53 @@ vec3 hash33(uvec3 x)
     return vec3(x) * (1.0 / float(0xffffffffU));
 }
 
-float perlinNoise(vec3 uv) {
-    vec3 i = floor(uv);
-    vec3 f = fract(uv);
+vec3 hash(vec3 p) // this hash is not production ready, please
+{ // replace this by something better
+    p = vec3(dot(p, vec3(127.1, 311.7, 74.7)),
+            dot(p, vec3(269.5, 183.3, 246.1)),
+            dot(p, vec3(113.5, 271.9, 124.6)));
 
-    // Fade curve (smooth interpolation)
-    // vec3 u = f * f * (3.0 - 2.0 * f);
-    vec3 u = smoothstep(0.0f, 1.0f, f);
+    return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
+}
 
-    // --- Corners on z = 0 plane ---
-    float dot000 = dot(hash33(uvec3(i + vec3(0.0, 0.0, 0.0))), f - vec3(0.0, 0.0, 0.0));
-    float dot100 = dot(hash33(uvec3(i + vec3(1.0, 0.0, 0.0))), f - vec3(1.0, 0.0, 0.0));
-    float dot010 = dot(hash33(uvec3(i + vec3(0.0, 1.0, 0.0))), f - vec3(0.0, 1.0, 0.0));
-    float dot110 = dot(hash33(uvec3(i + vec3(1.0, 1.0, 0.0))), f - vec3(1.0, 1.0, 0.0));
+float perlinNoise(in vec3 x)
+{
+    // grid
+    vec3 p = floor(x);
+    vec3 w = fract(x);
 
-    float mixX00 = mix(dot000, dot100, u.x);
-    float mixX10 = mix(dot010, dot110, u.x);
-    float mixY0 = mix(mixX00, mixX10, u.y);
+    // quintic interpolant
+    vec3 u = w * w * w * (w * (w * 6.0 - 15.0) + 10.0);
 
-    // --- Corners on z = 1 plane ---
-    float dot001 = dot(hash33(uvec3(i + vec3(0.0, 0.0, 1.0))), f - vec3(0.0, 0.0, 1.0));
-    float dot101 = dot(hash33(uvec3(i + vec3(1.0, 0.0, 1.0))), f - vec3(1.0, 0.0, 1.0));
-    float dot011 = dot(hash33(uvec3(i + vec3(0.0, 1.0, 1.0))), f - vec3(0.0, 1.0, 1.0));
-    float dot111 = dot(hash33(uvec3(i + vec3(1.0, 1.0, 1.0))), f - vec3(1.0, 1.0, 1.0));
+    // gradients
+    vec3 ga = hash(p + vec3(0.0, 0.0, 0.0));
+    vec3 gb = hash(p + vec3(1.0, 0.0, 0.0));
+    vec3 gc = hash(p + vec3(0.0, 1.0, 0.0));
+    vec3 gd = hash(p + vec3(1.0, 1.0, 0.0));
+    vec3 ge = hash(p + vec3(0.0, 0.0, 1.0));
+    vec3 gf = hash(p + vec3(1.0, 0.0, 1.0));
+    vec3 gg = hash(p + vec3(0.0, 1.0, 1.0));
+    vec3 gh = hash(p + vec3(1.0, 1.0, 1.0));
 
-    float mixX01 = mix(dot001, dot101, u.x);
-    float mixX11 = mix(dot011, dot111, u.x);
-    float mixY1 = mix(mixX01, mixX11, u.y);
+    // projections
+    float va = dot(ga, w - vec3(0.0, 0.0, 0.0));
+    float vb = dot(gb, w - vec3(1.0, 0.0, 0.0));
+    float vc = dot(gc, w - vec3(0.0, 1.0, 0.0));
+    float vd = dot(gd, w - vec3(1.0, 1.0, 0.0));
+    float ve = dot(ge, w - vec3(0.0, 0.0, 1.0));
+    float vf = dot(gf, w - vec3(1.0, 0.0, 1.0));
+    float vg = dot(gg, w - vec3(0.0, 1.0, 1.0));
+    float vh = dot(gh, w - vec3(1.0, 1.0, 1.0));
 
-    // --- Final interpolation along z ---
-    // vec2 gradient = g00 + u.x * (g10 - g00) + u.y * (g01 - g00) + u.x * u.y * (g00 - g10 - g01 + g11) + du * (u.yx * (a - b - c + d) + vec2(b, c) - a);
-    return mix(mixY0, mixY1, u.z);
+    // interpolation
+    return va +
+        u.x * (vb - va) +
+        u.y * (vc - va) +
+        u.z * (ve - va) +
+        u.x * u.y * (va - vb - vc + vd) +
+        u.y * u.z * (va - vc - ve + vg) +
+        u.z * u.x * (va - vb - ve + vf) +
+        u.x * u.y * u.z * (-va + vb + vc - vd + ve - vf - vg + vh);
 }
 
 float fbm(vec3 position, int n, float persistence, float lacunarity) {
@@ -83,23 +101,43 @@ float fbm(vec3 position, int n, float persistence, float lacunarity) {
     return total;
 }
 
-// FIX: This produce weird square artifacts
+// NOTE: the grid artifact came from the fact that I used integer hash and it seems to tile similarly to how fract works simply replacing the hash function works wonder
 void main() {
+    float eps = 0.001f;
     vec3 color = vec3(0.0f);
 
-    float displacement = fbm(vertexAttribute.fragPos, 16, 0.5f, 2.0f);
+    vec3 pos = vertexAttribute.rawPos * 5.0f;
 
-    vec3 dispPos = vertexAttribute.fragPos + vertexAttribute.normal * displacement;
+    int octaves = 10;
+    float d0 = fbm(pos, octaves, 0.5f, 2.0f);
+    float dx = fbm(pos + vec3(eps, 0.0f, 0.0f), octaves, 0.5f, 2.0f);
+    float dy = fbm(pos + vec3(0.0f, eps, 0.0f), octaves, 0.5f, 2.0f);
+    float dz = fbm(pos + vec3(0.0f, 0.0f, eps), octaves, 0.5f, 2.0f);
 
-    vec3 dpdx = dFdx(dispPos);
-    vec3 dpdy = dFdy(dispPos);
+    vec3 dNormal = vec3(
+            (dx - d0) / eps,
+            (dy - d0) / eps,
+            (dz - d0) / eps
+        );
+    dNormal = normalize(vertexAttribute.normal - dNormal);
 
-    vec3 dNormal = normalize(cross(dpdx, dpdy));
-    // vec3 dNormal = normalize(dispPos);
+    float slopeFactor = d0;
+    vec3 land = mix(vec3(1.0f), vec3(0.0f, 1.0f, 0.0f), smoothstep(0.001f, 0.1f, slopeFactor));
+    land = mix(land, vec3(1.0f, 0.0f, 0.0f), smoothstep(globalFloat, globalFloat2, slopeFactor));
+    vec3 sea = mix(vec3(0.0f, 0.0f, 1.0f), vec3(1.0f), smoothstep(0.01f, 0.1f, slopeFactor));
+    vec3 albedo = mix(sea, land, smoothstep(0.0f, 0.01f, slopeFactor));
 
     vec3 lightDir = normalize(vec3(0.5f));
-    float diff = dot(dNormal, lightDir);
-    color = vec3(1.0f) * diff;
+    float diff = max(0.0f, dot(dNormal, lightDir));
+    vec3 diffuse = albedo * diff;
 
+    vec3 viewDir = normalize(camera.position - vertexAttribute.fragPos);
+    vec3 halfDir = normalize(vertexAttribute.normal + viewDir);
+    float spec = pow(1.0f - max(0.0f, dot(halfDir, vertexAttribute.normal)), 0.8f);
+    vec3 specular = vec3(1.0f, 0.1f, 0.1f) * spec;
+
+    color += diffuse + specular;
+    // float f = fbm(pos * 20.0f, 8, 0.5f, 2.0f);
+    // color = vec3(f * 20.0f);
     FragColor = vec4(color, 1.0f);
 }
