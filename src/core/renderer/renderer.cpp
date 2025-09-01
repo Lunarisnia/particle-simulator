@@ -117,7 +117,7 @@ void Core::Renderer::Render() {
         "resolution",
         glm::vec2(Core::Window::GetWidth(true), Core::Window::GetHeight(true)));
     mesh->BindVertexArray();
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     glDrawElements(GL_TRIANGLES, mesh->GetIndiceLength(), GL_UNSIGNED_INT, 0);
 

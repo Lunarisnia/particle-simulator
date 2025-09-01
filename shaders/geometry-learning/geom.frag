@@ -106,7 +106,7 @@ void main() {
     float eps = 0.001f;
     vec3 color = vec3(0.0f);
 
-    vec3 pos = vertexAttribute.rawPos * 5.0f;
+    vec3 pos = vertexAttribute.rawPos + vec3(currentTime) * 0.25f;
 
     int octaves = 10;
     float d0 = fbm(pos, octaves, 0.5f, 2.0f);
@@ -124,9 +124,9 @@ void main() {
     vec3 lightDir = normalize(vec3(0.5f));
     float diff = max(0.0f, dot(dNormal, lightDir));
     vec3 diffuse = vec3(1.0f) * diff;
-    // color += diffuse;
+    color += diffuse;
 
-    color = vec3(vertexAttribute.textureCoord, 0.0f);
+    // color = vec3(vertexAttribute.textureCoord, 0.0f);
     // float f = fbm(pos * 20.0f, 8, 0.5f, 2.0f);
     // color = vec3(f * 20.0f);
     FragColor = vec4(color, 1.0f);

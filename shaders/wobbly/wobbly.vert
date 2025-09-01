@@ -113,6 +113,6 @@ void main()
     vec3 B = cross(N, T);
     vertexAttribute.TBN = transpose(mat3(T, B, N));
 
-    // vec3 displaced = generateTerrain(aPos, aNormal, fbm(aPos, 16, 0.5f, 2.0f));
-    gl_Position = projection * view * model * vec4(aPos, 1.0);
+    vec3 displaced = generateTerrain(aPos, aNormal, fbm(aPos + vec3(currentTime) * 0.25f, 16, 0.5f, 2.0f));
+    gl_Position = projection * view * model * vec4(displaced, 1.0);
 }
