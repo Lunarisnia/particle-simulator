@@ -7,6 +7,18 @@
 #include "core/shader/shader.hpp"
 #include "core/world/world.hpp"
 
+std::shared_ptr<Core::Object> Core::Primitive::CreatePlane(
+    Core::Shader shader) {
+  std::shared_ptr<Core::Object> obj = std::make_shared<Core::Object>();
+  std::shared_ptr<Core::Material> material =
+      std::make_shared<Core::Material>(shader);
+  std::shared_ptr<Core::Mesh> mesh = obj->AddComponent<Core::Mesh>(material);
+  obj->mesh = mesh;
+  Core::Procedural::GeneratePlane(mesh);
+  Core::World::AddObject(obj);
+  return obj;
+}
+
 std::shared_ptr<Core::Object> Core::Primitive::CreatePlane(Core::Shader shader,
                                                            int div) {
   std::shared_ptr<Core::Object> obj = std::make_shared<Core::Object>();

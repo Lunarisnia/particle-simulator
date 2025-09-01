@@ -19,9 +19,21 @@ struct Camera {
 };
 uniform Camera camera;
 
+struct PointLight {
+    vec3 position;
+
+    vec3 diffuse;
+    vec3 specular;
+};
+uniform PointLight pointLight[2];
+
 uniform vec2 mousePosition;
 uniform float globalFloat;
 uniform float globalFloat2;
+
+uniform int octave;
+uniform float persistence;
+uniform float lacunarity;
 
 const uint k = 1103515245U;
 vec3 hash33(uvec3 x)
@@ -106,13 +118,13 @@ void main() {
     float eps = 0.001f;
     vec3 color = vec3(0.0f);
 
-    vec3 pos = vertexAttribute.rawPos + vec3(currentTime) * 0.25f;
+    vec3 pos = vertexAttribute.rawPos + vec3(globalFloat);
 
-    int octaves = 10;
-    float d0 = fbm(pos, octaves, 0.5f, 2.0f);
-    float dx = fbm(pos + vec3(eps, 0.0f, 0.0f), octaves, 0.5f, 2.0f);
-    float dy = fbm(pos + vec3(0.0f, eps, 0.0f), octaves, 0.5f, 2.0f);
-    float dz = fbm(pos + vec3(0.0f, 0.0f, eps), octaves, 0.5f, 2.0f);
+    int octaves = octave;
+    float d0 = fbm(pos, octaves, persistence, lacunarity);
+    float dx = fbm(pos + vec3(eps, 0.0f, 0.0f), octaves, persistence, lacunarity);
+    float dy = fbm(pos + vec3(0.0f, eps, 0.0f), octaves, persistence, lacunarity);
+    float dz = fbm(pos + vec3(0.0f, 0.0f, eps), octaves, persistence, lacunarity);
 
     vec3 dNormal = vec3(
             (dx - d0) / eps,
@@ -121,7 +133,8 @@ void main() {
         );
     dNormal = normalize(vertexAttribute.normal - dNormal);
 
-    vec3 lightDir = normalize(vec3(0.5f));
+    PointLight pLight = pointLight[0];
+    vec3 lightDir = normalize(pLight.position - vertexAttribute.fragPos);
     float diff = max(0.0f, dot(dNormal, lightDir));
     vec3 diffuse = vec3(1.0f) * diff;
     color += diffuse;

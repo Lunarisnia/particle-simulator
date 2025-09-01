@@ -8,10 +8,11 @@ const float PI = 3.14159265358979323846f;
 
 void Core::Procedural::GenerateComplexPlane(std::shared_ptr<Mesh> &mesh,
                                             int div) {
-  glm::vec3 v0 = glm::vec3(-0.5f, -0.5f, 0.0f);
-  glm::vec3 v1 = glm::vec3(-0.5f, 0.5f, 0.0f);
-  glm::vec3 v2 = glm::vec3(0.5f, 0.5f, 0.0f);
-  glm::vec3 v4 = glm::vec3(0.5f, -0.5f, 0.0f);
+  float scale = 10.0f;
+  glm::vec3 v0 = glm::vec3(-0.5f, -0.5f, 0.0f) * scale;
+  glm::vec3 v1 = glm::vec3(-0.5f, 0.5f, 0.0f) * scale;
+  glm::vec3 v2 = glm::vec3(0.5f, 0.5f, 0.0f) * scale;
+  glm::vec3 v4 = glm::vec3(0.5f, -0.5f, 0.0f) * scale;
 
   glm::vec3 v10 = (v0 - v1) / float(div);
   glm::vec3 v24 = (v4 - v2) / float(div);

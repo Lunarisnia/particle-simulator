@@ -10,6 +10,11 @@ uniform mat4 view;
 uniform mat4 projection;
 uniform mat4 lightSpaceMatrix;
 uniform float currentTime;
+uniform float globalFloat;
+
+uniform int octave;
+uniform float persistence;
+uniform float lacunarity;
 
 struct VertexAttribute {
     vec3 fragPos;
@@ -113,6 +118,6 @@ void main()
     vec3 B = cross(N, T);
     vertexAttribute.TBN = transpose(mat3(T, B, N));
 
-    vec3 displaced = generateTerrain(aPos, aNormal, fbm(aPos + vec3(currentTime) * 0.25f, 16, 0.5f, 2.0f));
+    vec3 displaced = generateTerrain(aPos, aNormal, fbm(aPos + vec3(globalFloat), octave, persistence, lacunarity));
     gl_Position = projection * view * model * vec4(displaced, 1.0);
 }

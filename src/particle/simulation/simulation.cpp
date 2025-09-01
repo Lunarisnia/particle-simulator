@@ -17,6 +17,7 @@
 #include "core/renderer/renderer.hpp"
 #include "core/static_camera/static_camera.hpp"
 #include "core/texture/texture.hpp"
+#include "editor/inspector/inspector.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/trigonometric.hpp"
 #include "particle/model/model.hpp"
@@ -137,6 +138,13 @@ void Particle::Simulation::Update() {
           "camera.position", Core::StaticCamera::transform->GetWorldPosition());
       object->mesh->material->SetFloat("globalFloat", globalFloat);
       object->mesh->material->SetFloat("globalFloat2", globalFloat2);
+
+      object->mesh->material->SetInt("octave", Editor::Inspector::octave);
+      object->mesh->material->SetFloat("persistence",
+                                       Editor::Inspector::persistence);
+      object->mesh->material->SetFloat("lacunarity",
+                                       Editor::Inspector::lacunarity);
+
       object->mesh->material->SetInt(
           "shadowCubeMap", Core::Texture::GetTextureID("shadowCubeMap"));
       object->mesh->material->SetVec2("mousePosition",

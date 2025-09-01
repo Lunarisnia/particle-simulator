@@ -6,7 +6,8 @@
 namespace Core {
 class Primitive {
  public:
-  static std::shared_ptr<Core::Object> CreatePlane(Shader shader, int div = 1);
+  static std::shared_ptr<Core::Object> CreatePlane(Shader shader);
+  static std::shared_ptr<Core::Object> CreatePlane(Shader shader, int div);
   static std::shared_ptr<Core::Object> CreateCube(const std::string& vertPath,
                                                   const std::string& fragPath);
   static std::shared_ptr<Core::Object> CreateUVSphere(Shader shader,
