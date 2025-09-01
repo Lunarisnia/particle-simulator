@@ -137,7 +137,14 @@ void main() {
     vec3 lightDir = normalize(pLight.position - vertexAttribute.fragPos);
     float diff = max(0.0f, dot(dNormal, lightDir));
     vec3 diffuse = vec3(1.0f) * diff;
-    color += diffuse;
+
+    vec3 viewDir = normalize(camera.position - vertexAttribute.fragPos);
+    vec3 halfDir = normalize(lightDir + viewDir);
+    float spec = pow(max(0.0f, dot(dNormal, halfDir)), 64.0f);
+    vec3 specular = vec3(1.0f, 0.0f, 0.0f) * spec;
+    specular = 0.0f;
+
+    color += specular + diffuse;
 
     // color = vec3(vertexAttribute.textureCoord, 0.0f);
     // float f = fbm(pos * 20.0f, 8, 0.5f, 2.0f);
