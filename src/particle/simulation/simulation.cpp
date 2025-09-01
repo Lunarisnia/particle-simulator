@@ -95,10 +95,18 @@ void Particle::Simulation::Init() {
   Core::Shader ballShader = Core::Shader::CreateShader(
       "./shaders/wobbly/wobbly.vert", "./shaders/geometry-learning/geom.frag");
   std::shared_ptr<Core::Object> ball =
-      Core::Primitive::CreateUVSphere(ballShader, "Hello", 512, 512);
-  ball->isActive = true;
+      Core::Primitive::CreateUVSphere(ballShader, "Hello", 64, 64);
+  ball->isActive = false;
   ball->name = "Ball";
-  cubes.emplace_back(ball);
+  /*cubes.emplace_back(ball);*/
+
+  Core::Shader planeShader = Core::Shader::CreateShader(
+      "./shaders/wobbly/wobbly.vert", "./shaders/geometry-learning/geom.frag");
+  std::shared_ptr<Core::Object> plane =
+      Core::Primitive::CreatePlane(planeShader, 256);
+  plane->isActive = true;
+  plane->name = "PPPP";
+  cubes.emplace_back(plane);
 
   try {
     Particle::Model model;

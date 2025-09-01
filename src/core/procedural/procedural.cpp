@@ -1,7 +1,71 @@
 #include "core/procedural/procedural.hpp"
+#include <cstddef>
 #include "core/math/math.hpp"
+#include "glm/ext/vector_float2.hpp"
+#include "glm/ext/vector_float3.hpp"
 
 const float PI = 3.14159265358979323846f;
+
+void Core::Procedural::GenerateComplexPlane(std::shared_ptr<Mesh> &mesh,
+                                            int div) {
+  glm::vec3 v0 = glm::vec3(-0.5f, -0.5f, 0.0f);
+  glm::vec3 v1 = glm::vec3(-0.5f, 0.5f, 0.0f);
+  glm::vec3 v2 = glm::vec3(0.5f, 0.5f, 0.0f);
+  glm::vec3 v4 = glm::vec3(0.5f, -0.5f, 0.0f);
+
+  glm::vec3 v10 = (v0 - v1) / float(div);
+  glm::vec3 v24 = (v4 - v2) / float(div);
+
+  for (int i = 0; i <= div; i++) {
+    glm::vec3 start = v1 + v10 * float(i);
+    glm::vec3 end = v2 + v24 * float(i);
+
+    glm::vec3 step = (end - start) / float(div);
+    for (int j = 0; j <= div; j++) {
+      glm::vec3 pos = start + step * float(j);
+
+      glm::vec2 uv(float(j) / div, 1.0f - float(i) / div);
+
+      mesh->AddVertex(Core::VertexData{
+          pos,
+          uv,
+          glm::vec3(0.0f, 0.0f, 1.0f),
+      });
+    }
+  }
+
+  for (int i = 0; i < div; i++) {
+    for (int j = 0; j < div; j++) {
+      int row1 = i * (div + 1);
+      int row2 = (i + 1) * (div + 1);
+
+      int topLeft = row1 + j;
+      int topRight = row1 + j + 1;
+      int bottomLeft = row2 + j;
+      int bottomRight = row2 + j + 1;
+
+      mesh->AddIndex(topLeft);
+      mesh->AddIndex(bottomLeft);
+      mesh->AddIndex(topRight);
+      glm::vec3 tangent1 = Core::Math::CalculateTangent(
+          *mesh->GetVertex(topLeft), *mesh->GetVertex(bottomLeft),
+          *mesh->GetVertex(topRight));
+      mesh->GetVertex(topLeft)->tangent = tangent1;
+      mesh->GetVertex(bottomLeft)->tangent = tangent1;
+      mesh->GetVertex(topRight)->tangent = tangent1;
+
+      mesh->AddIndex(topRight);
+      mesh->AddIndex(bottomLeft);
+      mesh->AddIndex(bottomRight);
+      glm::vec3 tangent2 = Core::Math::CalculateTangent(
+          *mesh->GetVertex(topRight), *mesh->GetVertex(bottomLeft),
+          *mesh->GetVertex(bottomRight));
+      mesh->GetVertex(bottomRight)->tangent = tangent2;
+    }
+  }
+
+  mesh->SetupMesh();
+}
 
 void Core::Procedural::GeneratePlane(std::shared_ptr<Mesh> &mesh) {
   mesh->AddVertex(Core::VertexData{

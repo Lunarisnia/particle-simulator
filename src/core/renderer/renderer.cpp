@@ -117,6 +117,7 @@ void Core::Renderer::Render() {
         "resolution",
         glm::vec2(Core::Window::GetWidth(true), Core::Window::GetHeight(true)));
     mesh->BindVertexArray();
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     glDrawElements(GL_TRIANGLES, mesh->GetIndiceLength(), GL_UNSIGNED_INT, 0);
 
@@ -139,6 +140,7 @@ void Core::Renderer::Render() {
       skybox->mesh->material->SetMat4("projection",
                                       StaticCamera::GetProjectionMatrix());
       skybox->mesh->BindVertexArray();
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
       glDrawElements(GL_TRIANGLES, skybox->mesh->GetIndiceLength(),
                      GL_UNSIGNED_INT, 0);
     }
@@ -165,6 +167,8 @@ void Core::Renderer::RenderViewport() {
 
   viewport->mesh->material->SetInt("outlineTexture",
                                    Core::Texture::GetTextureID("outline"));
+
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   glDrawElements(GL_TRIANGLES, viewport->mesh->GetIndiceLength(),
                  GL_UNSIGNED_INT, 0);
 }

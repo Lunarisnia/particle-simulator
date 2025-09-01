@@ -121,22 +121,12 @@ void main() {
         );
     dNormal = normalize(vertexAttribute.normal - dNormal);
 
-    float slopeFactor = d0;
-    vec3 land = mix(vec3(1.0f), vec3(0.0f, 1.0f, 0.0f), smoothstep(0.001f, 0.1f, slopeFactor));
-    land = mix(land, vec3(1.0f, 0.0f, 0.0f), smoothstep(globalFloat, globalFloat2, slopeFactor));
-    vec3 sea = mix(vec3(0.0f, 0.0f, 1.0f), vec3(1.0f), smoothstep(0.01f, 0.1f, slopeFactor));
-    vec3 albedo = mix(sea, land, smoothstep(0.0f, 0.01f, slopeFactor));
-
     vec3 lightDir = normalize(vec3(0.5f));
     float diff = max(0.0f, dot(dNormal, lightDir));
-    vec3 diffuse = albedo * diff;
+    vec3 diffuse = vec3(1.0f) * diff;
+    // color += diffuse;
 
-    vec3 viewDir = normalize(camera.position - vertexAttribute.fragPos);
-    vec3 halfDir = normalize(vertexAttribute.normal + viewDir);
-    float spec = pow(1.0f - max(0.0f, dot(halfDir, vertexAttribute.normal)), 0.8f);
-    vec3 specular = vec3(1.0f, 0.1f, 0.1f) * spec;
-
-    color += diffuse + specular;
+    color = vec3(vertexAttribute.textureCoord, 0.0f);
     // float f = fbm(pos * 20.0f, 8, 0.5f, 2.0f);
     // color = vec3(f * 20.0f);
     FragColor = vec4(color, 1.0f);
