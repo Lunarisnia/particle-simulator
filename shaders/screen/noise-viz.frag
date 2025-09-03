@@ -23,6 +23,15 @@ uniform vec2 resolution;
 
 #define PI 3.141592653589793238462
 
+float inverseLerp(float v, float minValue, float maxValue) {
+    return (v - minValue) / (maxValue - minValue);
+}
+
+float remap(float v, float inMin, float inMax, float outMin, float outMax) {
+    float t = inverseLerp(v, inMin, inMax);
+    return mix(outMin, outMax, t);
+}
+
 vec3 blackAndWhite(vec3 color) {
     color = vec3((color.r + color.g + color.b) / 3.0f);
     return color;
@@ -137,11 +146,12 @@ void main()
     float lacunarity = 2.0f;
     int octaves = 2;
     float noise = fbm(noisePos, octaves, persistence, lacunarity);
-    // noise = fbm(noisePos + noise, octaves, persistence, lacunarity);
-    // noise = fbm(noisePos + noise, octaves, persistence, lacunarity);
     // NOTE: FBM seem to generate value ranging from [-1, 1] so remap it to [0,1]
     noise = (1.0 + noise) / 2.0f;
+    // noise = remap(noise, -1.0f, 1.0f, 0.0f, 1.0f); // NOTE: same result as above
 
-    vec3 color = vec3(noise);
+    float top = smoothstep(0.5f, 0.6f, noise);
+    vec3 color = mix(vec3(noise), vec3(0.5f, 0.0f, 0.0f), top);
+    // vec3 color = vec3(top + noise);
     FragColor = vec4(color, 1.0f);
 }
