@@ -118,6 +118,8 @@ void main()
     vec3 B = cross(N, T);
     vertexAttribute.TBN = transpose(mat3(T, B, N));
 
-    vec3 displaced = generateTerrain(aPos, aNormal, fbm(aPos + vec3(globalFloat), octave, persistence, lacunarity));
+    float noise = fbm(aPos + vec3(globalFloat), octave, persistence, lacunarity);
+    noise = (noise + 1.0f) / 2.0f;
+    vec3 displaced = generateTerrain(aPos, aNormal, noise);
     gl_Position = projection * view * model * vec4(displaced, 1.0);
 }

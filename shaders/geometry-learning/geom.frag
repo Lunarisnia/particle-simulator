@@ -113,6 +113,10 @@ float fbm(vec3 position, int n, float persistence, float lacunarity) {
     return total;
 }
 
+float saturate(float v) {
+    return (v + 1.0f) / 2.0f;
+}
+
 // NOTE: the grid artifact came from the fact that I used integer hash and it seems to tile similarly to how fract works simply replacing the hash function works wonder
 void main() {
     float eps = 0.001f;
@@ -121,10 +125,10 @@ void main() {
     vec3 pos = vertexAttribute.rawPos + vec3(globalFloat);
 
     int octaves = octave;
-    float d0 = fbm(pos, octaves, persistence, lacunarity);
-    float dx = fbm(pos + vec3(eps, 0.0f, 0.0f), octaves, persistence, lacunarity);
-    float dy = fbm(pos + vec3(0.0f, eps, 0.0f), octaves, persistence, lacunarity);
-    float dz = fbm(pos + vec3(0.0f, 0.0f, eps), octaves, persistence, lacunarity);
+    float d0 = saturate(fbm(pos, octaves, persistence, lacunarity));
+    float dx = saturate(fbm(pos + vec3(eps, 0.0f, 0.0f), octaves, persistence, lacunarity));
+    float dy = saturate(fbm(pos + vec3(0.0f, eps, 0.0f), octaves, persistence, lacunarity));
+    float dz = saturate(fbm(pos + vec3(0.0f, 0.0f, eps), octaves, persistence, lacunarity));
 
     vec3 dNormal = vec3(
             (dx - d0) / eps,
@@ -142,8 +146,7 @@ void main() {
     vec3 halfDir = normalize(lightDir + viewDir);
     float spec = pow(max(0.0f, dot(dNormal, halfDir)), 64.0f);
     vec3 specular = vec3(1.0f, 0.0f, 0.0f) * spec;
-    specular = 0.0f;
-
+    // specular = vec3(0.0f);
     color += specular + diffuse;
 
     // color = vec3(vertexAttribute.textureCoord, 0.0f);
