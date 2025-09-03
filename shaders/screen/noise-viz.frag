@@ -52,144 +52,54 @@ vec3 useKernel3x3(float kernel[9], float offset) {
 
     return color;
 }
-// UE4's PseudoRandom function
-// https://github.com/EpicGames/UnrealEngine/blob/release/Engine/Shaders/Private/Random.ush
-float pseudo(vec2 v) {
-    v = fract(v / 128.) * 128. + vec2(-64.340622, -72.465622);
-    return fract(dot(v.xyx * v.xyy, vec3(20.390625, 60.703125, 2.4281209)));
+
+vec3 hash(vec3 p) // this hash is not production ready, please
+{ // replace this by something better
+    p = vec3(dot(p, vec3(127.1, 311.7, 74.7)),
+            dot(p, vec3(269.5, 183.3, 246.1)),
+            dot(p, vec3(113.5, 271.9, 124.6)));
+
+    return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
 }
 
-// Takes our xz positions and turns them into a random number between 0 and 1 using the above pseudo random function
-float HashPosition(vec2 pos) {
-    float _Seed = 0.12312348f;
-    return pseudo(pos * vec2(_Seed, _Seed + 4));
-}
-
-// Generates a random gradient vector for the perlin noise lattice points, watch my perlin noise video for a more in depth explanation
-vec2 RandVector(float seed) {
-    float _GradientRotation = 0.0f;
-    float theta = seed * 360 * 2 - 360;
-    theta += _GradientRotation;
-    theta = theta * PI / 180.0;
-    return normalize(vec2(cos(theta), sin(theta)));
-}
-
-// Normal smoothstep is cubic -- to avoid discontinuities in the gradient, we use a quintic interpolation instead as explained in my perlin noise video
-vec2 quinticInterpolation(vec2 t) {
-    return t * t * t * (t * (t * vec2(6) - vec2(15)) + vec2(10));
-}
-
-// Derivative of above function
-vec2 quinticDerivative(vec2 t) {
-    return vec2(30) * t * t * (t * (t - vec2(2)) + vec2(1));
-}
-
-// it's perlin noise that returns the noise in the x component and the derivatives in the yz components as explained in my perlin noise video
-vec3 perlin_noise2D(vec2 pos) {
-    vec2 latticeMin = floor(pos);
-    vec2 latticeMax = ceil(pos);
-
-    vec2 remainder = fract(pos);
-
-    // Lattice Corners
-    vec2 c00 = latticeMin;
-    vec2 c10 = vec2(latticeMax.x, latticeMin.y);
-    vec2 c01 = vec2(latticeMin.x, latticeMax.y);
-    vec2 c11 = latticeMax;
-
-    // Gradient Vectors assigned to each corner
-    vec2 g00 = RandVector(HashPosition(c00));
-    vec2 g10 = RandVector(HashPosition(c10));
-    vec2 g01 = RandVector(HashPosition(c01));
-    vec2 g11 = RandVector(HashPosition(c11));
-
-    // Directions to position from lattice corners
-    vec2 p0 = remainder;
-    vec2 p1 = p0 - vec2(1.0);
-
-    vec2 p00 = p0;
-    vec2 p10 = vec2(p1.x, p0.y);
-    vec2 p01 = vec2(p0.x, p1.y);
-    vec2 p11 = p1;
-
-    vec2 u = quinticInterpolation(remainder);
-    vec2 du = quinticDerivative(remainder);
-
-    float a = dot(g00, p00);
-    float b = dot(g10, p10);
-    float c = dot(g01, p01);
-    float d = dot(g11, p11);
-
-    // Expanded interpolation freaks of nature from https://iquilezles.org/articles/gradientnoise/
-    float noise = a + u.x * (b - a) + u.y * (c - a) + u.x * u.y * (a - b - c + d);
-
-    vec2 gradient = g00 + u.x * (g10 - g00) + u.y * (g01 - g00) + u.x * u.y * (g00 - g10 - g01 + g11) + du * (u.yx * (a - b - c + d) + vec2(b, c) - a);
-    return vec3(noise, gradient);
-}
-
-const uint k = 1103515245U;
-vec3 hash33(uvec3 x)
+float perlinNoise(in vec3 x)
 {
-    x = ((x >> 8U) ^ x.yzx) * k;
-    x = ((x >> 8U) ^ x.yzx) * k;
-    x = ((x >> 8U) ^ x.yzx) * k;
+    // grid
+    vec3 p = floor(x);
+    vec3 w = fract(x);
 
-    return vec3(x) * (1.0 / float(0xffffffffU));
-}
+    // quintic interpolant
+    vec3 u = w * w * w * (w * (w * 6.0 - 15.0) + 10.0);
 
-vec3 valueNoise() {
-    vec2 uv = gl_FragCoord.xy / resolution;
-    uv *= 20.0f;
-    float x = step(0.5f, uv.x);
-    float y = step(0.5f, uv.y);
+    // gradients
+    vec3 ga = hash(p + vec3(0.0, 0.0, 0.0));
+    vec3 gb = hash(p + vec3(1.0, 0.0, 0.0));
+    vec3 gc = hash(p + vec3(0.0, 1.0, 0.0));
+    vec3 gd = hash(p + vec3(1.0, 1.0, 0.0));
+    vec3 ge = hash(p + vec3(0.0, 0.0, 1.0));
+    vec3 gf = hash(p + vec3(1.0, 0.0, 1.0));
+    vec3 gg = hash(p + vec3(0.0, 1.0, 1.0));
+    vec3 gh = hash(p + vec3(1.0, 1.0, 1.0));
 
-    vec2 texSize = vec2(2.0f);
-    vec2 pc = uv * texSize - 0.5f;
-    vec2 i = floor(pc) + 0.5f;
+    // projections
+    float va = dot(ga, w - vec3(0.0, 0.0, 0.0));
+    float vb = dot(gb, w - vec3(1.0, 0.0, 0.0));
+    float vc = dot(gc, w - vec3(0.0, 1.0, 0.0));
+    float vd = dot(gd, w - vec3(1.0, 1.0, 0.0));
+    float ve = dot(ge, w - vec3(0.0, 0.0, 1.0));
+    float vf = dot(gf, w - vec3(1.0, 0.0, 1.0));
+    float vg = dot(gg, w - vec3(0.0, 1.0, 1.0));
+    float vh = dot(gh, w - vec3(1.0, 1.0, 1.0));
 
-    vec3 n1 = hash33(uvec3(i, 1.0f));
-    vec3 n2 = hash33(uvec3(i + vec2(1.0f, 0.0f) / texSize, 1.0f));
-    vec3 n3 = hash33(uvec3(i + vec2(0.0f, 1.0f) / texSize, 1.0f));
-    vec3 n4 = hash33(uvec3(i + vec2(1.0f, 1.0f) / texSize, 1.0f));
-
-    vec2 f = smoothstep(0.0f, 1.0f, fract(pc));
-
-    vec3 px1 = mix(n1, n2, f.x);
-    vec3 px2 = mix(n3, n4, f.x);
-    vec3 color = mix(px1, px2, f.y);
-    return vec3(color.x);
-}
-
-float perlinNoise(vec3 uv) {
-    vec3 i = floor(uv);
-    vec3 f = fract(uv);
-
-    // Fade curve (smooth interpolation)
-    // vec3 u = f * f * (3.0 - 2.0 * f);
-    vec3 u = smoothstep(0.0f, 1.0f, f);
-
-    // --- Corners on z = 0 plane ---
-    float dot000 = dot(hash33(uvec3(i + vec3(0.0, 0.0, 0.0))), f - vec3(0.0, 0.0, 0.0));
-    float dot100 = dot(hash33(uvec3(i + vec3(1.0, 0.0, 0.0))), f - vec3(1.0, 0.0, 0.0));
-    float dot010 = dot(hash33(uvec3(i + vec3(0.0, 1.0, 0.0))), f - vec3(0.0, 1.0, 0.0));
-    float dot110 = dot(hash33(uvec3(i + vec3(1.0, 1.0, 0.0))), f - vec3(1.0, 1.0, 0.0));
-
-    float mixX00 = mix(dot000, dot100, u.x);
-    float mixX10 = mix(dot010, dot110, u.x);
-    float mixY0 = mix(mixX00, mixX10, u.y);
-
-    // --- Corners on z = 1 plane ---
-    float dot001 = dot(hash33(uvec3(i + vec3(0.0, 0.0, 1.0))), f - vec3(0.0, 0.0, 1.0));
-    float dot101 = dot(hash33(uvec3(i + vec3(1.0, 0.0, 1.0))), f - vec3(1.0, 0.0, 1.0));
-    float dot011 = dot(hash33(uvec3(i + vec3(0.0, 1.0, 1.0))), f - vec3(0.0, 1.0, 1.0));
-    float dot111 = dot(hash33(uvec3(i + vec3(1.0, 1.0, 1.0))), f - vec3(1.0, 1.0, 1.0));
-
-    float mixX01 = mix(dot001, dot101, u.x);
-    float mixX11 = mix(dot011, dot111, u.x);
-    float mixY1 = mix(mixX01, mixX11, u.y);
-
-    // --- Final interpolation along z ---
-    return mix(mixY0, mixY1, u.z);
+    // interpolation
+    return va +
+        u.x * (vb - va) +
+        u.y * (vc - va) +
+        u.z * (ve - va) +
+        u.x * u.y * (va - vb - vc + vd) +
+        u.y * u.z * (va - vc - ve + vg) +
+        u.z * u.x * (va - vb - ve + vf) +
+        u.x * u.y * u.z * (-va + vb + vc - vd + ve - vf - vg + vh);
 }
 
 float fbm(vec3 position, int n, float persistence, float lacunarity) {
@@ -198,7 +108,7 @@ float fbm(vec3 position, int n, float persistence, float lacunarity) {
     float total = 0.0f;
     float normalization = 0.0f;
     for (int i = 0; i < n; i++) {
-        float noiseValue = perlin_noise2D(position.xy * frequency).x;
+        float noiseValue = perlinNoise(position * frequency);
         total += noiseValue * amplitude;
         normalization += amplitude;
 
@@ -221,8 +131,17 @@ void main()
 
     // Initial noise sample position offset and scaled by uniform variables
     vec2 uv = gl_FragCoord.xy / resolution;
-    vec3 noise_pos = vertexAttribute.fragPos / 0.05f;
+    vec3 noisePos = vec3(vertexAttribute.fragPos.xy * 10.0f, currentFrame * 0.01f);
 
-    vec3 color = vec3(fbm(noise_pos, 6, 0.5f, 2.0f));
+    float persistence = 0.5f;
+    float lacunarity = 2.0f;
+    int octaves = 2;
+    float noise = fbm(noisePos, octaves, persistence, lacunarity);
+    // noise = fbm(noisePos + noise, octaves, persistence, lacunarity);
+    // noise = fbm(noisePos + noise, octaves, persistence, lacunarity);
+    // NOTE: FBM seem to generate value ranging from [-1, 1] so remap it to [0,1]
+    noise = (1.0 + noise) / 2.0f;
+
+    vec3 color = vec3(noise);
     FragColor = vec4(color, 1.0f);
 }
